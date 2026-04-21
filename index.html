@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Darts Display Mock</title>
+
+<style>
+:root {
+  --bg:#111;
+  --panel:#1a1a1a;
+  --border:#2a2a2a;
+  --text:#fff;
+  --muted:#9a9a9a;
+  --accent:#7fdc7f;
+
+  --num:#2a2a2a;
+  --red:#3a1f1f;
+  --amber:#3a321f;
+  --blue:#1f2f3a;
+  --green:#243a24;
+}
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:sans-serif;
+}
+
+.app {
+  max-width:420px;
+  margin:auto;
+  padding:12px;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* PLAYER WINDOW */
+.player-window {
+  background:var(--panel);
+  border:2px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+}
+
+.player-name {
+  font-size:1.2rem;
+  color:var(--muted);
+}
+
+.score {
+  font-size:5.2rem;
+  font-weight:bold;
+  margin:6px 0 12px;
+  line-height:1;
+}
+
+.advice {
+  font-size:1.05rem;
+  color:var(--accent);
+  opacity:0.9;
+}
+
+/* KEYPAD */
+.keypad {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+}
+
+.key {
+  background:var(--num);
+  border:2px solid var(--border);
+  border-radius:14px;
+  font-size:1.5rem;
+  padding:14px 0;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+/* ENTER */
+.key.enter {
+  grid-column:span 3;
+  font-size:1.7rem;
+  background:#3f6f3f;
+  border-color:#6fcf6f;
+}
+
+/* DELETE / UNDO */
+.key.del,
+.key.undo {
+  background:var(--red);
+  border-color:#6a2a2a;
+}
+
+/* BOTTOM CONTROLS */
+.bottom {
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+}
+
+.ctrl {
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:18px 0;
+  font-size:1rem;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.ctrl.bust {
+  background:var(--amber);
+  border-color:#6a5a2a;
+}
+
+.ctrl.miss {
+  background:var(--blue);
+  border-color:#2a4a6a;
+}
+
+.ctrl.dart {
+  background:var(--green);
+  border-color:#2a6a2a;
+}
+
+.ctrl.advice {
+  background:#222;
+  color:var(--accent);
+  border-color:#2a6a2a;
+}
+
+/* TABLET */
+@media (min-width:768px) {
+  .app { max-width:720px; gap:16px; }
+  .player-window { padding:32px; }
+  .score { font-size:5.6rem; }
+  .keypad, .bottom { gap:14px; }
+}
+
+/* ===== TV MODE ===== */
+@media (min-width: 1200px) {
+
+  body {
+    background:#000;
+  }
+
+  .app {
+    max-width: 1100px;
+    gap: 28px;
+  }
+
+  .player-window {
+    padding: 48px;
+    border-width: 1px;
+  }
+
+  .player-name {
+    font-size: 1.8rem;
+    color:#ccc;
+  }
+
+  .score {
+    font-size: 8rem;
+    letter-spacing: 2px;
+  }
+
+  .advice {
+    font-size: 1.6rem;
+  }
+
+  .key {
+    font-size: 2.4rem;
+    padding: 28px 0;
+  }
+
+  .ctrl {
+    font-size: 1.6rem;
+    padding: 30px 0;
+  }
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="player-window">
+    <div class="player-name">PLAYER 1</div>
+    <div class="score">501</div>
+    <div class="advice">SET UP D20</div>
+  </div>
+
+  <div class="keypad">
+    <div class="key">1</div>
+    <div class="key">2</div>
+    <div class="key">3</div>
+    <div class="key">4</div>
+    <div class="key">5</div>
+    <div class="key">6</div>
+    <div class="key">7</div>
+    <div class="key">8</div>
+    <div class="key">9</div>
+
+    <div class="key del">DEL</div>
+    <div class="key">0</div>
+    <div class="key undo">UNDO</div>
+
+    <div class="key enter">ENTER</div>
+  </div>
+
+  <div class="bottom">
+    <div class="ctrl bust">BUST</div>
+    <div class="ctrl miss">MISS</div>
+    <div class="ctrl dart">DART ↔ DART</div>
+    <div class="ctrl advice">ADVICE</div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { onDisplayModeChange, DisplayMode } from "./displayMode.js";
+
+  const playerWindow = document.querySelector(".player-window");
+  const keypad = document.querySelector(".keypad");
+  const controls = document.querySelector(".bottom");
+
+  onDisplayModeChange(mode => {
+    if (mode === DisplayMode.NORMAL) {
+      // Phone portrait, standalone
+      playerWindow.style.display = "";
+      keypad.style.display = "";
+      controls.style.display = "";
+    } else {
+      // Controller mode (TV or forced landscape)
+      playerWindow.style.display = "none";
+      keypad.style.display = "";
+      controls.style.display = "";
+    }
+  });
+</script>
+
+</body>
+</html>
