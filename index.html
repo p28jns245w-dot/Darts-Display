@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v12</title>
+<title>Darts Display Mock v13</title>
 
 <style>
 :root {
   --bg: #0d0d0d;
-  --panel: #1a1a1a;
-  --input-group-bg: rgba(255, 255, 255, 0.04); /* Lighter box for score/nums */
+  /* A slightly more pronounced 'lighter' background for the input zone */
+  --input-group-bg: rgba(255, 255, 255, 0.07); 
   --text: #ffffff;
   --accent: #50d890;
-  --border-std: rgba(255, 255, 255, 0.15);
-  --border-red: rgba(255, 75, 92, 0.4);
-  --border-amber: rgba(255, 154, 60, 0.4);
-  --border-blue: rgba(0, 173, 181, 0.4);
+  --border-std: rgba(255, 255, 255, 0.12);
+  --border-red: rgba(255, 75, 92, 0.35);
+  --border-amber: rgba(255, 154, 60, 0.35);
+  --border-blue: rgba(0, 173, 181, 0.35);
 }
 
 * { box-sizing: border-box; }
@@ -44,13 +44,12 @@ body {
   gap: 8px;
 }
 
-/* THE LIGHTER BOX (Input Group) */
-/* We use a pseudo-element or background logic to highlight the 1-9, 0, and Score area */
-/* For simplicity in this grid, we apply a shared background style to those specific areas */
+/* THE LIGHTER BOX (Input Group Style) */
 .input-highlight {
   background: var(--input-group-bg);
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  /* Brighter text for the input numbers */
+  color: #fff;
 }
 
 .key {
@@ -61,30 +60,28 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.1s;
 }
 
 .key:active { 
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.score-view { background: transparent; border: none; }
 .score-txt { font-size: 3.5rem; font-weight: 200; }
 
 .enter { 
   border: 2px solid var(--accent); 
   color: var(--accent);
   background: rgba(80, 216, 144, 0.05);
-  font-size: 1.4rem; 
 }
 
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .advice-btn { border-color: var(--accent); color: var(--accent); font-size: 0.85rem; }
-.dart { border-color: var(--border-std); font-size: 1.5rem; }
+.dart { border-color: var(--border-std); font-size: 1.4rem; }
 
 /* --- PORTRAIT (9x3) --- */
 @media (orientation: portrait) {
@@ -92,35 +89,34 @@ body {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(9, 1fr);
   }
-  .score-view { grid-area: 1 / 1 / 3 / 4; }
+  .score-view { grid-area: 1 / 1 / 3 / 4; border: none; background: rgba(255,255,255,0.05); }
   .k1 { grid-area: 3 / 1; } .k2 { grid-area: 3 / 2; } .k3 { grid-area: 3 / 3; }
   .k4 { grid-area: 4 / 1; } .k5 { grid-area: 4 / 2; } .k6 { grid-area: 4 / 3; }
   .k7 { grid-area: 5 / 1; } .k8 { grid-area: 5 / 2; } .k9 { grid-area: 5 / 3; }
   .del { grid-area: 6 / 1; } .k0 { grid-area: 6 / 2; } .undo { grid-area: 6 / 3; }
-  .enter { grid-area: 7 / 1 / 9 / 3; }
+  .enter { grid-area: 7 / 1 / 9 / 3; font-size: 1.5rem; }
   .advice-btn { grid-area: 7 / 3 / 9 / 4; }
   .bust { grid-area: 9 / 1; } .miss { grid-area: 9 / 2; } .dart { grid-area: 9 / 3; }
 }
 
-/* --- LANDSCAPE (7x3 with Island Offset) --- */
+/* --- LANDSCAPE (7x3 with Surgical Island Fix) --- */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    /* THE ISLAND FIX: Push the grid away from the left edge */
-    padding-left: 50px; 
-    padding-right: 20px;
+    /* Reduced by half per your request */
+    padding-left: 25px; 
+    padding-right: 10px;
   }
   .score-view { display: none; }
   
-  /* Grid Areas */
   .k1 { grid-area: 1 / 1; } .k2 { grid-area: 1 / 2; } .k3 { grid-area: 1 / 3; }
   .k4 { grid-area: 2 / 1; } .k5 { grid-area: 2 / 2; } .k6 { grid-area: 2 / 3; }
   .k7 { grid-area: 3 / 1; } .k8 { grid-area: 3 / 2; } .k9 { grid-area: 3 / 3; }
   .k0 { grid-area: 1 / 4 / 3 / 5; }
   .del { grid-area: 1 / 5; } .undo { grid-area: 1 / 6; } .dart { grid-area: 1 / 7; }
   .bust { grid-area: 2 / 5; } .miss { grid-area: 2 / 6; } .advice-btn { grid-area: 2 / 7; }
-  .enter { grid-area: 3 / 4 / 4 / 8; }
+  .enter { grid-area: 3 / 4 / 4 / 8; font-size: 1.3rem; }
 }
 </style>
 </head>
