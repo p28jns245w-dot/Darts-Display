@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v15</title>
+<title>Darts Display Mock v16</title>
 
 <style>
 :root {
@@ -31,7 +31,7 @@ body {
 .app {
   width: 100%;
   height: 100dvh;
-  padding: 1.5vh; /* Responsive padding */
+  padding: 10px;
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom);
@@ -40,10 +40,10 @@ body {
 .keypad {
   display: grid;
   flex: 1;
-  gap: 1.2vh; /* Gap scales with screen height */
+  gap: 8px;
 }
 
-/* --- THE DYNAMIC SCALING ENGINE --- */
+/* --- REFINED SCALING --- */
 .key {
   container-type: size; 
   background: rgba(255, 255, 255, 0.03);
@@ -53,11 +53,12 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.1s;
-  /* Numbers scale to fill height/width appropriately */
-  font-size: 45cqmin; 
+  overflow: hidden; /* Prevention against the 'Blow Up' */
+  white-space: nowrap;
+  /* Numbers: 35% of the smallest button dimension */
+  font-size: 35cqmin; 
 }
 
 .key:active { background: rgba(255, 255, 255, 0.15); }
@@ -67,16 +68,16 @@ body {
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-/* Specific button text scaling */
-.score-txt { font-size: 60cqmin; font-weight: 200; }
-.enter { border: 2.5px solid var(--accent); color: var(--accent); font-size: 30cqmin; }
-.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 22cqmin; }
-.dart { font-size: 55cqmin; }
+/* Specific button text scaling - Smaller than before to prevent overlap */
+.score-txt { font-size: 55cqmin; font-weight: 200; }
+.enter { border: 2.5px solid var(--accent); color: var(--accent); font-size: 22cqmin; }
+.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 18cqmin; }
+.dart { font-size: 40cqmin; }
 
-/* Actions */
-.del, .undo { border-color: var(--border-red); color: #ff4b5c; font-size: 28cqmin; }
-.bust { border-color: var(--border-amber); color: #ff9a3c; font-size: 22cqmin; }
-.miss { border-color: var(--border-blue); color: #00adb5; font-size: 22cqmin; }
+/* Actions - Scaled down for words */
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; font-size: 20cqmin; }
+.bust { border-color: var(--border-amber); color: #ff9a3c; font-size: 18cqmin; }
+.miss { border-color: var(--border-blue); color: #00adb5; font-size: 18cqmin; }
 
 /* --- PORTRAIT (9x3) --- */
 @media (orientation: portrait) {
@@ -99,7 +100,6 @@ body {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    /* 28px Offset to clear iPhone Island, with symmetric right padding for tablets */
     padding-left: 28px; 
     padding-right: 28px; 
   }
