@@ -40,46 +40,48 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart { font-size: 2.5rem !important; } 
 
-/* --- LANDSCAPE --- */
-@media (orientation: landscape) {
-  .keypad { 
-    grid-template-columns: repeat(7, 1fr); 
-    grid-template-rows: 2.2fr 1fr 1fr 1fr; 
-    gap: 10px;
-    padding-left: calc(env(safe-area-inset-left) + 5px);
-    padding-right: calc(env(safe-area-inset-right) + 5px);
-  }
+/* --- UNIVERSAL SCORE VIEW (3-COLUMN BASE) --- */
+.score-view { 
+  display: grid !important; 
+  grid-template-columns: repeat(7, 1fr); 
+  padding: 0 !important;
+  overflow: hidden;
+}
+.sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.02); }
+.sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-  .score-view { 
-    grid-column: span 7; 
-    display: grid !important; 
-    grid-template-columns: repeat(7, 1fr); 
-    padding: 0 !important;
-    overflow: hidden;
-  }
+.action-row { display: flex; justify-content: space-between; align-items: center; width: 90%; }
+.row-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+.row-val { color: var(--accent); font-weight: bold; font-size: 0.8rem; }
+.dart-dots { font-size: 1rem; color: var(--accent); letter-spacing: 4px; }
+.bench-p { color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
+.active-player { color: var(--accent) !important; font-weight: bold; }
 
-  .sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.02); }
-  .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-  .action-row { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    width: 90%; 
-    margin-top: 5px;
-  }
-  .row-label { font-size: 0.7rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-  .row-val { color: var(--accent); font-weight: bold; font-size: 0.9rem; }
-  .dart-dots { font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
-
-  .dash-item { width: 100%; text-align: center; }
-  .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; }
-  .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
+/* --- PORTRAIT SPECIFIC --- */
+@media (orientation: portrait) {
+  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+  .score-view { grid-area: 1 / 1 / 2 / 4; }
   
-  /* Surgical removal of (0) logic from left sidebar */
-  .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
-  .active-player { color: var(--accent) !important; font-weight: bold; }
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
+  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
+
+  .score-txt { font-size: 60px; line-height: 1; }
+  .num, .k0 { font-size: 42px; }
+  .key { font-size: 22px; }
+  .bench-p { font-size: 0.7rem; }
+  .dash-label { font-size: 0.5rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+  .dash-val { color: var(--accent); font-weight: bold; font-size: 0.9rem; }
+}
+
+/* --- LANDSCAPE SPECIFIC (LOCKED) --- */
+@media (orientation: landscape) {
+  .keypad { grid-template-columns: repeat(7, 1fr); grid-template-rows: 2.2fr 1fr 1fr 1fr; gap: 10px; }
+  .score-view { grid-column: span 7; }
 
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
@@ -95,29 +97,21 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     .num, .k0 { font-size: 32px; }
     .key { font-size: 18px; }
     .keypad { gap: 4px; }
-    .action-row { margin-top: 0; }
   }
-
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
     .score-txt { font-size: 150px; }
     .num, .k0 { font-size: 60px; }
     .key { font-size: 28px; }
-    .action-row { margin-top: 15px; }
   }
 }
 
-@media (orientation: portrait) {
-  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
-  .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
-  .score-txt { font-size: 80px; }
-  .num, .k0 { font-size: 42px; }
-  .key { font-size: 22px; }
-}
-
+/* --- IPAD / LARGE SCREEN --- */
 @media (min-width: 768px) {
   .key { font-size: 32px; }
   .num, .k0 { font-size: 64px; }
+  .bench-p { font-size: 1.1rem; }
+  .score-txt { font-size: 100px; }
 }
 </style>
 </head>
