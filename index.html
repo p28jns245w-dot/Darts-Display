@@ -41,7 +41,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart { font-size: 2.5rem !important; } 
 
-/* --- 1. PORTRAIT RESTORATION --- */
+/* --- 1. PORTRAIT --- */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
   .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
@@ -53,13 +53,12 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
   .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 
-  /* Restoration of font sizes */
   .score-txt { font-size: 80px; }
   .num, .k0 { font-size: 42px; }
-  .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 22px; }
+  .key { font-size: 22px; } /* Base button font size */
 }
 
-/* --- 2. LANDSCAPE RESTORATION --- */
+/* --- 2. LANDSCAPE --- */
 @media (orientation: landscape) {
   .keypad { 
     grid-template-columns: repeat(7, 1fr); 
@@ -77,7 +76,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     overflow: hidden;
   }
 
-  /* Centering Logic */
   .sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.02); }
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -85,7 +83,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .dash-item { width: 100%; text-align: center; }
   .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; }
   .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
-  .dart-dots { display: flex; justify-content: center; width: 100%; font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
+  .dart-dots { display: flex; justify-content: center; width: 100%; font-size: 1rem; color: var(--accent); letter-spacing: 6px; margin-top: 5px; }
   .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
   .active-player { color: var(--accent) !important; font-weight: bold; }
 
@@ -98,24 +96,30 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
-  /* Restoration of Phone Landscape Font Sizes */
+  /* Phone Specific */
   @media (max-height: 500px) {
     .app { padding: 5px; }
     .score-txt { font-size: 60px; line-height: 0.8; }
-    .num, .k0 { font-size: 32px; } /* Numbers back to Big Size */
+    .num, .k0 { font-size: 32px; }
+    .key { font-size: 18px; }
     .keypad { gap: 4px; }
-    .sv-right { gap: 4px; } 
-    .dart-dots { margin-top: 5px; }
     .bench-p { font-size: 0.75rem; }
   }
 
+  /* Large Tablet Specific */
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
     .score-txt { font-size: 150px; }
-    .num, .k0 { font-size: 60px; } /* Big Screen Numbers */
+    .num, .k0 { font-size: 60px; }
+    .key { font-size: 28px; } /* Restores iPad button text size */
     .dart-dots { margin-top: 15px; font-size: 1.2rem; }
-    .sv-right { gap: 12px; }
   }
+}
+
+/* --- 3. UNIVERSAL IPAD FIX --- */
+@media (min-width: 768px) {
+  .key { font-size: 32px; } /* Ensures all action text is large on iPad */
+  .num, .k0 { font-size: 64px; }
 }
 </style>
 </head>
