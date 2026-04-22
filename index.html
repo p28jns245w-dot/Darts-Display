@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v17</title>
+<title>Darts Display Mock v18</title>
 
 <style>
 :root {
@@ -34,7 +34,6 @@ body {
   padding: 12px;
   display: flex;
   flex-direction: column;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .keypad {
@@ -43,7 +42,7 @@ body {
   gap: 10px;
 }
 
-/* --- THE SWEET SPOT SCALING --- */
+/* --- CLAMPED SCALING (THE FIX) --- */
 .key {
   container-type: size; 
   background: rgba(255, 255, 255, 0.03);
@@ -52,13 +51,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
   font-weight: 700;
   cursor: pointer;
   overflow: hidden;
   white-space: nowrap;
-  /* Numbers: 22% is the sweet spot for iPad Pro */
-  font-size: 22cqmin; 
+  
+  /* NUMBERS: Min 20px, Target 22% of box, Max 60px */
+  font-size: clamp(20px, 22cqmin, 60px); 
 }
 
 .key:active { background: rgba(255, 255, 255, 0.15); }
@@ -68,20 +67,39 @@ body {
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-/* Score window stays slightly more prominent but still contained */
-.score-txt { font-size: 45cqmin; font-weight: 200; }
+/* SCORE WINDOW: Large but hard-capped */
+.score-txt { font-size: clamp(40px, 45cqmin, 100px); font-weight: 200; }
 
-/* Enter and Words: Dropped to 15-18 range to prevent overlap */
-.enter { border: 2.5px solid var(--accent); color: var(--accent); font-size: 18cqmin; }
-.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 15cqmin; }
-.dart { font-size: 30cqmin; }
+/* ENTER & WORDS: Smaller caps to prevent bleeding */
+.enter { 
+    border: 2.5px solid var(--accent); 
+    color: var(--accent); 
+    font-size: clamp(18px, 18cqmin, 45px); 
+}
 
-/* Action Buttons */
-.del, .undo { border-color: var(--border-red); color: #ff4b5c; font-size: 16cqmin; }
-.bust { border-color: var(--border-amber); color: #ff9a3c; font-size: 15cqmin; }
-.miss { border-color: var(--border-blue); color: #00adb5; font-size: 15cqmin; }
+.advice-btn { 
+    border-color: var(--accent); 
+    color: var(--accent); 
+    font-size: clamp(14px, 14cqmin, 30px); 
+}
 
-/* --- PORTRAIT --- */
+.del, .undo { 
+    border-color: var(--border-red); 
+    color: #ff4b5c; 
+    font-size: clamp(14px, 14cqmin, 30px); 
+}
+
+.bust, .miss { 
+    border-color: inherit; 
+    font-size: clamp(14px, 12cqmin, 25px); 
+}
+
+.bust { color: #ff9a3c; border-color: var(--border-amber); }
+.miss { color: #00adb5; border-color: var(--border-blue); }
+
+.dart { font-size: clamp(24px, 30cqmin, 50px); }
+
+/* --- GRID LAYOUTS --- */
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
@@ -97,7 +115,6 @@ body {
   .bust { grid-area: 9 / 1; } .miss { grid-area: 9 / 2; } .dart { grid-area: 9 / 3; }
 }
 
-/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
@@ -138,7 +155,7 @@ body {
     <div class="key undo">UNDO</div>
     <div class="key bust">BUST</div>
     <div class="key miss">MISS</div>
-    <div class="key dart">🎯🎯🎯</div>
+    <div class="key dart">🎯</div>
     <div class="key advice-btn">ADVICE</div>
     <div class="key enter">ENTER</div>
   </div>
