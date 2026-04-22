@@ -4,16 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Darts Master Pro</title>
+    <title>Darts Master Pro v43</title>
     <style>
         :root {
             --bg: #0d0d0d;
             --text: #ffffff;
             --accent: #50d890;
-            --active-bg: rgba(80, 216, 144, 0.3); /* For the highlight */
+            --active-bg: rgba(80, 216, 144, 0.3);
             --border-std: rgba(255, 255, 255, 0.15);
-            --border-red: rgba(255, 75, 92, 0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -22,7 +20,6 @@
         .app { width: 100%; height: 100dvh; padding: 10px; display: flex; flex-direction: column; }
         .keypad { display: grid; flex: 1; gap: 8px; }
 
-        /* The "Split Sec" Highlight Logic */
         .key { 
             background: rgba(255, 255, 255, 0.03); 
             border: 1px solid var(--border-std); 
@@ -34,50 +31,53 @@
             font-weight: 700; 
             transition: background 0.05s, transform 0.05s;
         }
+        /* Haptic-Visual Highlight */
         .key:active { 
             background: var(--active-bg) !important; 
-            transform: scale(0.96); 
+            transform: scale(0.95); 
             border-color: var(--accent);
         }
 
-        .score-view { background: rgba(255, 255, 255, 0.05); border: none; pointer-events: none; }
-        .score-txt { line-height: 1; }
-        .player-tag { font-size: 1.2rem; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-        .typed-val { color: var(--accent); font-size: 1.5rem; height: 1.5rem; margin-bottom: 10px; font-family: monospace; }
-        .dart-dots { font-size: 24px; color: var(--accent); letter-spacing: 8px; }
+        .score-view { 
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%); 
+            border: none; 
+            pointer-events: none; 
+            position: relative;
+        }
 
-        /* Layout Logic (v40 optimized) */
+        /* Leaderboard Bar - Shows other player scores */
+        .leaderboard {
+            position: absolute;
+            bottom: 10px;
+            width: 90%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
+        }
+        .leaderboard .active-p { color: var(--accent); font-weight: bold; }
+
+        .player-tag { font-size: 1.2rem; color: var(--accent); margin-bottom: 5px; letter-spacing: 2px; }
+        .typed-val { color: var(--accent); font-size: 1.5rem; height: 1.5rem; margin-bottom: 5px; font-family: monospace; }
+        .score-txt { line-height: 1; font-size: clamp(80px, 20vw, 150px); }
+        .dart-dots { font-size: 24px; color: var(--accent); letter-spacing: 8px; margin-top: 5px; }
+
+        /* Shared Grid logic */
         @media (orientation: portrait) {
-            .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+            .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.8fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
             .score-view { grid-area: 1 / 1 / 2 / 4; }
-            .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
-            .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
-            .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-            .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
-            .enter { grid-area: 6 / 1 / 7 / 3; background: rgba(80, 216, 144, 0.1); border: 2px solid var(--accent); }
-            .help-btn { grid-area: 6 / 3 / 7 / 4; color: var(--accent); }
-            .bust { grid-area: 7 / 1; color: #ff9a3c; } .miss { grid-area: 7 / 2; color: #00adb5; } .dart { grid-area: 7 / 3; }
-
-            .score-txt { font-size: clamp(80px, 20vw, 150px); }
-            .num, .k0 { font-size: 32px; }
+            .enter { grid-area: 6 / 1 / 7 / 3; border: 2px solid var(--accent); font-size: 24px; }
+            .num { font-size: 32px; }
         }
 
         @media (orientation: landscape) {
-            .keypad { 
-                grid-template-columns: repeat(7, 1fr); 
-                grid-template-rows: 1.7fr 1fr 1fr 1fr; /* iPad AirPlay optimized */
-                gap: 10px;
-                padding: 10px calc(env(safe-area-inset-right) + 10px) 10px calc(env(safe-area-inset-left) + 10px);
-            }
+            .keypad { grid-template-columns: repeat(7, 1fr); grid-template-rows: 1.8fr 1fr 1fr 1fr; gap: 10px; }
             .score-view { grid-column: span 7; }
-            .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
-            .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
-            .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
             .k0 { grid-area: 2 / 4 / 4 / 5; font-size: 60px; } 
-            .del { grid-area: 2 / 5; color: #ff4b5c; } .dart { grid-area: 2 / 6; } .undo { grid-area: 2 / 7; color: #ff4b5c; }
-            .help-btn { grid-area: 3 / 5; color: var(--accent); } .bust { grid-area: 3 / 6; color: #ff9a3c; } .miss { grid-area: 3 / 7; color: #00adb5; }
-            .enter { grid-area: 4 / 4 / 5 / 8; background: rgba(80, 216, 144, 0.1); border: 2px solid var(--accent); font-size: 30px; }
-
+            .enter { grid-area: 4 / 4 / 5 / 8; border: 2px solid var(--accent); font-size: 30px; }
             .score-txt { font-size: clamp(60px, 15vh, 180px); }
         }
     </style>
@@ -87,10 +87,11 @@
 <div class="app">
     <div class="keypad">
         <div class="key score-view">
-            <div class="player-tag" id="playerTag">PLAYER 1</div>
+            <div class="player-tag" id="playerTag">---</div>
             <div class="typed-val" id="typedDisplay"></div>
-            <div class="score-txt" id="scoreDisplay">501</div>
+            <div class="score-txt" id="scoreDisplay">---</div>
             <div class="dart-dots" id="dartDots"></div>
+            <div class="leaderboard" id="leaderboard"></div>
         </div>
         
         <div class="key num k1" onclick="press('1')">1</div>
@@ -105,57 +106,74 @@
         <div class="key num k0" onclick="press('0')">0</div>
         
         <div class="key del" onclick="del()">DEL</div>
-        <div class="key dart" onclick="dartThrew()">🎯</div>
         <div class="key undo" onclick="undo()">UNDO</div>
-        <div class="key help-btn" onclick="showHelp()">AVG</div>
-        <div class="key bust" onclick="doBust()">BUST</div>
-        <div class="key miss" onclick="doMiss()">MISS</div>
+        <div class="key help-btn" onclick="showStats()">STATS</div>
+        <div class="key bust" onclick="doBust()" style="color:#ff9a3c">BUST</div>
+        <div class="key miss" onclick="doMiss()" style="color:#00adb5">MISS</div>
         <div class="key enter" onclick="enter()">ENTER</div>
     </div>
 </div>
 
 <script>
-/* --- 1. YOUR REFINED ENGINE --- */
 class DartsEngine {
-    constructor(playerCount = 2, startingScore = 501) {
+    constructor(playerCount, startScore, bestOf) {
         this.playerCount = playerCount;
-        this.startingScore = startingScore;
-        this.players = Array.from({ length: playerCount }, (_, i) => `Player ${i + 1}`);
-        this.scores = Array(playerCount).fill(startingScore);
+        this.startingScore = startScore;
+        this.bestOf = bestOf;
+        this.players = Array.from({ length: playerCount }, (_, i) => `P${i + 1}`);
+        this.scores = Array(playerCount).fill(startScore);
+        this.legs = Array(playerCount).fill(0);
         this.totalPoints = Array(playerCount).fill(0);
         this.totalDarts = Array(playerCount).fill(0);
         this.current = 0;
-        this.history = [];
         this.dartsDone = 0;
-        this.turnStartScore = startingScore;
+        this.history = [];
     }
 
     submitScore(val) {
+        if (val > 180) return { status: "ERR" };
         this._saveHistory();
+        
         let rem = this.scores[this.current] - val;
-        if (rem < 0 || rem === 1) return { status: "BUST" };
-        
-        this.totalPoints[this.current] += val;
-        this.totalDarts[this.current] += 3; 
+        if (rem < 0 || rem === 1) {
+            this.totalDarts[this.current] += 3;
+            this._nextTurn();
+            return { status: "BUST" };
+        }
+
         this.scores[this.current] = rem;
-        
-        if (rem === 0) return { status: "LEG_WON" };
+        this.totalPoints[this.current] += val;
+        this.totalDarts[this.current] += 3;
+
+        if (rem === 0) {
+            this.legs[this.current]++;
+            if (this.legs[this.current] >= this.bestOf) return { status: "MATCH_WON" };
+            this._resetLeg();
+            return { status: "LEG_WON" };
+        }
+
         this._nextTurn();
         return { status: "SUCCESS" };
+    }
+
+    _resetLeg() {
+        this.scores = Array(this.playerCount).fill(this.startingScore);
+        this.current = 0; 
+        this.dartsDone = 0;
     }
 
     _nextTurn() {
         this.current = (this.current + 1) % this.playerCount;
         this.dartsDone = 0;
-        this.turnStartScore = this.scores[this.current];
     }
 
     _saveHistory() {
         this.history.push(JSON.stringify({
             scores: [...this.scores],
+            legs: [...this.legs],
             current: this.current,
-            points: [...this.totalPoints],
-            darts: [...this.totalDarts]
+            pts: [...this.totalPoints],
+            drts: [...this.totalDarts]
         }));
     }
 
@@ -163,41 +181,32 @@ class DartsEngine {
         if (!this.history.length) return;
         let h = JSON.parse(this.history.pop());
         this.scores = h.scores;
+        this.legs = h.legs;
         this.current = h.current;
-        this.totalPoints = h.points;
-        this.totalDarts = h.darts;
-    }
-
-    getState() {
-        let avg = (this.totalPoints[this.current] / (this.totalDarts[this.current] / 3 || 1)).toFixed(1);
-        return {
-            name: this.players[this.current],
-            score: this.scores[this.current],
-            avg: avg,
-            dartsInTurn: this.dartsDone
-        };
+        this.totalPoints = h.pts;
+        this.totalDarts = h.drts;
     }
 }
 
-/* --- 2. THE UI BRIDGE --- */
 let game;
 let typedValue = "";
 
 function init() {
-    const pCount = prompt("Number of Players (1-4):", "2") || 2;
-    const startVal = prompt("Starting Score (101, 301, 501...):", "501") || 501;
-    game = new DartsEngine(parseInt(pCount), parseInt(startVal));
+    const p = prompt("Players (1-4):", "2") || 2;
+    const s = prompt("Game (101-601):", "501") || 501;
+    const b = prompt("Best of legs (e.g. 3):", "3") || 3;
+    game = new DartsEngine(parseInt(p), parseInt(s), parseInt(b));
     refreshUI();
 }
 
 function haptic() {
-    if (window.navigator.vibrate) window.navigator.vibrate(10);
+    if ("vibrate" in navigator) navigator.vibrate(15);
 }
 
-function press(num) {
+function press(n) {
     haptic();
     if (typedValue.length < 3) {
-        typedValue += num;
+        typedValue += n;
         refreshUI();
     }
 }
@@ -210,35 +219,18 @@ function del() {
 
 function enter() {
     haptic();
-    if (typedValue === "") return;
+    if (!typedValue) return;
     const res = game.submitScore(parseInt(typedValue));
+    
     if (res.status === "BUST") alert("BUST!");
-    if (res.status === "LEG_WON") {
-        alert(game.getState().name + " WINS!");
-        location.reload(); 
+    if (res.status === "LEG_WON") alert("LEG WON!");
+    if (res.status === "MATCH_WON") {
+        alert("MATCH OVER! " + game.players[game.current] + " WINS!");
+        location.reload();
     }
+    
     typedValue = "";
     refreshUI();
-}
-
-function dartThrew() {
-    haptic();
-    if (game.dartsDone < 3) {
-        game.dartsDone++;
-        refreshUI();
-    }
-}
-
-function doBust() {
-    haptic();
-    game.submitScore(0); // Forcing a 0 turn and skip
-    refreshUI();
-}
-
-function doMiss() {
-    haptic();
-    typedValue = "0";
-    enter();
 }
 
 function undo() {
@@ -247,22 +239,31 @@ function undo() {
     refreshUI();
 }
 
-function showHelp() {
-    haptic();
-    alert(`Average: ${game.getState().avg}`);
+function doBust() { haptic(); game.submitScore(0); typedValue = ""; refreshUI(); }
+function doMiss() { haptic(); typedValue = "0"; enter(); }
+
+function showStats() {
+    let stats = game.players.map((p, i) => {
+        let avg = (game.totalPoints[i] / (game.totalDarts[i] / 3 || 1)).toFixed(1);
+        return `${p}: Avg ${avg}`;
+    }).join('\n');
+    alert(stats);
 }
 
 function refreshUI() {
-    const state = game.getState();
-    document.getElementById('scoreDisplay').innerText = state.score;
-    document.getElementById('playerTag').innerText = state.name;
+    document.getElementById('scoreDisplay').innerText = game.scores[game.current];
+    document.getElementById('playerTag').innerText = game.players[game.current];
     document.getElementById('typedDisplay').innerText = typedValue || "---";
-    document.getElementById('dartDots').innerText = "• ".repeat(state.dartsInTurn);
+    
+    // Update Leaderboard
+    let lb = document.getElementById('leaderboard');
+    lb.innerHTML = game.scores.map((s, i) => {
+        let isAct = i === game.current ? 'active-p' : '';
+        return `<span class="${isAct}">P${i+1}: ${s} (${game.legs[i]})</span>`;
+    }).join('');
 }
 
-// Start the sequence
 init();
 </script>
-
 </body>
 </html>
