@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v33 - Scaling Refined</title>
+<title>Darts Master v34 - Device-Aware Scaling</title>
 
 <style>
 :root {
   --bg: #0d0d0d;
-  --input-group-bg: rgba(255, 255, 255, 0.08); 
   --text: #ffffff;
   --accent: #50d890;
   --border-std: rgba(255, 255, 255, 0.15);
@@ -18,147 +17,83 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow: hidden; touch-action: none; }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, system-ui, sans-serif;
-  overflow: hidden;
-  touch-action: none;
-}
+.app { width: 100%; height: 100dvh; padding: 10px; display: flex; flex-direction: column; }
+.keypad { display: grid; flex: 1; gap: 8px; }
+.key { container-type: size; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-std); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; }
 
-.app {
-  width: 100%;
-  height: 100dvh;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-.keypad {
-  display: grid;
-  flex: 1;
-  gap: 8px;
-}
-
-.key {
-  container-type: size; 
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-std);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.key:active { background: rgba(255, 255, 255, 0.15); }
-.input-highlight { background: var(--input-group-bg); border: 1.5px solid rgba(255,255,255,0.2); }
-
-/* Common Colors */
+/* Colors */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn { border-color: var(--accent); color: var(--accent); }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 
-/* --- 1. PORTRAIT MODE (FIXED OVERSIZED TEXT) --- */
+/* --- 1. PORTRAIT (iPhone vs iPad Fix) --- */
 @media (orientation: portrait) {
-  .keypad {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .score-view { grid-area: 1 / 1 / 2 / 4; border: none; background: rgba(255,255,255,0.06); }
-  .score-txt { font-size: clamp(45px, 60cqmin, 120px); font-weight: 800; }
-  
-  /* Reduced number ceiling for phone */
-  .num, .k0 { font-size: clamp(20px, 30cqmin, 38px); }
-  
-  .enter { grid-area: 6 / 1 / 7 / 3; font-size: clamp(18px, 18cqmin, 26px); }
-  .help-btn { grid-area: 6 / 3 / 7 / 4; font-size: clamp(12px, 15cqmin, 18px); }
-  
+  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+  .score-view { grid-area: 1 / 1 / 2 / 4; }
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
   .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
-  
-  /* Tiny action text fix */
-  .del, .undo, .bust, .miss, .dart { font-size: clamp(13px, 15cqmin, 17px); }
+
+  /* iPhone Portrait (Small Screen) */
+  @media (max-width: 500px) {
+    .score-txt { font-size: 80px; }
+    .num, .k0 { font-size: 32px; }
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 15px; }
+  }
+  /* iPad Portrait (Large Screen) */
+  @media (min-width: 501px) {
+    .score-txt { font-size: 140px; }
+    .num, .k0 { font-size: 55px; }
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 24px; }
+  }
 }
 
-/* --- 2. LANDSCAPE MODE (7x3 TV GRID - IPAD TEXT FIX) --- */
+/* --- 2. LANDSCAPE (iPhone vs iPad Fix) --- */
 @media (orientation: landscape) {
-  .keypad {
-    grid-template-columns: repeat(21, 1fr); 
-    grid-template-rows: 2.2fr 1fr 1fr 1fr; 
-    padding-left: calc(env(safe-area-inset-left) + 10px);
-    padding-right: calc(env(safe-area-inset-right) + 10px);
-    padding-bottom: env(safe-area-inset-bottom);
-    gap: 10px;
-  }
-
-  .score-view { grid-area: 1 / 1 / 2 / 22; border: none; background: rgba(255,255,255,0.04); }
-  .score-txt { font-size: clamp(60px, 80cqmin, 180px); font-weight: 800; }
-
-  /* Grid Layout (Numbers 1-9) */
+  .keypad { grid-template-columns: repeat(21, 1fr); grid-template-rows: 2.2fr 1fr 1fr 1fr; gap: 10px; }
+  .score-view { grid-area: 1 / 1 / 2 / 22; }
   .k1 { grid-area: 2 / 1 / 3 / 4; } .k2 { grid-area: 2 / 4 / 3 / 7; } .k3 { grid-area: 2 / 7 / 3 / 10; }
   .k4 { grid-area: 3 / 1 / 4 / 4; } .k5 { grid-area: 3 / 4 / 4 / 7; } .k6 { grid-area: 3 / 7 / 4 / 10; }
   .k7 { grid-area: 4 / 1 / 5 / 4; } .k8 { grid-area: 4 / 4 / 5 / 7; } .k9 { grid-area: 4 / 7 / 5 / 10; }
-
-  /* Zero (Rows 1-2) */
   .k0 { grid-area: 2 / 10 / 4 / 13; }
-
-  /* Actions (Rows 1-2) */
   .del { grid-area: 2 / 13 / 3 / 16; } .dart { grid-area: 2 / 16 / 3 / 19; } .undo { grid-area: 2 / 19 / 3 / 22; }
   .help-btn { grid-area: 3 / 13 / 4 / 16; } .bust { grid-area: 3 / 16 / 4 / 19; } .miss { grid-area: 3 / 19 / 4 / 22; }
-
-  /* Enter Anchor */
   .enter { grid-area: 4 / 10 / 5 / 22; }
 
-  /* LANDSCAPE SCALING REFINEMENT */
-  /* Numbers stay large but capped */
-  .num, .k0 { font-size: clamp(24px, 35cqmin, 50px); }
-  
-  /* Increased the 'floor' (16px) and 'ceiling' (32px) for action text in landscape */
-  .bust, .miss, .del, .undo, .dart, .help-btn, .enter { 
-    font-size: clamp(16px, 18cqmin, 32px); 
+  /* iPhone Landscape (Still too big? Shrink it) */
+  @media (max-height: 500px) {
+    .score-txt { font-size: 60px; }
+    .num, .k0 { font-size: 26px; }
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 14px; }
+    .keypad { gap: 6px; }
   }
-}
-
-/* Specific scaling for TV/Pro-size iPads */
-@media (orientation: landscape) and (min-width: 1024px) {
-  .keypad { gap: 14px; }
-  .key { border-radius: 18px; border-width: 2px; }
-  .score-txt { font-size: 200px; }
-  .num, .k0 { font-size: 65px; }
-  .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 28px; }
+  /* iPad/TV Landscape (Keep it big) */
+  @media (min-height: 501px) {
+    .score-txt { font-size: 150px; }
+    .num, .k0 { font-size: 60px; }
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 26px; }
+  }
 }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="keypad">
-    <div class="key score-view input-highlight"><div class="score-txt">501</div></div>
-    <div class="key num k1 input-highlight">1</div>
-    <div class="key num k2 input-highlight">2</div>
-    <div class="key num k3 input-highlight">3</div>
-    <div class="key num k4 input-highlight">4</div>
-    <div class="key num k5 input-highlight">5</div>
-    <div class="key num k6 input-highlight">6</div>
-    <div class="key num k7 input-highlight">7</div>
-    <div class="key num k8 input-highlight">8</div>
-    <div class="key num k9 input-highlight">9</div>
-    <div class="key num k0 input-highlight">0</div>
-    <div class="key del">DEL</div>
-    <div class="key undo">UNDO</div>
-    <div class="key bust">BUST</div>
-    <div class="key miss">MISS</div>
-    <div class="key dart">🎯</div>
-    <div class="key help-btn">HELP</div>
+    <div class="key score-view"><div class="score-txt">501</div></div>
+    <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
+    <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
+    <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
+    <div class="key num k0">0</div>
+    <div class="key del">DEL</div><div class="key undo">UNDO</div>
+    <div class="key bust">BUST</div><div class="key miss">MISS</div>
+    <div class="key dart">🎯</div><div class="key help-btn">HELP</div>
     <div class="key enter">ENTER</div>
   </div>
 </div>
