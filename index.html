@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v22 - Pro Proportion</title>
+<title>Darts Master v23 - Final Polish</title>
 
 <style>
 :root {
@@ -83,7 +83,7 @@ body {
   .enter { font-size: clamp(30px, 20cqmin, 65px); }
   .del, .undo, .help-btn, .bust, .miss { font-size: clamp(20px, 16cqmin, 38px); }
   .dart { font-size: clamp(40px, 35cqmin, 75px); }
-  .keypad { gap: 15px; }
+  .keypad { gap: 12px; }
 }
 
 /* Colors */
@@ -96,21 +96,17 @@ body {
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
-    /* THE NEW PROPORTIONS: Score 2.5, Numbers 1, Enter Row 1.5, Miss Row 1 */
     grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
+    /* Respect bottom home indicator */
+    padding-bottom: env(safe-area-inset-bottom);
   }
-  /* Score spans the top row (the 2.5fr one) */
   .score-view { grid-area: 1 / 1 / 2 / 4; border: none; background: rgba(255,255,255,0.06); }
-  
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
-  
-  /* Enter Row (The 1.5fr one) */
   .enter { grid-area: 6 / 1 / 7 / 3; }
   .help-btn { grid-area: 6 / 3 / 7 / 4; }
-  
   .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
 
@@ -119,8 +115,10 @@ body {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    padding-left: 28px; 
-    padding-right: 28px; 
+    /* DYNAMIC ISLAND FIX: Uses hardware-safe margins + 5px buffer */
+    padding-left: calc(env(safe-area-inset-left) + 5px);
+    padding-right: calc(env(safe-area-inset-right) + 5px);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .score-view { display: none; }
   .k1 { grid-area: 1 / 1; } .k2 { grid-area: 1 / 2; } .k3 { grid-area: 1 / 3; }
