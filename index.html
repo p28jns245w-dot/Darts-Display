@@ -3,15 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v10</title>
+<title>Darts Display Mock v11</title>
 
 <style>
 :root {
   --bg: #0d0d0d;
   --panel: #1a1a1a;
   --text: #ffffff;
-  --accent: #50d890; /* Green */
-  
+  --accent: #50d890;
   --border-std: rgba(255, 255, 255, 0.15);
   --border-red: rgba(255, 75, 92, 0.4);
   --border-amber: rgba(255, 154, 60, 0.4);
@@ -57,7 +56,6 @@ body {
   transform: scale(0.97);
 }
 
-/* Specific Outlines */
 .score-view { background: var(--panel); border: 1px solid var(--border-std); border-radius: 16px; }
 .score-txt { font-size: 3.5rem; font-weight: 200; }
 
@@ -73,18 +71,13 @@ body {
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .advice-btn { border-color: var(--accent); color: var(--accent); font-size: 0.85rem; }
 
-/* THE DART BUTTON (Graphical Icon) */
+/* THE DART BUTTON (Now with Emoji) */
 .dart { 
   border-color: var(--border-std); 
-  color: var(--accent); /* Tint the SVG to match advice/accent */
-}
-.dart svg { 
-  display: block; 
-  height: 60%; 
-  width: auto; 
+  font-size: 1.5rem; /* Large enough for the 3 emojis to show clearly */
+  line-height: 1;
 }
 
-/* --- GRID LOGIC --- */
 @media (orientation: portrait) {
   .keypad {
     display: grid;
@@ -142,13 +135,7 @@ body {
     <div class="key bust">BUST</div>
     <div class="key miss">MISS</div>
     
-    <div class="key dart">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11.5 1.5L2.5 6M11.5 1.5L20.5 6M11.5 1.5V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M13.5 1.5L22.5 6M13.5 1.5L4.5 6M13.5 1.5V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M12.5 22.5L12.5 11M12.5 11L18.5 16M12.5 11L6.5 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </div>
+    <div class="key dart">🎯🎯🎯</div>
     
     <div class="key advice-btn">ADVICE</div>
     <div class="key enter">ENTER</div>
