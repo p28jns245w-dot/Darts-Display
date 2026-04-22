@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v8</title>
+<title>Darts Display Mock v9</title>
 
 <style>
 :root {
   --bg: #0d0d0d;
   --panel: #1a1a1a;
-  --border: rgba(255,255,255,0.08);
   --text: #ffffff;
-  --accent: #50d890;
-  --num: #222;
-  --red: #4a1a1a;
-  --amber: #4a3a1a;
-  --blue: #1a2a4a;
-  --green: #1a4a1a;
+  --accent: #50d890; /* Green */
+  
+  /* Semi-transparent complimentary border colors */
+  --border-std: rgba(255, 255, 255, 0.15);
+  --border-red: rgba(255, 75, 92, 0.4);
+  --border-amber: rgba(255, 154, 60, 0.4);
+  --border-blue: rgba(0, 173, 181, 0.4);
 }
 
 * { box-sizing: border-box; }
@@ -40,36 +40,43 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* --- THE NEW OUTLINE DESIGN --- */
 .key {
-  background: var(--num);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03); /* Extremely subtle fill */
+  border: 1px solid var(--border-std);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.1s ease;
 }
 
-.key:active { filter: brightness(1.5); transform: scale(0.98); }
+.key:active { 
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.97);
+}
 
-.score-view { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; }
+/* Specific Outlines */
+.score-view { background: var(--panel); border: 1px solid var(--border-std); border-radius: 16px; }
 .score-txt { font-size: 3.5rem; font-weight: 200; }
-.enter { background: var(--green); border-color: var(--accent); font-size: 1.4rem; }
-.del, .undo { background: var(--red); }
-.bust { background: var(--amber); }
-.miss { background: var(--blue); }
-.dart { background: #333; font-size: 0.85rem; }
 
-/* THE UPDATED ADVICE BUTTON */
-.advice-btn { 
-  background: rgba(80, 216, 144, 0.05); 
-  color: var(--accent); 
-  border: 1px solid var(--accent); 
-  font-size: 0.85rem; 
+.enter { 
+  border: 2px solid var(--accent); 
+  color: var(--accent);
+  background: rgba(80, 216, 144, 0.05);
+  font-size: 1.4rem; 
 }
 
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; }
+.bust { border-color: var(--border-amber); color: #ff9a3c; }
+.miss { border-color: var(--border-blue); color: #00adb5; }
+.dart { border-color: var(--border-std); font-size: 0.85rem; color: #bbb; }
+.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 0.85rem; }
+
+/* --- GRID LOGIC --- */
 @media (orientation: portrait) {
   .keypad {
     display: grid;
