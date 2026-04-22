@@ -59,7 +59,8 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     overflow: hidden;
   }
 
-  .sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; padding: 0 10px; text-align: left; background: rgba(255,255,255,0.02); }
+  /* All sections now centered */
+  .sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.02); }
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 5px; gap: 4px; }
 
@@ -80,22 +81,22 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   /* PHONE-SPECIFIC SNUG FIT */
   @media (max-height: 500px) {
     .app { padding: 5px; }
-    .score-txt { font-size: 60px; line-height: 0.7; }
+    .score-txt { font-size: 60px; line-height: 0.8; }
     .keypad { gap: 4px; }
-    .sv-right { flex-direction: column; gap: 6px; } /* Stacked Vertical */
-    .dart-dots { margin-top: -5px; font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
+    .sv-right { flex-direction: column; gap: 6px; } 
+    .dart-dots { margin-top: 5px; font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
     .bench-p { font-size: 0.75rem; }
   }
 
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
     .score-txt { font-size: 150px; }
-    .dart-dots { margin-top: 5px; font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; }
+    .dart-dots { margin-top: 15px; font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; }
     .sv-right { gap: 15px; }
   }
 }
 
-/* PORTRAIT (UNTOUCHED) */
+/* PORTRAIT */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
   .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
