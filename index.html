@@ -33,7 +33,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   cursor: pointer;
 }
 
-/* Colors */
+/* Color Classes */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn { border-color: var(--accent); color: var(--accent); }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
@@ -41,7 +41,25 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart { font-size: 2.5rem !important; } 
 
-/* --- LANDSCAPE --- */
+/* --- 1. PORTRAIT RESTORATION --- */
+@media (orientation: portrait) {
+  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+  .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
+  
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
+  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
+
+  /* Restoration of font sizes */
+  .score-txt { font-size: 80px; }
+  .num, .k0 { font-size: 42px; }
+  .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 22px; }
+}
+
+/* --- 2. LANDSCAPE RESTORATION --- */
 @media (orientation: landscape) {
   .keypad { 
     grid-template-columns: repeat(7, 1fr); 
@@ -59,17 +77,16 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     overflow: hidden;
   }
 
+  /* Centering Logic */
   .sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.02); }
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
   .dash-item { width: 100%; text-align: center; }
-  .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; width: 100%; }
-  .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; width: 100%; }
-  
+  .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; }
+  .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
   .dart-dots { display: flex; justify-content: center; width: 100%; font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
-  
-  .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; width: 100%; }
+  .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
   .active-player { color: var(--accent) !important; font-weight: bold; }
 
   /* Key Positions */
@@ -81,10 +98,11 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
-  /* PHONE-SPECIFIC SNUG FIT */
+  /* Restoration of Phone Landscape Font Sizes */
   @media (max-height: 500px) {
     .app { padding: 5px; }
     .score-txt { font-size: 60px; line-height: 0.8; }
+    .num, .k0 { font-size: 32px; } /* Numbers back to Big Size */
     .keypad { gap: 4px; }
     .sv-right { gap: 4px; } 
     .dart-dots { margin-top: 5px; }
@@ -94,16 +112,10 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
     .score-txt { font-size: 150px; }
+    .num, .k0 { font-size: 60px; } /* Big Screen Numbers */
     .dart-dots { margin-top: 15px; font-size: 1.2rem; }
     .sv-right { gap: 12px; }
   }
-}
-
-/* PORTRAIT (UNTOUCHED) */
-@media (orientation: portrait) {
-  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
-  .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
-  .score-txt { font-size: 80px; }
 }
 </style>
 </head>
@@ -122,14 +134,8 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
         <div class="dart-dots">•••</div>
       </div>
       <div class="sv-right">
-        <div class="dash-item">
-          <div class="dash-label">Avg</div>
-          <div class="dash-val">0.0</div>
-        </div>
-        <div class="dash-item">
-          <div class="dash-label">Help</div>
-          <div class="dash-val">OUT</div>
-        </div>
+        <div class="dash-item"><div class="dash-label">Avg</div><div class="dash-val">0.0</div></div>
+        <div class="dash-item"><div class="dash-label">Help</div><div class="dash-val">OUT</div></div>
       </div>
     </div>
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
