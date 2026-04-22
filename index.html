@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v20</title>
+<title>Darts Master v21 - Final</title>
 
 <style>
 :root {
@@ -63,24 +63,30 @@ body {
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-/* --- DEFAULT: PHONE SCALING --- */
-.num, .k0 { font-size: clamp(20px, 30cqmin, 45px); }
-.score-txt { font-size: clamp(30px, 45cqmin, 70px); font-weight: 200; }
-.enter { font-size: clamp(18px, 20cqmin, 35px); border: 2.5px solid var(--accent); color: var(--accent); }
-.del, .undo, .help-btn, .bust, .miss { font-size: clamp(12px, 16cqmin, 22px); }
-.dart { font-size: clamp(20px, 30cqmin, 40px); }
+/* --- THE "PUNCHY" SCORE --- */
+.score-txt { 
+  font-size: clamp(45px, 60cqmin, 140px); 
+  font-weight: 800; /* Max Punch */
+  letter-spacing: -1px;
+}
+
+/* --- PHONE SCALING --- */
+.num, .k0 { font-size: clamp(20px, 30cqmin, 42px); }
+.enter { font-size: clamp(18px, 18cqmin, 32px); border: 2.5px solid var(--accent); color: var(--accent); }
+.del, .undo, .help-btn, .bust, .miss { font-size: clamp(12px, 15cqmin, 20px); }
+.dart { font-size: clamp(20px, 30cqmin, 38px); }
 
 /* --- TABLET SCALING (iPad Pro) --- */
 @media (min-width: 768px) {
-  .num, .k0 { font-size: clamp(40px, 35cqmin, 90px); }
-  .score-txt { font-size: clamp(60px, 50cqmin, 130px); }
-  .enter { font-size: clamp(35px, 24cqmin, 75px); }
-  .del, .undo, .help-btn, .bust, .miss { font-size: clamp(22px, 18cqmin, 40px); }
-  .dart { font-size: clamp(40px, 35cqmin, 80px); }
+  .num, .k0 { font-size: clamp(40px, 35cqmin, 85px); }
+  .score-txt { font-size: clamp(80px, 65cqmin, 180px); } /* iPad gets even bigger score */
+  .enter { font-size: clamp(35px, 22cqmin, 70px); }
+  .del, .undo, .help-btn, .bust, .miss { font-size: clamp(22px, 16cqmin, 38px); }
+  .dart { font-size: clamp(40px, 35cqmin, 75px); }
   .keypad { gap: 15px; }
 }
 
-/* Actions Styles */
+/* Action Color Refinements */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn { border-color: var(--accent); color: var(--accent); }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
