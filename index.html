@@ -41,7 +41,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart { font-size: 2.5rem !important; } 
 
-/* --- LANDSCAPE LAYOUT --- */
+/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
   .keypad { 
     grid-template-columns: repeat(7, 1fr); 
@@ -59,27 +59,16 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     overflow: hidden;
   }
 
-  .sv-left { 
-    grid-column: span 2; 
-    border-right: 1px solid var(--border-std); 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    padding: 5px 12px; 
-    gap: 2px; 
-    text-align: left; 
-    background: rgba(255,255,255,0.02);
-  }
+  .sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; padding: 0 10px; text-align: left; background: rgba(255,255,255,0.02); }
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; gap: 8px; }
+  .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 5px; gap: 4px; }
 
-  .dart-dots { font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; margin-top: 5px; }
-  .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-  .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
-  .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); }
+  .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; }
+  .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
+  .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
   .active-player { color: var(--accent) !important; font-weight: bold; }
 
-  /* Grid Pos */
+  /* Key Positions */
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
@@ -88,23 +77,25 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
-  /* SURGICAL FIX FOR PHONE HEIGHT */
+  /* PHONE-SPECIFIC SNUG FIT */
   @media (max-height: 500px) {
-    .score-txt { font-size: 60px; line-height: 0.8; }
-    .keypad { gap: 5px; }
-    .sv-left, .sv-right { padding: 2px 8px; }
-    /* Side-by-side stats for phone */
-    .sv-right { flex-direction: row; gap: 15px; } 
-    .dart-dots { margin-top: 0; font-size: 1rem; }
+    .app { padding: 5px; }
+    .score-txt { font-size: 60px; line-height: 0.7; }
+    .keypad { gap: 4px; }
+    .sv-right { flex-direction: column; gap: 6px; } /* Stacked Vertical */
+    .dart-dots { margin-top: -5px; font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
+    .bench-p { font-size: 0.75rem; }
   }
 
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
     .score-txt { font-size: 150px; }
+    .dart-dots { margin-top: 5px; font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; }
+    .sv-right { gap: 15px; }
   }
 }
 
-/* Portrait (Untouched) */
+/* PORTRAIT (UNTOUCHED) */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
   .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
@@ -127,8 +118,14 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
         <div class="dart-dots">•••</div>
       </div>
       <div class="sv-right">
-        <div><div class="dash-label">Avg</div><div class="dash-val">0.0</div></div>
-        <div><div class="dash-label">Help</div><div class="dash-val">OUT</div></div>
+        <div>
+          <div class="dash-label">Avg</div>
+          <div class="dash-val">0.0</div>
+        </div>
+        <div>
+          <div class="dash-label">Help</div>
+          <div class="dash-val">OUT</div>
+        </div>
       </div>
     </div>
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
