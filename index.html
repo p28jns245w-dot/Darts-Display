@@ -69,9 +69,9 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 @media (orientation: landscape) {
   .keypad { 
     grid-template-columns: repeat(7, 1fr); 
+    /* Default for Phone (Wide) */
     grid-template-rows: 2.2fr 1fr 1fr 1fr; 
     gap: 10px;
-    /* Snug 5px Nudge from the island */
     padding-left: calc(env(safe-area-inset-left) + 5px);
     padding-right: calc(env(safe-area-inset-right) + 5px);
   }
@@ -85,18 +85,25 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
+  /* iPhone Landscape (Specific height limit) */
   @media (max-height: 500px) {
     .score-txt { font-size: 60px; } .num, .k0 { font-size: 26px; }
     .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 18px; }
     .dart { font-size: 2rem !important; }
     .keypad { gap: 6px; }
   }
+
+  /* iPad/TV Landscape (Taming the Height) */
   @media (min-height: 501px) {
+    /* Shaving the height off the score window for better TV proportions */
+    .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
+    
     .score-txt { font-size: 150px; } .num, .k0 { font-size: 60px; }
     .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 34px; }
     .dart { font-size: 4rem !important; }
   }
 }
+
 </style>
 </head>
 <body>
