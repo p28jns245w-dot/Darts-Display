@@ -4,93 +4,78 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Darts Pro v44 - 5 Col Layout</title>
+    <title>Darts Pro v45 - Reverted Layout</title>
     <style>
         :root {
             --bg: #0d0d0d;
             --text: #ffffff;
             --accent: #50d890;
-            --dim-text: rgba(255, 255, 255, 0.4);
-            --active-bg: rgba(80, 216, 144, 0.2);
-            --border: rgba(255, 255, 255, 0.1);
+            --active-bg: rgba(80, 216, 144, 0.3);
+            --border-std: rgba(255, 255, 255, 0.15);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow: hidden; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow: hidden; touch-action: manipulation; }
 
         .app { width: 100%; height: 100dvh; padding: 10px; display: flex; flex-direction: column; }
         .keypad { display: grid; flex: 1; gap: 8px; }
 
-        /* THE 5-COLUMN SCOREBOARD */
-        .score-view { 
-            grid-column: span 5; 
-            display: grid;
-            grid-template-columns: 1fr 3fr 1fr; /* Logic: Sidebar | Main | Data */
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        /* Col 1: Opponents */
-        .sidebar-opponents {
-            background: rgba(0, 0, 0, 0.3);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 10px;
-            gap: 10px;
-        }
-        .opp-card { font-size: 0.9rem; color: var(--dim-text); }
-        .opp-card b { color: #fff; font-size: 1.1rem; display: block; }
-
-        /* Col 2-4: Main Stage */
-        .main-stage {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-        }
-        .player-name { color: var(--accent); font-size: 1.2rem; letter-spacing: 3px; text-transform: uppercase; }
-        .big-score { font-size: clamp(70px, 18vw, 140px); font-weight: 800; line-height: 1; margin: 5px 0; }
-        .typed-preview { color: var(--accent); font-family: monospace; font-size: 1.5rem; height: 1.5rem; }
-
-        /* Col 5: Help/Stats */
-        .data-wing {
-            background: rgba(255, 255, 255, 0.02);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            text-align: center;
-        }
-        .stat-label { font-size: 0.7rem; color: var(--dim-text); text-transform: uppercase; margin-top: 10px; }
-        .stat-val { font-size: 1.1rem; font-weight: bold; color: var(--accent); }
-
-        /* KEYPAD LOGIC */
         .key { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid var(--border); 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--border-std); 
             border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 24px; font-weight: 700;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            transition: background 0.05s, transform 0.05s;
         }
-        .key:active { background: var(--active-bg); transform: scale(0.96); border-color: var(--accent); }
+        .key:active { 
+            background: var(--active-bg) !important; 
+            transform: scale(0.95); 
+            border-color: var(--accent);
+        }
+
+        .score-view { 
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%); 
+            border: none; 
+            pointer-events: none; 
+            position: relative;
+        }
+
+        .leaderboard {
+            position: absolute;
+            bottom: 10px;
+            width: 90%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
+        }
+        .leaderboard .active-p { color: var(--accent); font-weight: bold; }
+
+        .player-tag { font-size: 1.2rem; color: var(--accent); margin-bottom: 5px; letter-spacing: 2px; }
+        .typed-val { color: var(--accent); font-size: 1.5rem; height: 1.5rem; margin-bottom: 5px; font-family: monospace; }
+        .score-txt { line-height: 1; font-size: clamp(80px, 20vw, 150px); }
+        .dart-dots { font-size: 24px; color: var(--accent); letter-spacing: 8px; margin-top: 5px; }
 
         @media (orientation: portrait) {
-            .keypad { grid-template-columns: repeat(5, 1fr); grid-template-rows: 2.5fr repeat(5, 1fr); }
-            .num { grid-column: span 1; }
-            .enter { grid-column: span 3; grid-row: span 2; background: rgba(80, 216, 144, 0.1); border: 2px solid var(--accent); }
-            .wide { grid-column: span 2; }
+            .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.8fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+            .score-view { grid-area: 1 / 1 / 2 / 4; }
+            .enter { grid-area: 6 / 1 / 7 / 3; border: 2px solid var(--accent); font-size: 24px; }
+            .num { font-size: 32px; }
         }
 
         @media (orientation: landscape) {
-            .keypad { grid-template-columns: repeat(5, 1fr); grid-template-rows: 1.8fr repeat(3, 1fr); }
-            .enter { grid-column: 4 / 6; grid-row: 3 / 5; border: 2px solid var(--accent); }
+            .keypad { grid-template-columns: repeat(7, 1fr); grid-template-rows: 1.8fr 1fr 1fr 1fr; gap: 10px; }
+            .score-view { grid-column: span 7; }
+            .k0 { grid-area: 2 / 4 / 4 / 5; font-size: 60px; } 
+            .enter { grid-area: 4 / 4 / 5 / 8; border: 2px solid var(--accent); font-size: 30px; }
+            .score-txt { font-size: clamp(60px, 15vh, 180px); }
         }
     </style>
 </head>
@@ -98,26 +83,14 @@
 
 <div class="app">
     <div class="keypad">
-        <div class="score-view">
-            <div class="sidebar-opponents" id="oppList"></div>
-            
-            <div class="main-stage">
-                <div class="player-name" id="curName">PLAYER 1</div>
-                <div class="typed-preview" id="typedVal"></div>
-                <div class="big-score" id="curScore">501</div>
-                <div id="dartDots" style="color:var(--accent); letter-spacing:5px;"></div>
-            </div>
-
-            <div class="data-wing">
-                <div class="stat-label">Average</div>
-                <div class="stat-val" id="curAvg">0.0</div>
-                <div class="stat-label">Best Of</div>
-                <div class="stat-val" id="matchTarget">3</div>
-                <div class="stat-label">Check</div>
-                <div class="stat-val" id="checkout">--</div>
-            </div>
+        <div class="key score-view">
+            <div class="player-tag" id="playerTag">---</div>
+            <div class="typed-val" id="typedDisplay"></div>
+            <div class="score-txt" id="scoreDisplay">---</div>
+            <div class="dart-dots" id="dartDots"></div>
+            <div class="leaderboard" id="leaderboard"></div>
         </div>
-
+        
         <div class="key num" onclick="press('1')">1</div>
         <div class="key num" onclick="press('2')">2</div>
         <div class="key num" onclick="press('3')">3</div>
@@ -127,114 +100,161 @@
         <div class="key num" onclick="press('7')">7</div>
         <div class="key num" onclick="press('8')">8</div>
         <div class="key num" onclick="press('9')">9</div>
-        <div class="key del" onclick="del()">DEL</div>
         <div class="key num" onclick="press('0')">0</div>
-        <div class="key undo" onclick="undo()" style="color:#ff4b5c">UNDO</div>
-        <div class="key wide bust" onclick="doBust()" style="color:#ff9a3c">BUST</div>
+        
+        <div class="key del" onclick="del()">DEL</div>
+        <div class="key undo" onclick="undo()">UNDO</div>
+        <div class="key stats-btn" onclick="showStats()">STATS</div>
+        <div class="key bust" onclick="doBust()" style="color:#ff9a3c">BUST</div>
+        <div class="key miss" onclick="doMiss()" style="color:#00adb5">MISS</div>
         <div class="key enter" onclick="enter()">ENTER</div>
-        <div class="key wide miss" onclick="doMiss()" style="color:#00adb5">MISS</div>
     </div>
 </div>
 
 <script>
-// Engine is initialized via init prompts
 class DartsEngine {
-    constructor(pCount, start, best) {
-        this.pCount = pCount;
-        this.start = start;
-        this.best = best;
-        this.scores = Array(pCount).fill(start);
-        this.legs = Array(pCount).fill(0);
-        this.points = Array(pCount).fill(0);
-        this.darts = Array(pCount).fill(0);
+    constructor(playerCount, startScore, bestOf) {
+        this.playerCount = playerCount;
+        this.startingScore = startScore;
+        this.bestOf = bestOf;
+        this.players = Array.from({ length: playerCount }, (_, i) => `P${i + 1}`);
+        this.scores = Array(playerCount).fill(startScore);
+        this.legs = Array(playerCount).fill(0);
+        this.totalPoints = Array(playerCount).fill(0);
+        this.totalDarts = Array(playerCount).fill(0);
         this.current = 0;
         this.history = [];
     }
 
-    submit(val) {
-        if (val > 180) return "ERR";
-        this.history.push(JSON.stringify({s:[...this.scores], l:[...this.legs], c:this.current, p:[...this.points], d:[...this.darts]}));
+    submitScore(val) {
+        if (val > 180) return { status: "ERR" };
+        this._saveHistory();
         
-        let res = this.scores[this.current] - val;
-        if (res < 0 || res === 1) {
-            this.darts[this.current] += 3;
-            this.current = (this.current + 1) % this.pCount;
-            return "BUST";
+        let rem = this.scores[this.current] - val;
+        if (rem < 0 || rem === 1) {
+            this.totalDarts[this.current] += 3;
+            this._nextTurn();
+            return { status: "BUST" };
         }
 
-        this.scores[this.current] = res;
-        this.points[this.current] += val;
-        this.darts[this.current] += 3;
+        this.scores[this.current] = rem;
+        this.totalPoints[this.current] += val;
+        this.totalDarts[this.current] += 3;
 
-        if (res === 0) {
+        if (rem === 0) {
             this.legs[this.current]++;
-            if (this.legs[this.current] >= this.best) return "MATCH_WIN";
-            this.scores = Array(this.pCount).fill(this.start);
-            this.current = 0;
-            return "LEG_WIN";
+            if (this.legs[this.current] >= this.bestOf) return { status: "MATCH_WON" };
+            this._resetLeg();
+            return { status: "LEG_WON" };
         }
-        this.current = (this.current + 1) % this.pCount;
-        return "OK";
+
+        this._nextTurn();
+        return { status: "SUCCESS" };
+    }
+
+    _resetLeg() {
+        this.scores = Array(this.playerCount).fill(this.startingScore);
+        this.current = 0; 
+    }
+
+    _nextTurn() {
+        this.current = (this.current + 1) % this.playerCount;
+    }
+
+    _saveHistory() {
+        this.history.push(JSON.stringify({
+            scores: [...this.scores],
+            legs: [...this.legs],
+            current: this.current,
+            pts: [...this.totalPoints],
+            drts: [...this.totalDarts]
+        }));
     }
 
     undo() {
-        if (this.history.length) {
-            let h = JSON.parse(this.history.pop());
-            this.scores = h.s; this.legs = h.l; this.current = h.c; this.points = h.p; this.darts = h.d;
-        }
+        if (!this.history.length) return;
+        let h = JSON.parse(this.history.pop());
+        this.scores = h.scores;
+        this.legs = h.legs;
+        this.current = h.current;
+        this.totalPoints = h.pts;
+        this.totalDarts = h.drts;
     }
 }
 
 let game;
-let typed = "";
+let typedValue = "";
 
 function init() {
     const p = prompt("Players (1-4):", "2") || 2;
-    const s = prompt("Score (101-601):", "501") || 501;
+    const s = prompt("Game (101-601):", "501") || 501;
     const b = prompt("Best of legs:", "3") || 3;
     game = new DartsEngine(parseInt(p), parseInt(s), parseInt(b));
-    refresh();
+    refreshUI();
 }
 
-function haptic() { if (navigator.vibrate) navigator.vibrate(15); }
+function haptic() {
+    if ("vibrate" in navigator) navigator.vibrate(15);
+}
 
-function press(n) { haptic(); if (typed.length < 3) { typed += n; refresh(); } }
-function del() { haptic(); typed = typed.slice(0,-1); refresh(); }
-function undo() { haptic(); game.undo(); refresh(); }
-function doBust() { haptic(); game.submit(0); typed = ""; refresh(); }
-function doMiss() { haptic(); typed = "0"; enter(); }
+function press(n) {
+    haptic();
+    if (typedValue.length < 3) {
+        typedValue += n;
+        refreshUI();
+    }
+}
+
+function del() {
+    haptic();
+    typedValue = typedValue.slice(0, -1);
+    refreshUI();
+}
 
 function enter() {
     haptic();
-    if (!typed) return;
-    const res = game.submit(parseInt(typed));
-    if (res === "MATCH_WIN") { alert("MATCH OVER!"); location.reload(); }
-    typed = "";
-    refresh();
+    if (!typedValue) return;
+    const res = game.submitScore(parseInt(typedValue));
+    
+    if (res.status === "BUST") alert("BUST!");
+    if (res.status === "LEG_WON") alert("LEG WON!");
+    if (res.status === "MATCH_WON") {
+        alert("MATCH OVER! P" + (game.current + 1) + " WINS!");
+        location.reload();
+    }
+    
+    typedValue = "";
+    refreshUI();
 }
 
-function getOut(s) {
-    if (s > 170 || s < 2 || [169,168,166,165,163,162,159].includes(s)) return "--";
-    if ((s <= 40 && s % 2 === 0) || s === 50) return "D" + (s === 50 ? "B" : s/2);
-    return "OUT";
+function undo() {
+    haptic();
+    game.undo();
+    refreshUI();
 }
 
-function refresh() {
-    document.getElementById('curScore').innerText = game.scores[game.current];
-    document.getElementById('curName').innerText = `Player ${game.current + 1}`;
-    document.getElementById('typedVal').innerText = typed || "---";
-    document.getElementById('matchTarget').innerText = game.best;
-    document.getElementById('curAvg').innerText = (game.points[game.current] / (game.darts[game.current]/3 || 1)).toFixed(1);
-    document.getElementById('checkout').innerText = getOut(game.scores[game.current]);
+function doBust() { haptic(); game.submitScore(0); typedValue = ""; refreshUI(); }
+function doMiss() { haptic(); typedValue = "0"; enter(); }
 
-    // Update Opponent Sidebar
-    let oppHtml = "";
-    game.scores.forEach((s, i) => {
-        if (i !== game.current) {
-            oppHtml += `<div class="opp-card">P${i+1} <b>${s}</b> <small>Legs: ${game.legs[i]}</small></div>`;
-        }
-    });
-    document.getElementById('oppList').innerHTML = oppHtml;
+function showStats() {
+    haptic();
+    let stats = game.players.map((p, i) => {
+        let avg = (game.totalPoints[i] / (game.totalDarts[i] / 3 || 1)).toFixed(1);
+        return `${p}: Avg ${avg}`;
+    }).join('\n');
+    alert(stats);
+}
+
+function refreshUI() {
+    document.getElementById('scoreDisplay').innerText = game.scores[game.current];
+    document.getElementById('playerTag').innerText = game.players[game.current];
+    document.getElementById('typedDisplay').innerText = typedValue || "---";
+    
+    let lb = document.getElementById('leaderboard');
+    lb.innerHTML = game.scores.map((s, i) => {
+        let isAct = i === game.current ? 'active-p' : '';
+        return `<span class="${isAct}">P${i+1}: ${s} (${game.legs[i]})</span>`;
+    }).join('');
 }
 
 init();
