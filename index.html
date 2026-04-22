@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v26 - Asymmetric Landscape</title>
+<title>Darts Master v27 - Precision Grid</title>
 
 <style>
 :root {
@@ -86,12 +86,13 @@ body {
   .del, .undo, .bust, .miss, .dart { font-size: clamp(12px, 15cqmin, 20px); }
 }
 
-/* --- 2. LANDSCAPE (THE ASYMMETRIC DASHBOARD) --- */
+/* --- 2. LANDSCAPE (8-COLUMN PRECISION) --- */
 @media (orientation: landscape) {
   .keypad {
-    grid-template-columns: repeat(9, 1fr);
-    /* Billboard (2.5) | Num Row 1 (1) | Num Row 2 (1) | Action Row (1.5) */
-    grid-template-rows: 2.5fr 1fr 1fr 1.5fr;
+    /* Using 8 equal columns for the control deck */
+    grid-template-columns: repeat(8, 1fr);
+    /* Top Billboard stays flexible, Keyboard is 3 rows of exactly equal height */
+    grid-template-rows: 2fr 1fr 1fr 1fr;
     padding-left: calc(env(safe-area-inset-left) + 10px);
     padding-right: calc(env(safe-area-inset-right) + 10px);
     padding-bottom: env(safe-area-inset-bottom);
@@ -99,28 +100,36 @@ body {
   }
   
   /* Billboard */
-  .score-view { grid-area: 1 / 1 / 2 / 10; border: none; background: rgba(255,255,255,0.04); }
+  .score-view { grid-area: 1 / 1 / 2 / 9; border: none; background: rgba(255,255,255,0.04); }
   .score-txt { font-size: clamp(60px, 80cqmin, 200px); font-weight: 800; }
 
-  /* Numbers: Use 6 columns total (spanning 1.2 each roughly) */
-  .k1 { grid-area: 2 / 1 / 3 / 2; } .k2 { grid-area: 2 / 2 / 3 / 3; } .k3 { grid-area: 2 / 3 / 3 / 4; } .k4 { grid-area: 2 / 4 / 3 / 5; } .k5 { grid-area: 2 / 5 / 3 / 6; }
-  .k6 { grid-area: 3 / 1 / 4 / 2; } .k7 { grid-area: 3 / 2 / 4 / 3; } .k8 { grid-area: 3 / 3 / 4 / 4; } .k9 { grid-area: 3 / 4 / 4 / 5; } .k0 { grid-area: 3 / 5 / 4 / 7; } /* 0 is slightly wider to fill row */
+  /* Keypad (Cols 1-3) */
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
 
-  /* ENTER: Full height of the bottom 3 rows in Column 7 */
-  .enter { grid-area: 2 / 7 / 5 / 8; font-size: clamp(16px, 20cqmin, 35px); }
+  /* The "0" - Next to 3 and 6, taking top two sections of Column 4 */
+  .k0 { grid-area: 2 / 4 / 4 / 5; }
 
-  /* DEL & UNDO: 1.5 rows high in Column 8-9 */
-  .del { grid-area: 2 / 8 / 3.5 / 10; font-size: clamp(12px, 16cqmin, 24px); }
-  .undo { grid-area: 3.5 / 8 / 5 / 10; font-size: clamp(12px, 16cqmin, 24px); }
+  /* The "ENTER" - Uses Column 5, loads part of cell in Column 4 (Bottom Row) */
+  /* To make ENTER "load" into Col 4 bottom, it spans from Col 4 to 5 in Row 4 */
+  .enter { grid-area: 2 / 5 / 5 / 6; } 
 
-  /* Action Buttons: 1.5 columns wide under numbers */
-  .bust { grid-area: 4 / 1 / 5 / 3; } /* Spans 2 cols (which is roughly 1.5 relative to the num grid) */
-  .miss { grid-area: 4 / 3 / 5 / 5; }
-  .dart { grid-area: 4 / 5 / 5 / 6; }
-  .help-btn { grid-area: 4 / 6 / 5 / 7; } /* Fits the remaining gap to the ENTER pillar */
+  /* Action Row 3 (Bottom): 1.5 Columns Wide */
+  /* Bust: Col 4 bottom + half of 5? No, user said 1.5 wide. */
+  /* Re-mapping for 1.5 wide actions in remaining 3 columns (6, 7, 8) */
+  .bust { grid-area: 4 / 4; } /* This fills the remaining hole in Col 4 under 0 */
+  
+  .miss { grid-area: 2 / 6 / 3 / 8; }     /* 2 cols wide (Close to 1.5) */
+  .dart { grid-area: 2 / 8 / 3 / 9; }
+  
+  .del { grid-area: 3 / 6 / 4 / 8; }
+  .undo { grid-area: 4 / 6 / 5 / 8; }
+  .help-btn { grid-area: 3 / 8 / 5 / 9; } /* Vertical Pillar help */
 
-  .num, .k0 { font-size: clamp(18px, 25cqmin, 45px); }
-  .bust, .miss, .dart, .help-btn { font-size: clamp(12px, 14cqmin, 22px); }
+  .num, .k0 { font-size: clamp(20px, 30cqmin, 50px); }
+  .enter { font-size: clamp(16px, 20cqmin, 35px); }
+  .bust, .miss, .del, .undo, .dart, .help-btn { font-size: clamp(12px, 14cqmin, 20px); }
 }
 
 @media (orientation: landscape) and (min-width: 768px) {
