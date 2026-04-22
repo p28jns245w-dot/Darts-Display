@@ -33,7 +33,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   cursor: pointer;
 }
 
-/* Color Classes */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn { border-color: var(--accent); color: var(--accent); }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
@@ -41,24 +40,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart { font-size: 2.5rem !important; } 
 
-/* --- 1. PORTRAIT --- */
-@media (orientation: portrait) {
-  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
-  .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
-  
-  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
-  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
-  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
-  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
-  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
-
-  .score-txt { font-size: 80px; }
-  .num, .k0 { font-size: 42px; }
-  .key { font-size: 22px; } /* Base button font size */
-}
-
-/* --- 2. LANDSCAPE --- */
+/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
   .keypad { 
     grid-template-columns: repeat(7, 1fr); 
@@ -80,14 +62,24 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
+  /* Sub-Score Action Row */
+  .action-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 90%; 
+    margin-top: 5px;
+  }
+  .row-label { font-size: 0.7rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+  .row-val { color: var(--accent); font-weight: bold; font-size: 0.9rem; }
+  .dart-dots { font-size: 1rem; color: var(--accent); letter-spacing: 6px; }
+
   .dash-item { width: 100%; text-align: center; }
   .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; }
   .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
-  .dart-dots { display: flex; justify-content: center; width: 100%; font-size: 1rem; color: var(--accent); letter-spacing: 6px; margin-top: 5px; }
   .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
   .active-player { color: var(--accent) !important; font-weight: bold; }
 
-  /* Key Positions */
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
@@ -96,29 +88,34 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
-  /* Phone Specific */
   @media (max-height: 500px) {
     .app { padding: 5px; }
     .score-txt { font-size: 60px; line-height: 0.8; }
     .num, .k0 { font-size: 32px; }
     .key { font-size: 18px; }
     .keypad { gap: 4px; }
-    .bench-p { font-size: 0.75rem; }
+    .action-row { margin-top: 0; }
   }
 
-  /* Large Tablet Specific */
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
     .score-txt { font-size: 150px; }
     .num, .k0 { font-size: 60px; }
-    .key { font-size: 28px; } /* Restores iPad button text size */
-    .dart-dots { margin-top: 15px; font-size: 1.2rem; }
+    .key { font-size: 28px; }
+    .action-row { margin-top: 15px; }
   }
 }
 
-/* --- 3. UNIVERSAL IPAD FIX --- */
+@media (orientation: portrait) {
+  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+  .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
+  .score-txt { font-size: 80px; }
+  .num, .k0 { font-size: 42px; }
+  .key { font-size: 22px; }
+}
+
 @media (min-width: 768px) {
-  .key { font-size: 32px; } /* Ensures all action text is large on iPad */
+  .key { font-size: 32px; }
   .num, .k0 { font-size: 64px; }
 }
 </style>
@@ -133,15 +130,21 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
         <div class="bench-p">P3: <b>501</b> <small>(0)</small></div>
         <div class="bench-p">P4: <b>501</b> <small>(0)</small></div>
       </div>
+      
       <div class="sv-mid">
         <div class="score-txt">501</div>
-        <div class="dart-dots">•••</div>
+        <div class="action-row">
+          <div><span class="row-label">Legs</span> <span class="row-val">0</span></div>
+          <div class="dart-dots">•••</div>
+          <div><span class="row-label">Avg</span> <span class="row-val">0.0</span></div>
+        </div>
       </div>
+
       <div class="sv-right">
-        <div class="dash-item"><div class="dash-label">Avg</div><div class="dash-val">0.0</div></div>
         <div class="dash-item"><div class="dash-label">Help</div><div class="dash-val">OUT</div></div>
       </div>
     </div>
+
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
