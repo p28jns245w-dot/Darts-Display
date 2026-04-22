@@ -59,7 +59,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     overflow: hidden;
   }
 
-  /* Sub-sections */
   .sv-left { 
     grid-column: span 2; 
     border-right: 1px solid var(--border-std); 
@@ -75,9 +74,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; gap: 8px; }
 
   /* Sub-elements */
-  .p-name { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
-  .score-txt { font-weight: 800; line-height: 1; }
-  .dart-dots { font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; }
+  .dart-dots { font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; margin-top: 5px; }
   
   .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
   .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
@@ -98,23 +95,23 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
   @media (max-height: 500px) {
-    .score-txt { font-size: clamp(40px, 12vh, 60px); } 
+    .score-txt { font-size: 60px; } /* Fixed to v39 size */
     .num, .k0 { font-size: 26px; }
     .keypad { gap: 6px; }
   }
 
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
-    .score-txt { font-size: 110px; } .num, .k0 { font-size: 60px; }
+    .score-txt { font-size: 150px; } /* Fixed to v39 size */
+    .num, .k0 { font-size: 60px; }
   }
 }
 
-/* Maintain Portrait (No Changes as requested) */
+/* Portrait (Untouched) */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
   .score-view { grid-area: 1 / 1 / 2 / 4; display: flex; align-items: center; justify-content: center; }
   .score-txt { font-size: 80px; }
-  /* (Rest of grid positions omitted for brevity but remain intact) */
 }
 </style>
 </head>
@@ -131,7 +128,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
       </div>
 
       <div class="sv-mid">
-        <div class="p-name">PLAYER 1</div>
         <div class="score-txt">501</div>
         <div class="dart-dots">•••</div>
       </div>
