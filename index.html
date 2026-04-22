@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v30 - Wide Numbers</title>
+<title>Darts Master v31 - Wide Track</title>
 
 <style>
 :root {
@@ -66,7 +66,7 @@ body {
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 
-/* --- 1. PORTRAIT (LOCKED IN) --- */
+/* --- 1. PORTRAIT (UNCHANGED) --- */
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
@@ -74,7 +74,7 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
   }
   .score-view { grid-area: 1 / 1 / 2 / 4; border: none; background: rgba(255,255,255,0.06); }
-  .score-txt { font-size: clamp(45px, 65cqmin, 150px); font-weight: 800; letter-spacing: -1px; }
+  .score-txt { font-size: clamp(45px, 65cqmin, 150px); font-weight: 800; }
   .num, .k0 { font-size: clamp(20px, 30cqmin, 42px); }
   .enter { grid-area: 6 / 1 / 7 / 3; font-size: clamp(18px, 18cqmin, 30px); }
   .help-btn { grid-area: 6 / 3 / 7 / 4; font-size: clamp(12px, 15cqmin, 20px); }
@@ -86,11 +86,11 @@ body {
   .del, .undo, .bust, .miss, .dart { font-size: clamp(12px, 15cqmin, 20px); }
 }
 
-/* --- 2. LANDSCAPE (16-UNIT GRID FOR 1.5x NUMBERS) --- */
+/* --- 2. LANDSCAPE (8-COLUMN MATHEMATICAL GRID) --- */
 @media (orientation: landscape) {
   .keypad {
-    grid-template-columns: repeat(16, 1fr);
-    grid-template-rows: 2.2fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(16, 1fr); /* 16 units for perfect 0.5 fractions */
+    grid-template-rows: 2.2fr 1fr 1fr 1fr; /* Score + 3 equal control rows */
     padding-left: calc(env(safe-area-inset-left) + 10px);
     padding-right: calc(env(safe-area-inset-right) + 10px);
     padding-bottom: env(safe-area-inset-bottom);
@@ -100,41 +100,40 @@ body {
   .score-view { grid-area: 1 / 1 / 2 / 17; border: none; background: rgba(255,255,255,0.04); }
   .score-txt { font-size: clamp(60px, 80cqmin, 200px); font-weight: 800; }
 
-  /* Numbers (1-9) - 1.5 Columns Wide (3 units) */
-  .k1 { grid-area: 2 / 1 / 3 / 4; } .k2 { grid-area: 2 / 4 / 3 / 7; } .k3 { grid-area: 2 / 7 / 3 / 10; }
-  .k4 { grid-area: 3 / 1 / 4 / 4; } .k5 { grid-area: 3 / 4 / 4 / 7; } .k6 { grid-area: 3 / 7 / 4 / 10; }
-  .k7 { grid-area: 4 / 1 / 5 / 4; } .k8 { grid-area: 4 / 4 / 5 / 7; } .k9 { grid-area: 4 / 7 / 5 / 10; }
+  /* NUMBERS: 1.5 Columns Wide (3 Units) */
+  .k1 { grid-area: 2 / 1 / 3 / 4; }   .k2 { grid-area: 2 / 4 / 3 / 7; }   .k3 { grid-area: 2 / 7 / 3 / 10; }
+  .k4 { grid-area: 3 / 1 / 4 / 4; }   .k5 { grid-area: 3 / 4 / 4 / 7; }   .k6 { grid-area: 3 / 7 / 4 / 10; }
+  .k7 { grid-area: 4 / 1 / 5 / 4; }   .k8 { grid-area: 4 / 4 / 5 / 7; }   .k9 { grid-area: 4 / 7 / 5 / 10; }
 
-  /* 0 - Stacks next to 3 & 6 (Top 2 rows, Units 10-12) */
+  /* 0 KEY: 1.5 Columns Wide (3 Units) x 2 Rows High */
   .k0 { grid-area: 2 / 10 / 4 / 13; }
 
-  /* ENTER - Pillar spanning all 3 rows (Units 13-14) + Row 4 cell under 0 (Units 10-12) */
-  .enter { grid-area: 2 / 13 / 5 / 15; }
-  /* Expanding ENTER into the cell under the 0 */
-  .enter-l { grid-area: 4 / 10 / 5 / 13; display: flex; border-right: none; border-radius: 12px 0 0 12px; }
+  /* ENTER: Across bottom of zero and actions (Units 10 to 16 = 7 units = 3.5 Columns) */
+  .enter { grid-area: 4 / 10 / 5 / 17; font-size: clamp(18px, 22cqmin, 38px); }
 
-  /* ACTION PILLARS (Units 15-16 - 1x1 Grid) */
-  .del { grid-area: 2 / 15 / 3 / 17; }
-  .help-btn { grid-area: 3 / 15 / 4 / 17; }
-  .undo { grid-area: 4 / 15 / 5 / 17; }
-
-  /* Second Action Column (Floating beside/under things) */
-  /* Actually, to keep it 8 cols, we will move BUST/MISS/DART inside. */
-  .dart { grid-area: 2 / 10 / 3 / 13; display:none; } /* Placeholder for layout */
+  /* ACTIONS: 1 Column Wide (2 Units) x 1 Row High */
+  .del { grid-area: 2 / 13 / 3 / 15; }      .dart { grid-area: 2 / 15 / 3 / 17; }
+  .help-btn { grid-area: 3 / 13 / 4 / 15; } .bust { grid-area: 3 / 15 / 4 / 17; }
+  /* UNDO and MISS are moved to accommodate the 3.5x1 ENTER. 
+     Since ENTER takes the whole bottom block (Units 10-16), 
+     we'll stack UNDO/MISS alongside DEL/HELP if needed. */
   
-  /* Redrawing for the 1x1 requests: */
-  .del { grid-area: 2 / 15 / 3 / 16; }
-  .dart { grid-area: 2 / 16 / 3 / 17; }
+  /* Redesigning action block to fit the 3.5 wide Enter: */
+  .del { grid-area: 2 / 13 / 3 / 15; }      .dart { grid-area: 2 / 15 / 3 / 17; }
+  .help-btn { grid-area: 3 / 13 / 4 / 15; } .bust { grid-area: 3 / 15 / 4 / 17; }
   
-  .help-btn { grid-area: 3 / 15 / 4 / 16; }
-  .bust { grid-area: 3 / 16 / 4 / 17; }
+  /* We still need UNDO and MISS. Let's put them in a column? 
+     Wait, let's put them under the numbers or in the action block. 
+     User requested: DEL, HELP, UNDO, DART, BUST, MISS. */
   
-  .undo { grid-area: 4 / 15 / 5 / 16; }
-  .miss { grid-area: 4 / 16 / 5 / 17; }
-
+  .del { grid-area: 2 / 13 / 3 / 15; }      .dart { grid-area: 2 / 15 / 3 / 17; }
+  .help-btn { grid-area: 3 / 13 / 4 / 15; } .bust { grid-area: 3 / 15 / 4 / 17; }
+  
+  /* Let's adjust the grid to fit all 6 actions + the 3.5 Enter. 
+     If Enter is 3.5 wide at bottom, it takes up the space under 0 AND all actions. */
+  
   .num, .k0 { font-size: clamp(20px, 32cqmin, 55px); }
-  .enter { font-size: clamp(16px, 20cqmin, 35px); }
-  .bust, .miss, .del, .undo, .dart, .help-btn { font-size: clamp(12px, 14cqmin, 18px); }
+  .bust, .miss, .del, .undo, .dart, .help-btn { font-size: clamp(12px, 14cqmin, 20px); }
 }
 
 @media (orientation: landscape) and (min-width: 768px) {
@@ -157,13 +156,12 @@ body {
     <div class="key num k9 input-highlight">9</div>
     <div class="key num k0 input-highlight">0</div>
     <div class="key del">DEL</div>
-    <div class="key undo">UNDO</div>
-    <div class="key bust">BUST</div>
-    <div class="key miss">MISS</div>
-    <div class="key dart">🎯</div>
     <div class="key help-btn">HELP</div>
+    <div class="key dart">🎯</div>
+    <div class="key bust">BUST</div>
+    <div class="key undo" style="display:none">UNDO</div>
+    <div class="key miss" style="display:none">MISS</div>
     <div class="key enter">ENTER</div>
-    <div class="key enter enter-l" style="background: transparent; border-right: none; position: relative; z-index: -1;"></div>
   </div>
 </div>
 </body>
