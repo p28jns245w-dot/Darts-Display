@@ -62,7 +62,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-  /* Sub-Score Action Row */
   .action-row { 
     display: flex; 
     justify-content: space-between; 
@@ -77,6 +76,8 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .dash-item { width: 100%; text-align: center; }
   .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; line-height: 1; }
   .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; line-height: 1.1; }
+  
+  /* Surgical removal of (0) logic from left sidebar */
   .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.1; margin: 1px 0; }
   .active-player { color: var(--accent) !important; font-weight: bold; }
 
@@ -125,10 +126,10 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   <div class="keypad">
     <div class="key score-view">
       <div class="sv-left">
-        <div class="bench-p active-player">P1: <b>501</b> <small>(0)</small></div>
-        <div class="bench-p">P2: <b>501</b> <small>(0)</small></div>
-        <div class="bench-p">P3: <b>501</b> <small>(0)</small></div>
-        <div class="bench-p">P4: <b>501</b> <small>(0)</small></div>
+        <div class="bench-p active-player">P1: <b>501</b></div>
+        <div class="bench-p">P2: <b>501</b></div>
+        <div class="bench-p">P3: <b>501</b></div>
+        <div class="bench-p">P4: <b>501</b></div>
       </div>
       
       <div class="sv-mid">
