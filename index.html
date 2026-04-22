@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v34 - Device-Aware Scaling</title>
+<title>Darts Master v35 - Final Nudge</title>
 
 <style>
 :root {
@@ -30,7 +30,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 
-/* --- 1. PORTRAIT (iPhone vs iPad Fix) --- */
+/* --- 1. PORTRAIT (LOCKED NUMBERS, NUDGED TEXT) --- */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
@@ -41,23 +41,30 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
   .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 
-  /* iPhone Portrait (Small Screen) */
   @media (max-width: 500px) {
     .score-txt { font-size: 80px; }
     .num, .k0 { font-size: 32px; }
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 15px; }
+    /* Nudged Up from 15px */
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 17px; }
   }
-  /* iPad Portrait (Large Screen) */
   @media (min-width: 501px) {
     .score-txt { font-size: 140px; }
     .num, .k0 { font-size: 55px; }
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 24px; }
+    /* Nudged Up from 24px */
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 28px; }
   }
 }
 
-/* --- 2. LANDSCAPE (iPhone vs iPad Fix) --- */
+/* --- 2. LANDSCAPE (THE ISLAND FIX & NUDGED TEXT) --- */
 @media (orientation: landscape) {
-  .keypad { grid-template-columns: repeat(21, 1fr); grid-template-rows: 2.2fr 1fr 1fr 1fr; gap: 10px; }
+  .keypad { 
+    grid-template-columns: repeat(21, 1fr); 
+    grid-template-rows: 2.2fr 1fr 1fr 1fr; 
+    gap: 10px;
+    /* Island/Safe Area protection + your 15px nudge */
+    padding-left: calc(env(safe-area-inset-left) + 15px);
+    padding-right: calc(env(safe-area-inset-right) + 15px);
+  }
   .score-view { grid-area: 1 / 1 / 2 / 22; }
   .k1 { grid-area: 2 / 1 / 3 / 4; } .k2 { grid-area: 2 / 4 / 3 / 7; } .k3 { grid-area: 2 / 7 / 3 / 10; }
   .k4 { grid-area: 3 / 1 / 4 / 4; } .k5 { grid-area: 3 / 4 / 4 / 7; } .k6 { grid-area: 3 / 7 / 4 / 10; }
@@ -67,18 +74,18 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 13 / 4 / 16; } .bust { grid-area: 3 / 16 / 4 / 19; } .miss { grid-area: 3 / 19 / 4 / 22; }
   .enter { grid-area: 4 / 10 / 5 / 22; }
 
-  /* iPhone Landscape (Still too big? Shrink it) */
   @media (max-height: 500px) {
     .score-txt { font-size: 60px; }
     .num, .k0 { font-size: 26px; }
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 14px; }
+    /* Nudged Up from 14px */
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 16px; }
     .keypad { gap: 6px; }
   }
-  /* iPad/TV Landscape (Keep it big) */
   @media (min-height: 501px) {
     .score-txt { font-size: 150px; }
     .num, .k0 { font-size: 60px; }
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 26px; }
+    /* Nudged Up from 26px */
+    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 30px; }
   }
 }
 </style>
