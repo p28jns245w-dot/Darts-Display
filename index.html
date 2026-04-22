@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v25 - Dual World</title>
+<title>Darts Master v26 - Asymmetric Landscape</title>
 
 <style>
 :root {
@@ -86,43 +86,45 @@ body {
   .del, .undo, .bust, .miss, .dart { font-size: clamp(12px, 15cqmin, 20px); }
 }
 
-/* --- 2. LANDSCAPE (THE BROADCAST DASHBOARD) --- */
+/* --- 2. LANDSCAPE (THE ASYMMETRIC DASHBOARD) --- */
 @media (orientation: landscape) {
   .keypad {
-    grid-template-columns: repeat(7, 1fr);
-    /* Row 1-2: Score Billboard | Row 3-4: Numbers/Enter | Row 5: Footer */
-    grid-template-rows: 2fr 2fr 1fr 1fr 0.8fr;
+    grid-template-columns: repeat(9, 1fr);
+    /* Billboard (2.5) | Num Row 1 (1) | Num Row 2 (1) | Action Row (1.5) */
+    grid-template-rows: 2.5fr 1fr 1fr 1.5fr;
     padding-left: calc(env(safe-area-inset-left) + 10px);
     padding-right: calc(env(safe-area-inset-right) + 10px);
     padding-bottom: env(safe-area-inset-bottom);
-    gap: 6px;
+    gap: 8px;
   }
   
-  /* Billboard Top */
-  .score-view { grid-area: 1 / 1 / 3 / 8; border: none; background: rgba(255,255,255,0.04); }
-  .score-txt { font-size: clamp(60px, 75cqmin, 180px); font-weight: 800; }
+  /* Billboard */
+  .score-view { grid-area: 1 / 1 / 2 / 10; border: none; background: rgba(255,255,255,0.04); }
+  .score-txt { font-size: clamp(60px, 80cqmin, 200px); font-weight: 800; }
 
-  /* Numbers Grid */
-  .k1 { grid-area: 3 / 1; } .k2 { grid-area: 3 / 2; } .k3 { grid-area: 3 / 3; } .k4 { grid-area: 3 / 4; } .k5 { grid-area: 3 / 5; }
-  .k6 { grid-area: 4 / 1; } .k7 { grid-area: 4 / 2; } .k8 { grid-area: 4 / 3; } .k9 { grid-area: 4 / 4; } .k0 { grid-area: 4 / 5; }
+  /* Numbers: Use 6 columns total (spanning 1.2 each roughly) */
+  .k1 { grid-area: 2 / 1 / 3 / 2; } .k2 { grid-area: 2 / 2 / 3 / 3; } .k3 { grid-area: 2 / 3 / 3 / 4; } .k4 { grid-area: 2 / 4 / 3 / 5; } .k5 { grid-area: 2 / 5 / 3 / 6; }
+  .k6 { grid-area: 3 / 1 / 4 / 2; } .k7 { grid-area: 3 / 2 / 4 / 3; } .k8 { grid-area: 3 / 3 / 4 / 4; } .k9 { grid-area: 3 / 4 / 4 / 5; } .k0 { grid-area: 3 / 5 / 4 / 7; } /* 0 is slightly wider to fill row */
+
+  /* ENTER: Full height of the bottom 3 rows in Column 7 */
+  .enter { grid-area: 2 / 7 / 5 / 8; font-size: clamp(16px, 20cqmin, 35px); }
+
+  /* DEL & UNDO: 1.5 rows high in Column 8-9 */
+  .del { grid-area: 2 / 8 / 3.5 / 10; font-size: clamp(12px, 16cqmin, 24px); }
+  .undo { grid-area: 3.5 / 8 / 5 / 10; font-size: clamp(12px, 16cqmin, 24px); }
+
+  /* Action Buttons: 1.5 columns wide under numbers */
+  .bust { grid-area: 4 / 1 / 5 / 3; } /* Spans 2 cols (which is roughly 1.5 relative to the num grid) */
+  .miss { grid-area: 4 / 3 / 5 / 5; }
+  .dart { grid-area: 4 / 5 / 5 / 6; }
+  .help-btn { grid-area: 4 / 6 / 5 / 7; } /* Fits the remaining gap to the ENTER pillar */
+
   .num, .k0 { font-size: clamp(18px, 25cqmin, 45px); }
-
-  /* Right Pillars */
-  .enter { grid-area: 3 / 6 / 5 / 7; font-size: clamp(16px, 20cqmin, 35px); }
-  .del { grid-area: 3 / 7 / 4 / 8; font-size: clamp(12px, 16cqmin, 22px); }
-  .undo { grid-area: 4 / 7 / 5 / 8; font-size: clamp(12px, 16cqmin, 22px); }
-
-  /* Footer Strip */
-  .bust { grid-area: 5 / 1 / 6 / 3; }
-  .miss { grid-area: 5 / 3 / 6 / 5; }
-  .dart { grid-area: 5 / 5 / 6 / 6; }
-  .help-btn { grid-area: 5 / 6 / 6 / 8; }
   .bust, .miss, .dart, .help-btn { font-size: clamp(12px, 14cqmin, 22px); }
 }
 
-/* Tablet Scale Tweak for Landscape Gap */
 @media (orientation: landscape) and (min-width: 768px) {
-  .keypad { gap: 12px; }
+  .keypad { gap: 15px; }
 }
 </style>
 </head>
