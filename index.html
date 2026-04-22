@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v18</title>
+<title>Darts Master Final Layout</title>
 
 <style>
 :root {
@@ -17,7 +17,7 @@
   --border-blue: rgba(0, 173, 181, 0.4);
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
   margin: 0;
@@ -34,6 +34,7 @@ body {
   padding: 12px;
   display: flex;
   flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .keypad {
@@ -42,7 +43,6 @@ body {
   gap: 10px;
 }
 
-/* --- CLAMPED SCALING (THE FIX) --- */
 .key {
   container-type: size; 
   background: rgba(255, 255, 255, 0.03);
@@ -55,9 +55,6 @@ body {
   cursor: pointer;
   overflow: hidden;
   white-space: nowrap;
-  
-  /* NUMBERS: Min 20px, Target 22% of box, Max 60px */
-  font-size: clamp(20px, 22cqmin, 60px); 
 }
 
 .key:active { background: rgba(255, 255, 255, 0.15); }
@@ -67,39 +64,39 @@ body {
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-/* SCORE WINDOW: Large but hard-capped */
-.score-txt { font-size: clamp(40px, 45cqmin, 100px); font-weight: 200; }
+/* --- DYNAMIC TEXT SCALING --- */
 
-/* ENTER & WORDS: Smaller caps to prevent bleeding */
+/* NUMBERS: Scaled down for Phone (#1), scaled up for iPad (#3/4) */
+.num, .k0 {
+  font-size: clamp(24px, 32cqmin, 90px); 
+}
+
+/* SCORE WINDOW */
+.score-txt { font-size: clamp(40px, 50cqmin, 130px); font-weight: 200; }
+
+/* ENTER: Scaled up for iPad (#3/4) */
 .enter { 
-    border: 2.5px solid var(--accent); 
-    color: var(--accent); 
-    font-size: clamp(18px, 18cqmin, 45px); 
+  border: 2.5px solid var(--accent); 
+  color: var(--accent); 
+  font-size: clamp(20px, 24cqmin, 75px); 
 }
 
-.advice-btn { 
-    border-color: var(--accent); 
-    color: var(--accent); 
-    font-size: clamp(14px, 14cqmin, 30px); 
+/* ACTION BUTTONS: DEL, UNDO, HELP, BUST, MISS 
+   Uniformly scaled based on a better-fitting UNDO (#1/2)
+   Increased for iPad (#3/4) */
+.del, .undo, .help-btn, .bust, .miss {
+  font-size: clamp(12px, 18cqmin, 40px); 
 }
 
-.del, .undo { 
-    border-color: var(--border-red); 
-    color: #ff4b5c; 
-    font-size: clamp(14px, 14cqmin, 30px); 
-}
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; }
+.help-btn { border-color: var(--accent); color: var(--accent); }
+.bust { border-color: var(--border-amber); color: #ff9a3c; }
+.miss { border-color: var(--border-blue); color: #00adb5; }
 
-.bust, .miss { 
-    border-color: inherit; 
-    font-size: clamp(14px, 12cqmin, 25px); 
-}
-
-.bust { color: #ff9a3c; border-color: var(--border-amber); }
-.miss { color: #00adb5; border-color: var(--border-blue); }
-
-.dart { font-size: clamp(24px, 30cqmin, 50px); }
+.dart { font-size: clamp(24px, 35cqmin, 80px); }
 
 /* --- GRID LAYOUTS --- */
+
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
@@ -111,7 +108,7 @@ body {
   .k7 { grid-area: 5 / 1; } .k8 { grid-area: 5 / 2; } .k9 { grid-area: 5 / 3; }
   .del { grid-area: 6 / 1; } .k0 { grid-area: 6 / 2; } .undo { grid-area: 6 / 3; }
   .enter { grid-area: 7 / 1 / 9 / 3; }
-  .advice-btn { grid-area: 7 / 3 / 9 / 4; }
+  .help-btn { grid-area: 7 / 3 / 9 / 4; }
   .bust { grid-area: 9 / 1; } .miss { grid-area: 9 / 2; } .dart { grid-area: 9 / 3; }
 }
 
@@ -119,6 +116,7 @@ body {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    /* 28px Offset for Island (#2) */
     padding-left: 28px; 
     padding-right: 28px; 
   }
@@ -129,7 +127,7 @@ body {
   .k7 { grid-area: 3 / 1; } .k8 { grid-area: 3 / 2; } .k9 { grid-area: 3 / 3; }
   .k0 { grid-area: 1 / 4 / 3 / 5; }
   .del { grid-area: 1 / 5; } .undo { grid-area: 1 / 6; } .dart { grid-area: 1 / 7; }
-  .bust { grid-area: 2 / 5; } .miss { grid-area: 2 / 6; } .advice-btn { grid-area: 2 / 7; }
+  .bust { grid-area: 2 / 5; } .miss { grid-area: 2 / 6; } .help-btn { grid-area: 2 / 7; }
   .enter { grid-area: 3 / 4 / 4 / 8; }
 }
 </style>
@@ -156,7 +154,7 @@ body {
     <div class="key bust">BUST</div>
     <div class="key miss">MISS</div>
     <div class="key dart">🎯</div>
-    <div class="key advice-btn">ADVICE</div>
+    <div class="key help-btn">HELP</div>
     <div class="key enter">ENTER</div>
   </div>
 </div>
