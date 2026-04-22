@@ -30,15 +30,18 @@ body {
 }
 
 .app {
-  max-width:420px;
-  margin:auto;
-  padding:12px;
-  height: 100vh;
-  box-sizing: border-box;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+  max-width: 420px;
+  margin: auto;
+  padding: 12px;
+  /* Use dvh to account for the dynamic address bar */
+  height: 100vh; 
+  height: 100dvh; 
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box; /* Crucial to keep padding inside the height calculation */
 }
+
 
 /* PLAYER WINDOW */
 .player-window {
