@@ -73,17 +73,11 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; gap: 8px; }
 
-  /* Sub-elements */
   .dart-dots { font-size: 1.2rem; color: var(--accent); letter-spacing: 6px; margin-top: 5px; }
-  
   .dash-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
   .dash-val { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
-
-  /* Leaderboard Styling */
   .bench-p { font-size: 0.85rem; color: rgba(255,255,255,0.4); }
-  .bench-p b { color: rgba(255,255,255,0.6); }
   .active-player { color: var(--accent) !important; font-weight: bold; }
-  .active-player b { color: var(--text) !important; }
 
   /* Grid Pos */
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
@@ -94,16 +88,19 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; } 
 
+  /* SURGICAL FIX FOR PHONE HEIGHT */
   @media (max-height: 500px) {
-    .score-txt { font-size: 60px; } /* Fixed to v39 size */
-    .num, .k0 { font-size: 26px; }
-    .keypad { gap: 6px; }
+    .score-txt { font-size: 60px; line-height: 0.8; }
+    .keypad { gap: 5px; }
+    .sv-left, .sv-right { padding: 2px 8px; }
+    /* Side-by-side stats for phone */
+    .sv-right { flex-direction: row; gap: 15px; } 
+    .dart-dots { margin-top: 0; font-size: 1rem; }
   }
 
   @media (min-height: 501px) {
     .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
-    .score-txt { font-size: 150px; } /* Fixed to v39 size */
-    .num, .k0 { font-size: 60px; }
+    .score-txt { font-size: 150px; }
   }
 }
 
@@ -118,7 +115,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 <body>
 <div class="app">
   <div class="keypad">
-    
     <div class="key score-view">
       <div class="sv-left">
         <div class="bench-p active-player">P1: <b>501</b> <small>(0)</small></div>
@@ -126,24 +122,15 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
         <div class="bench-p">P3: <b>501</b> <small>(0)</small></div>
         <div class="bench-p">P4: <b>501</b> <small>(0)</small></div>
       </div>
-
       <div class="sv-mid">
         <div class="score-txt">501</div>
         <div class="dart-dots">•••</div>
       </div>
-
       <div class="sv-right">
-        <div>
-          <div class="dash-label">Avg</div>
-          <div class="dash-val">0.0</div>
-        </div>
-        <div>
-          <div class="dash-label">Help</div>
-          <div class="dash-val">OUT</div>
-        </div>
+        <div><div class="dash-label">Avg</div><div class="dash-val">0.0</div></div>
+        <div><div class="dash-label">Help</div><div class="dash-val">OUT</div></div>
       </div>
     </div>
-
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
