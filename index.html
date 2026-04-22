@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v35 - Final Nudge</title>
+<title>Darts Master v36 - Visual Lock</title>
 
 <style>
 :root {
@@ -30,6 +30,9 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 
+/* The Dart Emoji Special Scaling */
+.dart { font-size: 1.4em !important; transform: scale(1.3); }
+
 /* --- 1. PORTRAIT (LOCKED NUMBERS, NUDGED TEXT) --- */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
@@ -44,14 +47,14 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   @media (max-width: 500px) {
     .score-txt { font-size: 80px; }
     .num, .k0 { font-size: 32px; }
-    /* Nudged Up from 15px */
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 17px; }
+    /* Nudged Up from 17px */
+    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 19px; }
   }
   @media (min-width: 501px) {
     .score-txt { font-size: 140px; }
     .num, .k0 { font-size: 55px; }
-    /* Nudged Up from 24px */
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 28px; }
+    /* Nudged Up from 28px */
+    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 32px; }
   }
 }
 
@@ -61,7 +64,6 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     grid-template-columns: repeat(21, 1fr); 
     grid-template-rows: 2.2fr 1fr 1fr 1fr; 
     gap: 10px;
-    /* Island/Safe Area protection + your 15px nudge */
     padding-left: calc(env(safe-area-inset-left) + 15px);
     padding-right: calc(env(safe-area-inset-right) + 15px);
   }
@@ -77,15 +79,15 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   @media (max-height: 500px) {
     .score-txt { font-size: 60px; }
     .num, .k0 { font-size: 26px; }
-    /* Nudged Up from 14px */
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 16px; }
+    /* Nudged Up from 16px */
+    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 18px; }
     .keypad { gap: 6px; }
   }
   @media (min-height: 501px) {
     .score-txt { font-size: 150px; }
     .num, .k0 { font-size: 60px; }
-    /* Nudged Up from 26px */
-    .bust, .miss, .del, .undo, .dart, .help-btn, .enter { font-size: 30px; }
+    /* Nudged Up from 30px */
+    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 34px; }
   }
 }
 </style>
