@@ -7,218 +7,187 @@
 
 <style>
 :root {
-  --bg:#111;
-  --panel:#1a1a1a;
-  --border:#2a2a2a;
-  --text:#fff;
-  --muted:#9a9a9a;
-  --accent:#7fdc7f;
-
-  --num:#2a2a2a;
-  --red:#3a1f1f;
-  --amber:#3a321f;
-  --blue:#1f2f3a;
-  --green:#243a24;
+  --bg: #0d0d0d;
+  --panel: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --text: #ffffff;
+  --muted: #888;
+  --accent: #50d890;
+  
+  --num: #2a2a2a;
+  --red: #3a1f1f;
+  --amber: #3a321f;
+  --blue: #1f2f3a;
+  --green: #243a24;
 }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: sans-serif;
-  
-  /* The new stuff: */
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
-  touch-action: none; 
+  touch-action: manipulation;
 }
-
 
 .app {
   max-width: 420px;
   margin: auto;
   padding: 12px;
-  /* Use dvh to account for the dynamic address bar */
-  height: 100vh; 
-  height: 100dvh; 
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-sizing: border-box; /* Crucial to keep padding inside the height calculation */
+  box-sizing: border-box;
 }
 
-
-/* PLAYER WINDOW */
+/* --- PLAYER WINDOW --- */
 .player-window {
-  background:var(--panel);
-  border:2px solid var(--border);
-  border-radius:18px;
-  padding:20px;
-  text-align:center;
+  background: linear-gradient(145deg, #1e1e1e, #161616);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  text-align: center;
 }
 
 .player-name {
-  font-size:1.2rem;
-  color:var(--muted);
+  font-size: 1.1rem;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .score {
-  font-size:5.2rem;
-  font-weight:bold;
-  margin:4px 0;
-  line-height:1;
+  font-size: 5.5rem;
+  font-weight: 300;
+  margin: 4px 0;
+  line-height: 1;
 }
 
 .advice {
-  font-size:1rem;
-  color:var(--accent);
-  font-weight: 600;
+  font-size: 1rem;
+  color: var(--accent);
 }
 
-/* KEYPAD */
-.keypad {
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:10px;
-  flex: 1; /* Allow keypad to grow */
-}
-
+/* --- BUTTON STYLES --- */
 .key {
-  background:var(--num);
-  border:2px solid var(--border);
-  border-radius:14px;
-  font-size:1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 1.2rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   cursor: pointer;
   user-select: none;
+  word-wrap: break-word;
+  padding: 8px;
 }
 
 .key:active {
-  background: #333;
-  transform: scale(0.98);
+  filter: brightness(1.5);
+  transform: scale(0.96);
 }
 
-/* ENTER */
-.key.enter {
-  grid-column:span 3;
-  font-size:1.7rem;
-  background:#3f6f3f;
-  border-color:#6fcf6f;
+.num { background: var(--num); font-size: 1.5rem; }
+.enter { background: #3f6f3f; border-color: #6fcf6f; font-size: 1.4rem; }
+.del, .undo { background: var(--red); }
+.bust { background: var(--amber); }
+.miss { background: var(--blue); }
+.dart { background: var(--green); font-size: 1rem; }
+.advice-btn { background: #222; color: var(--accent); font-size: 1rem; }
+
+
+/* --- PORTRAIT LAYOUT --- */
+.keypad {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+  /* We use 6 columns here so we can easily center 3 buttons or 2 buttons */
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-areas:
+    "n1 n1 n2 n2 n3 n3"
+    "n4 n4 n5 n5 n6 n6"
+    "n7 n7 n8 n8 n9 n9"
+    "dl dl n0 n0 un un"
+    "en en en en en en"
+    "bu bu bu mi mi mi"
+    "da da da ad ad ad";
 }
 
-/* DELETE / UNDO */
-.key.del, .key.undo {
-  background:var(--red);
-  border-color:#6a2a2a;
+/* Map the HTML elements to the grid areas */
+.key:nth-child(1) { grid-area: n1; }
+.key:nth-child(2) { grid-area: n2; }
+.key:nth-child(3) { grid-area: n3; }
+.key:nth-child(4) { grid-area: n4; }
+.key:nth-child(5) { grid-area: n5; }
+.key:nth-child(6) { grid-area: n6; }
+.key:nth-child(7) { grid-area: n7; }
+.key:nth-child(8) { grid-area: n8; }
+.key:nth-child(9) { grid-area: n9; }
+.del { grid-area: dl; }
+.key:nth-child(11) { grid-area: n0; } /* 0 key */
+.undo { grid-area: un; }
+.enter { grid-area: en; }
+.bust { grid-area: bu; }
+.miss { grid-area: mi; }
+.dart { grid-area: da; }
+.advice-btn { grid-area: ad; }
+
+
+/* --- LANDSCAPE VIEW (7-Column Layout) --- */
+@media (orientation: landscape) {
+  .app {
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .player-window { display: none; }
+
+  .keypad {
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-areas:
+      "n1 n2 n3 en dl un ."
+      "n4 n5 n6 en bu mi ."
+      "n7 n8 n9 n0 da ad .";
+  }
 }
-
-/* BOTTOM CONTROLS */
-.bottom {
-  display:grid;
-  grid-template-columns:repeat(2, 1fr);
-  gap:10px;
-}
-
-.ctrl {
-  border:2px solid var(--border);
-  border-radius:14px;
-  padding:15px 0;
-  font-size:0.9rem;
-  text-align:center;
-  font-weight: bold;
-}
-
-.ctrl.bust { background:var(--amber); border-color:#6a5a2a; }
-.ctrl.miss { background:var(--blue); border-color:#2a4a6a; }
-.ctrl.dart { background:var(--green); border-color:#2a6a2a; }
-.ctrl.advice { background:#222; color:var(--accent); border-color:#2a6a2a; }
-
-/* TABLET/TV ADJUSTMENTS */
-@media (min-width:768px) {
-  .app { max-width:720px; gap:16px; }
-  .score { font-size:6rem; }
-}
-
-@media (min-width: 1200px) {
-  .app { max-width: 1100px; padding: 40px; }
-  .score { font-size: 9rem; }
-  .key { font-size: 2.2rem; }
-}
-
-/* LANDSCAPE/CONTROLLER MODE */
-@media (orientation: landscape) and (max-height: 500px) {
-  .app { flex-direction: row; max-width: 100%; }
-  .player-window { display: none; } /* Focus only on input */
-  .keypad { grid-template-columns: repeat(6, 1fr); }
-  .key.enter { grid-column: span 2; }
-}
-
 </style>
 </head>
 <body>
 
 <div class="app">
-  <div class="player-window" id="display-panel">
+  <div class="player-window">
     <div class="player-name">Player 1</div>
     <div class="score">501</div>
     <div class="advice">SET UP D20</div>
   </div>
 
   <div class="keypad">
-    <div class="key">1</div>
-    <div class="key">2</div>
-    <div class="key">3</div>
-    <div class="key">4</div>
-    <div class="key">5</div>
-    <div class="key">6</div>
-    <div class="key">7</div>
-    <div class="key">8</div>
-    <div class="key">9</div>
+    <div class="key num">1</div>
+    <div class="key num">2</div>
+    <div class="key num">3</div>
+    <div class="key num">4</div>
+    <div class="key num">5</div>
+    <div class="key num">6</div>
+    <div class="key num">7</div>
+    <div class="key num">8</div>
+    <div class="key num">9</div>
+    
     <div class="key del">DEL</div>
-    <div class="key">0</div>
+    <div class="key num">0</div>
     <div class="key undo">UNDO</div>
     <div class="key enter">ENTER</div>
-  </div>
 
-  <div class="bottom">
-    <div class="ctrl bust">BUST</div>
-    <div class="ctrl miss">MISS</div>
-    <div class="ctrl dart">DART ↔ DART</div>
-    <div class="ctrl advice">ADVICE</div>
+    <div class="key bust">BUST</div>
+    <div class="key miss">MISS</div>
+    <div class="key dart">DART ↔ DART</div>
+    <div class="key advice-btn">ADVICE</div>
   </div>
 </div>
-
-<script>
-  const DisplayMode = {
-    NORMAL: "normal",
-    CONTROLLER: "controller"
-  };
-
-  const playerWindow = document.getElementById("display-panel");
-
-  function detectDisplayMode() {
-    // If screen is wide but window is small, assume it's a controller for a second screen
-    const isLandscape = window.innerWidth > window.innerHeight;
-    const isSmallHeight = window.innerHeight < 500;
-    
-    return (isLandscape && isSmallHeight) ? DisplayMode.CONTROLLER : DisplayMode.NORMAL;
-  }
-
-  function applyMode() {
-    const mode = detectDisplayMode();
-    if (mode === DisplayMode.CONTROLLER) {
-      playerWindow.style.display = "none";
-    } else {
-      playerWindow.style.display = "block";
-    }
-  }
-
-  window.addEventListener("resize", applyMode);
-  applyMode();
-</script>
 
 </body>
 </html>
