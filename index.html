@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v21 - Final</title>
+<title>Darts Master v22 - Pro Proportion</title>
 
 <style>
 :root {
@@ -63,51 +63,58 @@ body {
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-/* --- THE "PUNCHY" SCORE --- */
+/* --- THE SCORE TEXT --- */
 .score-txt { 
-  font-size: clamp(45px, 60cqmin, 140px); 
-  font-weight: 800; /* Max Punch */
+  font-size: clamp(45px, 65cqmin, 150px); 
+  font-weight: 800; 
   letter-spacing: -1px;
 }
 
 /* --- PHONE SCALING --- */
 .num, .k0 { font-size: clamp(20px, 30cqmin, 42px); }
-.enter { font-size: clamp(18px, 18cqmin, 32px); border: 2.5px solid var(--accent); color: var(--accent); }
+.enter { font-size: clamp(18px, 18cqmin, 30px); border: 2.5px solid var(--accent); color: var(--accent); }
 .del, .undo, .help-btn, .bust, .miss { font-size: clamp(12px, 15cqmin, 20px); }
 .dart { font-size: clamp(20px, 30cqmin, 38px); }
 
 /* --- TABLET SCALING (iPad Pro) --- */
 @media (min-width: 768px) {
   .num, .k0 { font-size: clamp(40px, 35cqmin, 85px); }
-  .score-txt { font-size: clamp(80px, 65cqmin, 180px); } /* iPad gets even bigger score */
-  .enter { font-size: clamp(35px, 22cqmin, 70px); }
-  .del, .undo, .help-btn, .bust, .miss { font-size: clamp(22px, 16cqmin, 38px); }
+  .score-txt { font-size: clamp(80px, 70cqmin, 200px); }
+  .enter { font-size: clamp(30px, 20cqmin, 65px); }
+  .del, .undo, .help-btn, .bust, .miss { font-size: clamp(20px, 16cqmin, 38px); }
   .dart { font-size: clamp(40px, 35cqmin, 75px); }
   .keypad { gap: 15px; }
 }
 
-/* Action Color Refinements */
+/* Colors */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn { border-color: var(--accent); color: var(--accent); }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
 .miss { border-color: var(--border-blue); color: #00adb5; }
 
-/* --- GRID LAYOUTS --- */
+/* --- PORTRAIT --- */
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(9, 1fr);
+    /* THE NEW PROPORTIONS: Score 2.5, Numbers 1, Enter Row 1.5, Miss Row 1 */
+    grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
   }
-  .score-view { grid-area: 1 / 1 / 3 / 4; border: none; background: rgba(255,255,255,0.06); }
-  .k1 { grid-area: 3 / 1; } .k2 { grid-area: 3 / 2; } .k3 { grid-area: 3 / 3; }
-  .k4 { grid-area: 4 / 1; } .k5 { grid-area: 4 / 2; } .k6 { grid-area: 4 / 3; }
-  .k7 { grid-area: 5 / 1; } .k8 { grid-area: 5 / 2; } .k9 { grid-area: 5 / 3; }
-  .del { grid-area: 6 / 1; } .k0 { grid-area: 6 / 2; } .undo { grid-area: 6 / 3; }
-  .enter { grid-area: 7 / 1 / 9 / 3; }
-  .help-btn { grid-area: 7 / 3 / 9 / 4; }
-  .bust { grid-area: 9 / 1; } .miss { grid-area: 9 / 2; } .dart { grid-area: 9 / 3; }
+  /* Score spans the top row (the 2.5fr one) */
+  .score-view { grid-area: 1 / 1 / 2 / 4; border: none; background: rgba(255,255,255,0.06); }
+  
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+  
+  /* Enter Row (The 1.5fr one) */
+  .enter { grid-area: 6 / 1 / 7 / 3; }
+  .help-btn { grid-area: 6 / 3 / 7 / 4; }
+  
+  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
 
+/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
