@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Master v29 - Master Anchor</title>
+<title>Darts Master v30 - Wide Numbers</title>
 
 <style>
 :root {
@@ -86,7 +86,7 @@ body {
   .del, .undo, .bust, .miss, .dart { font-size: clamp(12px, 15cqmin, 20px); }
 }
 
-/* --- 2. LANDSCAPE (THE MASTER ANCHOR) --- */
+/* --- 2. LANDSCAPE (16-UNIT GRID FOR 1.5x NUMBERS) --- */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(16, 1fr);
@@ -100,62 +100,41 @@ body {
   .score-view { grid-area: 1 / 1 / 2 / 17; border: none; background: rgba(255,255,255,0.04); }
   .score-txt { font-size: clamp(60px, 80cqmin, 200px); font-weight: 800; }
 
-  /* Numbers (1-9) */
-  .k1 { grid-area: 2 / 1 / 3 / 3; } .k2 { grid-area: 2 / 3 / 3 / 5; } .k3 { grid-area: 2 / 5 / 3 / 7; }
-  .k4 { grid-area: 3 / 1 / 4 / 3; } .k5 { grid-area: 3 / 3 / 4 / 5; } .k6 { grid-area: 3 / 5 / 4 / 7; }
-  .k7 { grid-area: 4 / 1 / 5 / 3; } .k8 { grid-area: 4 / 3 / 5 / 5; } .k9 { grid-area: 4 / 5 / 5 / 7; }
+  /* Numbers (1-9) - 1.5 Columns Wide (3 units) */
+  .k1 { grid-area: 2 / 1 / 3 / 4; } .k2 { grid-area: 2 / 4 / 3 / 7; } .k3 { grid-area: 2 / 7 / 3 / 10; }
+  .k4 { grid-area: 3 / 1 / 4 / 4; } .k5 { grid-area: 3 / 4 / 4 / 7; } .k6 { grid-area: 3 / 7 / 4 / 10; }
+  .k7 { grid-area: 4 / 1 / 5 / 4; } .k8 { grid-area: 4 / 4 / 5 / 7; } .k9 { grid-area: 4 / 7 / 5 / 10; }
 
-  /* 0 - Column 4 Top 2 rows */
-  .k0 { grid-area: 2 / 7 / 4 / 9; }
+  /* 0 - Stacks next to 3 & 6 (Top 2 rows, Units 10-12) */
+  .k0 { grid-area: 2 / 10 / 4 / 13; }
 
-  /* ENTER - Now includes the cell under the 0 (L-Shape Logic) */
-  /* Spans Column 5 entirely + Column 4's bottom row */
-  .enter { grid-area: 2 / 9 / 5 / 11; } 
-  /* Visual merge trick: We expand ENTER to include the space under 0 */
-  .enter { grid-area: 2 / 9 / 5 / 11; } 
-  /* To actually merge the cell under 0, we extend the start of the enter area */
-  .enter { grid-area: 2 / 9 / 5 / 11; }
-  /* Correction to specifically fill the hole under 0: */
-  .enter { grid-area: 2 / 9 / 5 / 11; } 
-  /* Since CSS Grid is rectangular, we'll put a spacer or just make ENTER span both cols in the bottom row */
-  .enter { grid-area: 2 / 9 / 5 / 11; } 
-  /* Re-mapping BUST to move so ENTER can take that slot */
-  .enter { grid-area: 2 / 9 / 5 / 11; }
-  /* Let's just make the ENTER button wider at the bottom or keep it a massive pillar. 
-     To merge the cell under 0 into it, it spans Units 7 through 10 in the bottom row. */
-  .enter { grid-area: 2 / 9 / 5 / 11; } 
+  /* ENTER - Pillar spanning all 3 rows (Units 13-14) + Row 4 cell under 0 (Units 10-12) */
+  .enter { grid-area: 2 / 13 / 5 / 15; }
+  /* Expanding ENTER into the cell under the 0 */
+  .enter-l { grid-area: 4 / 10 / 5 / 13; display: flex; border-right: none; border-radius: 12px 0 0 12px; }
+
+  /* ACTION PILLARS (Units 15-16 - 1x1 Grid) */
+  .del { grid-area: 2 / 15 / 3 / 17; }
+  .help-btn { grid-area: 3 / 15 / 4 / 17; }
+  .undo { grid-area: 4 / 15 / 5 / 17; }
+
+  /* Second Action Column (Floating beside/under things) */
+  /* Actually, to keep it 8 cols, we will move BUST/MISS/DART inside. */
+  .dart { grid-area: 2 / 10 / 3 / 13; display:none; } /* Placeholder for layout */
   
-  /* Actually, let's execute the requested merge: */
-  .enter { grid-area: 2 / 9 / 5 / 11; }
-  /* And we will put a 'ghost' key or simply expand ENTER to cover that 4th column bottom row. */
-  .enter { grid-area: 2 / 9 / 5 / 11; }
-
-  /* NEW ACTION COLUMN (Units 11-16) */
-  /* DEL (Top) */
-  .del { grid-area: 2 / 11 / 3 / 14; }
-  /* HELP (Middle) */
-  .help-btn { grid-area: 3 / 11 / 4 / 14; }
-  /* UNDO (Bottom) */
-  .undo { grid-area: 4 / 11 / 5 / 14; }
-
-  /* DART (Top Right) */
-  .dart { grid-area: 2 / 14 / 3 / 17; }
-  /* BUST (Under Dart) */
-  .bust { grid-area: 3 / 14 / 4 / 17; }
-  /* MISS (Under Bust) */
-  .miss { grid-area: 4 / 14 / 5 / 17; }
-
-  /* FINAL PIECE: The cell left empty under 0 (Units 7-8 in Row 4) merged to ENTER */
-  /* We do this by creating a secondary 'enter-extender' or just stretching the grid-area */
-  .enter { grid-area: 2 / 9 / 5 / 11; } 
-  /* To fill the hole under 0 (Units 7-8, Row 4): */
-  .k0-sub { grid-area: 4 / 7 / 5 / 9; display: none; } /* We will just stretch ENTER or add a second enter key */
+  /* Redrawing for the 1x1 requests: */
+  .del { grid-area: 2 / 15 / 3 / 16; }
+  .dart { grid-area: 2 / 16 / 3 / 17; }
   
-  /* Simplified for cleanest code: ENTER spans its pillar, and we add an 'extra' button 
-     or just let ENTER span from units 7 to 10 in the bottom row. */
-  .enter { grid-area: 2 / 9 / 5 / 11; }
-  /* Let's just fill that 0-bottom hole with the ENTER button specifically: */
-  .enter-fill { grid-area: 4 / 7 / 5 / 11; border-radius: 12px; } /* This is the bottom of the L */
+  .help-btn { grid-area: 3 / 15 / 4 / 16; }
+  .bust { grid-area: 3 / 16 / 4 / 17; }
+  
+  .undo { grid-area: 4 / 15 / 5 / 16; }
+  .miss { grid-area: 4 / 16 / 5 / 17; }
+
+  .num, .k0 { font-size: clamp(20px, 32cqmin, 55px); }
+  .enter { font-size: clamp(16px, 20cqmin, 35px); }
+  .bust, .miss, .del, .undo, .dart, .help-btn { font-size: clamp(12px, 14cqmin, 18px); }
 }
 
 @media (orientation: landscape) and (min-width: 768px) {
@@ -184,7 +163,7 @@ body {
     <div class="key dart">🎯</div>
     <div class="key help-btn">HELP</div>
     <div class="key enter">ENTER</div>
-    <style>@media (orientation: landscape) { .enter { grid-area: 2 / 9 / 5 / 11; } .enter-l { grid-area: 4 / 7 / 5 / 9; border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; } }</style>
+    <div class="key enter enter-l" style="background: transparent; border-right: none; position: relative; z-index: -1;"></div>
   </div>
 </div>
 </body>
