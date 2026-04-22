@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v9</title>
+<title>Darts Display Mock v10</title>
 
 <style>
 :root {
@@ -12,7 +12,6 @@
   --text: #ffffff;
   --accent: #50d890; /* Green */
   
-  /* Semi-transparent complimentary border colors */
   --border-std: rgba(255, 255, 255, 0.15);
   --border-red: rgba(255, 75, 92, 0.4);
   --border-amber: rgba(255, 154, 60, 0.4);
@@ -40,9 +39,8 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* --- THE NEW OUTLINE DESIGN --- */
 .key {
-  background: rgba(255, 255, 255, 0.03); /* Extremely subtle fill */
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-std);
   border-radius: 12px;
   display: flex;
@@ -73,8 +71,18 @@ body {
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
 .miss { border-color: var(--border-blue); color: #00adb5; }
-.dart { border-color: var(--border-std); font-size: 0.85rem; color: #bbb; }
 .advice-btn { border-color: var(--accent); color: var(--accent); font-size: 0.85rem; }
+
+/* THE DART BUTTON (Graphical Icon) */
+.dart { 
+  border-color: var(--border-std); 
+  color: var(--accent); /* Tint the SVG to match advice/accent */
+}
+.dart svg { 
+  display: block; 
+  height: 60%; 
+  width: auto; 
+}
 
 /* --- GRID LOGIC --- */
 @media (orientation: portrait) {
@@ -133,7 +141,15 @@ body {
     <div class="key undo">UNDO</div>
     <div class="key bust">BUST</div>
     <div class="key miss">MISS</div>
-    <div class="key dart">DART</div>
+    
+    <div class="key dart">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.5 1.5L2.5 6M11.5 1.5L20.5 6M11.5 1.5V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13.5 1.5L22.5 6M13.5 1.5L4.5 6M13.5 1.5V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12.5 22.5L12.5 11M12.5 11L18.5 16M12.5 11L6.5 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    
     <div class="key advice-btn">ADVICE</div>
     <div class="key enter">ENTER</div>
   </div>
