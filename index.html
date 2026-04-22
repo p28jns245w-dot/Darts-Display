@@ -40,11 +40,30 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart { font-size: 2.5rem !important; } 
 
-/* --- UNIVERSAL SCORE VIEW --- */
-.score-view { display: grid !important; grid-template-columns: repeat(7, 1fr); padding: 0 !important; overflow: hidden; }
-.sv-left { grid-column: span 2; border-right: 1px solid var(--border-std); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255,255,255,0.02); }
-.sv-mid { grid-column: span 3; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.sv-right { grid-column: span 2; border-left: 1px solid var(--border-std); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+/* --- UNIVERSAL SCORE VIEW: SHADING REMOVED --- */
+.score-view { 
+  display: grid !important; 
+  grid-template-columns: repeat(7, 1fr); 
+  padding: 0 !important; 
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03); /* Single flat background for the whole unit */
+}
+
+/* Side panels now transparent (no shading boxes) */
+.sv-left { grid-column: span 2; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.sv-right { grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* Mid section handles the vertical lines to prevent gaps */
+.sv-mid { 
+  grid-column: span 3; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  text-align: center;
+  border-left: 1px solid var(--border-std);
+  border-right: 1px solid var(--border-std);
+}
 
 .action-row { display: flex; justify-content: space-between; align-items: center; width: 90%; }
 .row-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; }
@@ -91,9 +110,9 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
 
 /* --- IPAD SURGICAL SCALE-UP --- */
 @media (min-width: 768px) {
-  .key { font-size: 38px; } /* Action text bigger */
+  .key { font-size: 38px; }
   .num, .k0 { font-size: 64px; }
-  .dart { font-size: 4rem !important; } /* Dart restored */
+  .dart { font-size: 4rem !important; }
   .bench-p { font-size: 1.2rem; }
   .score-txt { font-size: 120px; }
   .row-label { font-size: 1rem; }
