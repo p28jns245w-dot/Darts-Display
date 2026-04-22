@@ -22,12 +22,16 @@
 }
 
 body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  overflow: hidden; /* Prevents bounce on mobile */
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: sans-serif;
+  
+  /* The new stuff: */
+  overflow: hidden;
+  touch-action: none; 
 }
+
 
 .app {
   max-width: 420px;
