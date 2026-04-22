@@ -3,19 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v13</title>
+<title>Darts Display Mock v15</title>
 
 <style>
 :root {
   --bg: #0d0d0d;
-  /* A slightly more pronounced 'lighter' background for the input zone */
-  --input-group-bg: rgba(255, 255, 255, 0.07); 
+  --input-group-bg: rgba(255, 255, 255, 0.08); 
   --text: #ffffff;
   --accent: #50d890;
-  --border-std: rgba(255, 255, 255, 0.12);
-  --border-red: rgba(255, 75, 92, 0.35);
-  --border-amber: rgba(255, 154, 60, 0.35);
-  --border-blue: rgba(0, 173, 181, 0.35);
+  --border-std: rgba(255, 255, 255, 0.15);
+  --border-red: rgba(255, 75, 92, 0.4);
+  --border-amber: rgba(255, 154, 60, 0.4);
+  --border-blue: rgba(0, 173, 181, 0.4);
 }
 
 * { box-sizing: border-box; }
@@ -32,7 +31,7 @@ body {
 .app {
   width: 100%;
   height: 100dvh;
-  padding: 10px;
+  padding: 1.5vh; /* Responsive padding */
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom);
@@ -41,18 +40,12 @@ body {
 .keypad {
   display: grid;
   flex: 1;
-  gap: 8px;
+  gap: 1.2vh; /* Gap scales with screen height */
 }
 
-/* THE LIGHTER BOX (Input Group Style) */
-.input-highlight {
-  background: var(--input-group-bg);
-  border: 1px solid rgba(255,255,255,0.1);
-  /* Brighter text for the input numbers */
-  color: #fff;
-}
-
+/* --- THE DYNAMIC SCALING ENGINE --- */
 .key {
+  container-type: size; 
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-std);
   border-radius: 12px;
@@ -63,25 +56,27 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.1s;
+  /* Numbers scale to fill height/width appropriately */
+  font-size: 45cqmin; 
 }
 
-.key:active { 
-  background: rgba(255, 255, 255, 0.15);
+.key:active { background: rgba(255, 255, 255, 0.15); }
+
+.input-highlight {
+  background: var(--input-group-bg);
+  border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-.score-txt { font-size: 3.5rem; font-weight: 200; }
+/* Specific button text scaling */
+.score-txt { font-size: 60cqmin; font-weight: 200; }
+.enter { border: 2.5px solid var(--accent); color: var(--accent); font-size: 30cqmin; }
+.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 22cqmin; }
+.dart { font-size: 55cqmin; }
 
-.enter { 
-  border: 2px solid var(--accent); 
-  color: var(--accent);
-  background: rgba(80, 216, 144, 0.05);
-}
-
-.del, .undo { border-color: var(--border-red); color: #ff4b5c; }
-.bust { border-color: var(--border-amber); color: #ff9a3c; }
-.miss { border-color: var(--border-blue); color: #00adb5; }
-.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 0.85rem; }
-.dart { border-color: var(--border-std); font-size: 1.4rem; }
+/* Actions */
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; font-size: 28cqmin; }
+.bust { border-color: var(--border-amber); color: #ff9a3c; font-size: 22cqmin; }
+.miss { border-color: var(--border-blue); color: #00adb5; font-size: 22cqmin; }
 
 /* --- PORTRAIT (9x3) --- */
 @media (orientation: portrait) {
@@ -89,24 +84,24 @@ body {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(9, 1fr);
   }
-  .score-view { grid-area: 1 / 1 / 3 / 4; border: none; background: rgba(255,255,255,0.05); }
+  .score-view { grid-area: 1 / 1 / 3 / 4; border: none; background: rgba(255,255,255,0.06); }
   .k1 { grid-area: 3 / 1; } .k2 { grid-area: 3 / 2; } .k3 { grid-area: 3 / 3; }
   .k4 { grid-area: 4 / 1; } .k5 { grid-area: 4 / 2; } .k6 { grid-area: 4 / 3; }
   .k7 { grid-area: 5 / 1; } .k8 { grid-area: 5 / 2; } .k9 { grid-area: 5 / 3; }
   .del { grid-area: 6 / 1; } .k0 { grid-area: 6 / 2; } .undo { grid-area: 6 / 3; }
-  .enter { grid-area: 7 / 1 / 9 / 3; font-size: 1.5rem; }
+  .enter { grid-area: 7 / 1 / 9 / 3; }
   .advice-btn { grid-area: 7 / 3 / 9 / 4; }
   .bust { grid-area: 9 / 1; } .miss { grid-area: 9 / 2; } .dart { grid-area: 9 / 3; }
 }
 
-/* --- LANDSCAPE (7x3 with Surgical Island Fix) --- */
+/* --- LANDSCAPE (7x3) --- */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    /* Reduced by half per your request */
-    padding-left: 25px; 
-    padding-right: 10px;
+    /* 28px Offset to clear iPhone Island, with symmetric right padding for tablets */
+    padding-left: 28px; 
+    padding-right: 28px; 
   }
   .score-view { display: none; }
   
@@ -116,7 +111,7 @@ body {
   .k0 { grid-area: 1 / 4 / 3 / 5; }
   .del { grid-area: 1 / 5; } .undo { grid-area: 1 / 6; } .dart { grid-area: 1 / 7; }
   .bust { grid-area: 2 / 5; } .miss { grid-area: 2 / 6; } .advice-btn { grid-area: 2 / 7; }
-  .enter { grid-area: 3 / 4 / 4 / 8; font-size: 1.3rem; }
+  .enter { grid-area: 3 / 4 / 4 / 8; }
 }
 </style>
 </head>
