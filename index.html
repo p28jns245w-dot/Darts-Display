@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Darts Display Mock v16</title>
+<title>Darts Display Mock v17</title>
 
 <style>
 :root {
@@ -31,7 +31,7 @@ body {
 .app {
   width: 100%;
   height: 100dvh;
-  padding: 10px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom);
@@ -40,10 +40,10 @@ body {
 .keypad {
   display: grid;
   flex: 1;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* --- REFINED SCALING --- */
+/* --- THE SWEET SPOT SCALING --- */
 .key {
   container-type: size; 
   background: rgba(255, 255, 255, 0.03);
@@ -55,10 +55,10 @@ body {
   text-align: center;
   font-weight: 700;
   cursor: pointer;
-  overflow: hidden; /* Prevention against the 'Blow Up' */
+  overflow: hidden;
   white-space: nowrap;
-  /* Numbers: 35% of the smallest button dimension */
-  font-size: 35cqmin; 
+  /* Numbers: 22% is the sweet spot for iPad Pro */
+  font-size: 22cqmin; 
 }
 
 .key:active { background: rgba(255, 255, 255, 0.15); }
@@ -68,18 +68,20 @@ body {
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 
-/* Specific button text scaling - Smaller than before to prevent overlap */
-.score-txt { font-size: 55cqmin; font-weight: 200; }
-.enter { border: 2.5px solid var(--accent); color: var(--accent); font-size: 22cqmin; }
-.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 18cqmin; }
-.dart { font-size: 40cqmin; }
+/* Score window stays slightly more prominent but still contained */
+.score-txt { font-size: 45cqmin; font-weight: 200; }
 
-/* Actions - Scaled down for words */
-.del, .undo { border-color: var(--border-red); color: #ff4b5c; font-size: 20cqmin; }
-.bust { border-color: var(--border-amber); color: #ff9a3c; font-size: 18cqmin; }
-.miss { border-color: var(--border-blue); color: #00adb5; font-size: 18cqmin; }
+/* Enter and Words: Dropped to 15-18 range to prevent overlap */
+.enter { border: 2.5px solid var(--accent); color: var(--accent); font-size: 18cqmin; }
+.advice-btn { border-color: var(--accent); color: var(--accent); font-size: 15cqmin; }
+.dart { font-size: 30cqmin; }
 
-/* --- PORTRAIT (9x3) --- */
+/* Action Buttons */
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; font-size: 16cqmin; }
+.bust { border-color: var(--border-amber); color: #ff9a3c; font-size: 15cqmin; }
+.miss { border-color: var(--border-blue); color: #00adb5; font-size: 15cqmin; }
+
+/* --- PORTRAIT --- */
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
@@ -95,7 +97,7 @@ body {
   .bust { grid-area: 9 / 1; } .miss { grid-area: 9 / 2; } .dart { grid-area: 9 / 3; }
 }
 
-/* --- LANDSCAPE (7x3) --- */
+/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
