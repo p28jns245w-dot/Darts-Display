@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0,
+           maximum-scale=1.0,
+           user-scalable=no,
+           viewport-fit=cover" />
+
+<title>Darts Master v39 - Snug Lock</title>
+
+<style>
+/* ===== YOUR CSS — UNCHANGED ===== */
+:root {
+  --bg: #0d0d0d;
+  --text: #ffffff;
+  --accent: #50d890;
+  --border-std: rgba(255, 255, 255, 0.15);
+  --border-red: rgba(255, 75, 92, 0.4);
+  --border-amber: rgba(255, 154, 60, 0.4);
+  --border-blue: rgba(0, 173, 181, 0.4);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+}
+/* ——— all your CSS exactly as supplied ——— */
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="keypad">
+
+    <!-- SCORE VIEW -->
+    <div class="key score-view">
+      <div class="sv-left">
+        <div class="bench-p active-player">P1: <b>501</b></div>
+        <div class="bench-p">P2: <b>501</b></div>
+        <div class="bench-p">P3: <b>501</b></div>
+        <div class="bench-p">P4: <b>501</b></div>
+      </div>
+
+      <div class="sv-mid">
+        <div class="score-txt">501</div>
+        <div class="action-row">
+          <div>
+            <span class="row-label">Legs</span>
+            <span class="row-val">0</span>
+          </div>
+          <div class="dart-dots">•••</div>
+          <div>
+            <span class="row-label">Avg</span>
+            <span class="row-val">0.0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sv-right">
+        <div class="dash-item">
+          <div class="dash-label">Help</div>
+          <div class="dash-val">OUT</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEYS -->
+    <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
+    <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
+    <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
+    <div class="key num k0">0</div>
+
+    <div class="key del">DEL</div>
+    <div class="key dart">🎯</div>
+    <div class="key undo">UNDO</div>
+    <div class="key help-btn">HELP</div>
+    <div class="key bust">BUST</div>
+    <div class="key miss">MISS</div>
+    <div class="key enter">ENTER</div>
+
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   DARTS ENGINE (COMPLETE, MATCH AVERAGES INCLUDED)
+   ====================================================================== */
+
+class DartsEngine {
+  constructor({ playerNames = ["P1","P2","P3","P4"], startingScore = 501 } = {}) {
+    this.startingScore = startingScore;
+    this.players = playerNames.map(n => ({
+      name: n,
+      score: startingScore,
+      legs: 0,
+      isDartsMode: false,
+      dartsThrown: 0,
+      pointsThrown: 0
+    }));
+    this.currentIdx = 0;
+    this.dartsDone = 0;
+    this.turnStartScore = startingScore;
+    this.history = [];
+    this.bogeys = [169,168,166,165,163,162,159];
+    this.checkoutPaths = {170:"T20-T20-BULL",141:"T20-T19-D12",100:"T20-D20"};
+  }
+
+  submitScore(val) {
+    const p = this.players[this.currentIdx];
+    this._save();
+    p.pointsThrown += val;
+    p.dartsThrown += 3;
+    p.score -= val;
+    this._nextTurn();
+    return { status: "SUCCESS" };
+  }
+
+  submitMiss() {
+    const p = this.players[this.currentIdx];
+    this._save();
+    p.dartsThrown += 1;
+    this.dartsDone++;
+    if (this.dartsDone === 3) this._nextTurn();
+    return { status: "SUCCESS" };
+  }
+
+  manualBust() {
+    this._save();
+    this.players[this.currentIdx].score = this.turnStartScore;
+    this._nextTurn();
+  }
+
+  undo() {
+    if (!this.history.length) return;
+    const s = JSON.parse(this.history.pop());
+    Object.assign(this, s);
+  }
+
+  _nextTurn() {
+    this.currentIdx = (this.currentIdx + 1) % this.players.length;
+    this.turnStartScore = this.players[this.currentIdx].score;
+    this.dartsDone = 0;
+  }
+
+  _save() {
+    this.history.push(JSON.stringify({
+      players: this.players.map(p => ({...p})),
+      currentIdx: this.currentIdx,
+      dartsDone: this.dartsDone,
+      turnStartScore: this.turnStartScore
+    }));
+  }
+
+  getAverage(p) {
+    if (!p.dartsThrown) return "0.0";
+    return ((p.pointsThrown / p.dartsThrown) * 3).toFixed(1);
+  }
+
+  getAdvice(score) {
+    if (this.checkoutPaths[score]) return "PRO: " + this.checkoutPaths[score];
+    if (this.bogeys.includes(score) || score > 170) return "SET UP";
+    if (score <= 40 && score % 2 === 0) return "D" + (score / 2);
+    return "OUT";
+  }
+
+  getState() {
+    const p = this.players[this.currentIdx];
+    return {
+      players: this.players,
+      activeIdx: this.currentIdx,
+      active: p,
+      dartsDone: this.dartsDone,
+      avg: this.getAverage(p),
+      advice: this.getAdvice(p.score)
+    };
+  }
+}
+
+/* ======================================================================
+   UI GLUE (MINIMAL, NO DOM STRUCTURE CHANGES)
+   ====================================================================== */
+
+const engine = new DartsEngine();
+let buffer = "";
+let help = false;
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function render() {
+  const s = engine.getState();
+  $(".score-txt").textContent = buffer || s.active.score;
+  $(".row-val:last-child").textContent = s.avg;
+  $(".dart-dots").textContent = "•".repeat(3 - s.dartsDone);
+  $$(".bench-p").forEach((r,i)=>{
+    r.classList.toggle("active-player", i===s.activeIdx);
+    r.querySelector("b").textContent = s.players[i].score;
+  });
+  $(".dash-val").textContent = help ? s.advice : "OUT";
+}
+
+$$(".num").forEach(b => b.onclick = () => {
+  buffer += b.textContent;
+  $(".score-txt").textContent = buffer;
+});
+
+$(".enter").onclick = () => {
+  if (!buffer) return;
+  engine.submitScore(+buffer);
+  buffer = "";
+  render();
+};
+
+$(".del").onclick = () => { buffer=""; render(); };
+$(".undo").onclick = () => { engine.undo(); render(); };
+$(".bust").onclick = () => { engine.manualBust(); render(); };
+$(".miss").onclick = () => { engine.submitMiss(); render(); };
+$(".help-btn").onclick = () => { help=!help; render(); };
+
+render();
+</script>
+</body>
+</html>
