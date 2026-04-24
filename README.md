@@ -1,1 +1,1 @@
-# Darts-Display
+# DartsDisplay
