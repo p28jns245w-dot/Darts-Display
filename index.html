@@ -92,11 +92,15 @@ body {
 .top-darts {
   color: var(--accent);
   letter-spacing: 2px;
-  font-size: 0.8em;
+  font-size: 0.65em;
+  line-height: 1;
+  margin-bottom: 2px;
 }
  
 .score-main {
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
   font-weight: 800;
+  line-height: 1;
 }
  
 .score-meta {
@@ -171,6 +175,13 @@ body {
   .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; }
 }
+ 
+/* iPad+ text floor */
+@media (min-width: 768px) {
+  .key { font-size: 1.4rem; }
+  .enter { font-size: 1.6rem; }
+  .dart { font-size: 3rem !important; }
+}
 </style>
 </head>
  
@@ -178,7 +189,6 @@ body {
 <div class="app">
   <div class="keypad">
  
-    <!-- SCORE WINDOW -->
     <div class="key score-view">
       <div class="score-left">
         <div class="player active">P1 - 501</div>
@@ -206,7 +216,6 @@ body {
       <div class="score-right">SET UP</div>
     </div>
  
-    <!-- KEYPAD -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
@@ -221,56 +230,5 @@ body {
  
   </div>
 </div>
- 
-<script>
-const game = {
-  players: [
-    { name: "P1", score: 501, legs: 0, darts: 0, totalScored: 0 },
-    { name: "P2", score: 501, legs: 0, darts: 0, totalScored: 0 },
-    { name: "P3", score: 501, legs: 0, darts: 0, totalScored: 0 },
-    { name: "P4", score: 501, legs: 0, darts: 0, totalScored: 0 }
-  ],
-  active: 0,
-  input: ""
-};
- 
-const scoreTxt  = document.querySelector('.score-txt');
-const playersUI = document.querySelectorAll('.score-left .player');
-const dartsUI   = document.querySelector('.top-darts');
-const avgUI     = document.querySelector('.avg .value');
-const keysNum   = document.querySelectorAll('.num');
-const keyDel    = document.querySelector('.del');
- 
-function render() {
-  const p = game.players[game.active];
-  scoreTxt.textContent = game.input || p.score;
- 
-  playersUI.forEach((el, i) => {
-    el.classList.toggle('active', i === game.active);
-    el.textContent = `${game.players[i].name} - ${game.players[i].score}`;
-  });
- 
-  dartsUI.textContent = '●'.repeat(p.darts) + '○'.repeat(3 - p.darts);
- 
-  const avg = p.darts ? ((p.totalScored / p.darts) * 3).toFixed(1) : '0.0';
-  avgUI.textContent = avg;
-}
- 
-keysNum.forEach(k => {
-  k.addEventListener('click', () => {
-    if (game.input.length < 3) {
-      game.input += k.textContent;
-      render();
-    }
-  });
-});
- 
-keyDel.addEventListener('click', () => {
-  game.input = game.input.slice(0, -1);
-  render();
-});
- 
-render();
-</script>
 </body>
 </html>
