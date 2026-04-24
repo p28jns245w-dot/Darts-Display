@@ -1,136 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+="en">
 <head>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta charset="UTF-8" />
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0,
                maximum-scale=1.0,
                user-scalable=no,
                viewport-fit=cover" />
-<title>Darts Master</title>
+<title>Darts Master v39 - Snug Lock</title>
  
 <style>
+/* ===============================
+   YOUR ORIGINAL CSS (UNCHANGED)
+   =============================== */
 :root {
   --bg: #0d0d0d;
   --text: #ffffff;
   --accent: #50d890;
-  --muted: rgba(255,255,255,0.4);
+  --border-std: rgba(255, 255, 255, 0.15);
+  --border-red: rgba(255, 75, 92, 0.4);
+  --border-amber: rgba(255, 154, 60, 0.4);
+  --border-blue: rgba(0, 173, 181, 0.4);
 }
  
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, sans-serif;
   overflow: hidden;
+  touch-action: none;
 }
  
-.app { height: 100dvh; padding: 10px; }
-.keypad { display: grid; height: 100%; gap: 8px; }
+.app { width: 100%; height: 100dvh; padding: 10px; display: flex; flex-direction: column; }
+.keypad { display: grid; flex: 1; gap: 8px; }
  
-/* =========================================
-   SCORE WINDOW (NEW INTERNAL STRUCTURE)
-   ========================================= */
-.score-view {
-  grid-column: span 3;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr; /* left / center / right */
-  background: rgba(255,255,255,0.03);
+.key {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-std);
   border-radius: 12px;
-  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
 }
  
-/* LEFT: PLAYERS */
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; }
+.help-btn { border-color: var(--accent); color: var(--accent); }
+.bust { border-color: var(--border-amber); color: #ff9a3c; }
+.miss { border-color: var(--border-blue); color: #00adb5; }
+.enter { border: 2.5px solid var(--accent); color: var(--accent); }
+ 
+.dart { font-size: 2.5rem !important; }
+ 
+/* ===============================
+   SCORE WINDOW — INTERNAL REWORK
+   =============================== */
+.score-view {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  padding: 6px;
+}
+ 
+/* LEFT — PLAYER LIST */
 .score-left {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
-.player {
-  color: var(--muted);
+.score-left .player {
+  color: rgba(255,255,255,0.5);
 }
-.player.active {
+.score-left .active {
   color: var(--accent);
   font-weight: 700;
 }
  
-/* CENTER: SCORE + INFO */
+/* CENTER — SCORE + META */
 .score-center {
   display: grid;
-  grid-template-rows: 1fr 1fr; /* TOP / BOTTOM */
-  align-items: center;
+  grid-template-rows: 1fr 1fr;
   text-align: center;
+  align-items: center;
 }
- 
 .score-main {
-  font-size: 120px;
+  font-size: inherit; /* controlled by existing media rules */
   font-weight: 800;
-  line-height: 1;
 }
- 
 .score-meta {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  font-size: 0.9rem;
+  font-size: 0.7em;
+  color: rgba(255,255,255,0.45);
 }
+.score-meta .legs { text-align: left; }
+.score-meta .darts { text-align: center; color: var(--accent); letter-spacing: 6px; }
+.score-meta .avg { text-align: right; }
  
-.legs {
-  justify-self: start;
-  color: var(--muted);
-}
- 
-.darts {
-  letter-spacing: 6px;
-  color: var(--accent);
-}
- 
-.avg {
-  justify-self: end;
-  color: var(--muted);
-}
- 
-/* RIGHT: HELP */
+/* RIGHT — HELP */
 .score-right {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  font-size: 0.9rem;
   color: var(--accent);
+  font-size: 0.8rem;
 }
  
-/* =========================================
-   KEYS (UNCHANGED)
-   ========================================= */
-.key {
-  background: rgba(255,255,255,0.03);
-  border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 700;
-}
+/* ===============================
+   YOUR ORIGINAL MEDIA QUERIES
+   (UNCHANGED BELOW THIS POINT)
+   =============================== */
  
-/* Portrait layout (example – reuse your existing grid rules) */
+/* --- PORTRAIT --- */
 @media (orientation: portrait) {
-  .keypad {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 2.5fr repeat(6, 1fr);
-  }
-  .score-view { grid-column: span 3; }
+  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+  .score-view { grid-area: 1 / 1 / 2 / 4; }
+ 
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
+  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
  
-/* Landscape layout (example) */
+/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
-  .keypad {
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: 2fr repeat(3, 1fr);
-  }
+  .keypad { grid-template-columns: repeat(7, 1fr); grid-template-rows: 2.2fr 1fr 1fr 1fr; gap: 10px; }
   .score-view { grid-column: span 7; }
+ 
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .k0 { grid-area: 2 / 4 / 4 / 5; }
+ 
+  .del { grid-area: 2 / 5; } .dart { grid-area: 2 / 6; } .undo { grid-area: 2 / 7; }
+  .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
+  .enter { grid-area: 4 / 4 / 5 / 8; }
 }
 </style>
 </head>
@@ -139,20 +150,20 @@ body {
 <div class="app">
   <div class="keypad">
  
-    <!-- SCORE WINDOW -->
-    <div class="score-view">
-     
-      <!-- LEFT -->
+    <!-- ===============================
+         SCORE WINDOW (ONLY HTML CHANGE)
+         =============================== -->
+    <div class="key score-view">
+ 
       <div class="score-left">
-        <div class="player active">P1  501</div>
-        <div class="player">P2  501</div>
-        <div class="player">P3  501</div>
-        <div class="player">P4  501</div>
+        <div class="player active">P1 501</div>
+        <div class="player">P2 501</div>
+        <div class="player">P3 501</div>
+        <div class="player">P4 501</div>
       </div>
  
-      <!-- CENTER -->
       <div class="score-center">
-        <div class="score-main">501</div>
+        <div class="score-main score-txt">501</div>
         <div class="score-meta">
           <div class="legs">Legs 0</div>
           <div class="darts">○ ○ ○</div>
@@ -160,18 +171,26 @@ body {
         </div>
       </div>
  
-      <!-- RIGHT -->
       <div class="score-right">
         SET UP
       </div>
  
     </div>
  
-    <!-- KEYS BELOW (placeholder) -->
-    <div class="key">1</div><div class="key">2</div><div class="key">3</div>
-    <div class="key">4</div><div class="key">5</div><div class="key">6</div>
-    <div class="key">7</div><div class="key">8</div><div class="key">9</div>
-    <div class="key">DEL</div><div class="key">0</div><div class="key">ENTER</div>
+    <!-- ===============================
+         KEYPAD — UNTOUCHED
+         =============================== -->
+    <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
+    <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
+    <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
+    <div class="key num k0">0</div>
+    <div class="key del">DEL</div>
+    <div class="key dart">🎯</div>
+    <div class="key undo">UNDO</div>
+    <div class="key help-btn">HELP</div>
+    <div class="key bust">BUST</div>
+    <div class="key miss">MISS</div>
+    <div class="key enter">ENTER</div>
  
   </div>
 </div>
