@@ -9,7 +9,7 @@
                  maximum-scale=1.0,
                  user-scalable=no,
                  viewport-fit=cover" />
-  <title>Darts Master v39 - Snug Lock</title>
+  <title>Darts Master v39</title>
  
 <style>
  
@@ -27,10 +27,9 @@
 }
  
 /* =====================================================
-   GLOBAL RESETS / BASE
+   GLOBAL BASE
    ===================================================== */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
- 
 body {
   margin: 0;
   background: var(--bg);
@@ -38,6 +37,68 @@ body {
   font-family: -apple-system, sans-serif;
   overflow: hidden;
   touch-action: none;
+}
+ 
+/* =====================================================
+   START SCREEN
+   ===================================================== */
+.start-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+ 
+.start-card {
+  width: 90%;
+  max-width: 380px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-std);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+ 
+.start-card h1 {
+  margin: 0 0 16px;
+  color: var(--accent);
+}
+ 
+.group { margin-bottom: 14px; }
+ 
+.group.inline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+ 
+label {
+  display: block;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
+ 
+input, select {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-std);
+  border-radius: 8px;
+  padding: 6px;
+  color: var(--text);
+}
+ 
+.start-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
 }
  
 /* =====================================================
@@ -52,7 +113,7 @@ body {
 }
  
 /* =====================================================
-   KEYPAD GRID
+   KEYPAD / KEYS
    ===================================================== */
 .keypad {
   display: grid;
@@ -60,11 +121,8 @@ body {
   gap: 8px;
 }
  
-/* =====================================================
-   GENERIC KEY
-   ===================================================== */
 .key {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--border-std);
   border-radius: 12px;
   display: flex;
@@ -74,9 +132,11 @@ body {
   cursor: pointer;
 }
  
-/* =====================================================
-   ACTION KEYS
-   ===================================================== */
+.key.active {
+  border-color: var(--accent);
+  background: rgba(80,216,144,0.12);
+}
+ 
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn  { border-color: var(--accent); color: var(--accent); }
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
@@ -93,7 +153,6 @@ body {
   padding: 6px;
 }
  
-/* ----- LEFT: PLAYERS ----- */
 .score-left {
   display: flex;
   flex-direction: column;
@@ -103,7 +162,6 @@ body {
 .score-left .player { color: rgba(255,255,255,0.5); }
 .score-left .active { color: var(--accent); font-weight: 700; }
  
-/* ----- CENTER: DARTS / SCORE / META ----- */
 .score-center {
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -111,24 +169,21 @@ body {
   align-items: center;
 }
  
-/* DART INDICATORS */
 .top-darts {
+  display: none;
   color: var(--accent);
   letter-spacing: 2px;
   font-size: 0.6em;
-  line-height: 1;
-  margin-top: -4px;   /* closer to top */
-  margin-bottom: 0;
+  margin-top: -4px;
 }
+.dart-mode .top-darts { display: block; }
  
-/* MAIN SCORE */
 .score-main {
   font-size: clamp(2.6rem, 6.5vw, 3.6rem);
   font-weight: 800;
   line-height: 1;
 }
  
-/* LEGS / AVG */
 .score-meta {
   display: grid;
   grid-template-columns: 0.7fr auto 0.7fr;
@@ -146,24 +201,19 @@ body {
 .score-meta .label {
   font-size: 0.65em;
   opacity: 0.7;
-  line-height: 1;
 }
  
-.score-meta .value {
-  margin-top: 2px;
-}
- 
-/* ----- RIGHT: SETUP ----- */
 .score-right {
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent);
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2.2vw, 0.95rem);
+  white-space: nowrap;
 }
  
 /* =====================================================
-   PORTRAIT LAYOUT
+   RESPONSIVE LAYOUTS
    ===================================================== */
 @media (orientation: portrait) {
   .keypad {
@@ -171,22 +221,8 @@ body {
     grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
   }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
- 
-  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
-  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
-  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
- 
-  .enter    { grid-area: 6 / 1 / 7 / 3; }
-  .help-btn { grid-area: 6 / 3 / 7 / 4; }
-  .bust     { grid-area: 7 / 1; }
-  .miss     { grid-area: 7 / 2; }
-  .dart     { grid-area: 7 / 3; }
 }
  
-/* =====================================================
-   LANDSCAPE LAYOUT
-   ===================================================== */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(7, 1fr);
@@ -194,25 +230,8 @@ body {
     gap: 10px;
   }
   .score-view { grid-column: span 7; }
- 
-  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
-  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
-  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
- 
-  .k0 { grid-area: 2 / 4 / 4 / 5; }
- 
-  .del      { grid-area: 2 / 5; }
-  .dart     { grid-area: 2 / 6; }
-  .undo     { grid-area: 2 / 7; }
-  .help-btn { grid-area: 3 / 5; }
-  .bust     { grid-area: 3 / 6; }
-  .miss     { grid-area: 3 / 7; }
-  .enter    { grid-area: 4 / 4 / 5 / 8; }
 }
  
-/* =====================================================
-   iPAD / LARGE SCREEN TEXT (BOOSTED)
-   ===================================================== */
 @media (min-width: 768px) {
   .key   { font-size: 1.7rem; }
   .enter { font-size: 1.9rem; }
@@ -223,42 +242,74 @@ body {
 </head>
  
 <body>
+ 
+<!-- ================= START SCREEN ================= -->
+<div class="start-screen">
+  <div class="start-card">
+    <h1>Darts Master</h1>
+ 
+    <div class="group">
+      <label>Players</label>
+      <select id="playerCount">
+        <option value="1">1 (Practice)</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
+    </div>
+ 
+    <div id="playerNames" class="group"></div>
+ 
+    <div class="group inline">
+      <div>
+        <label>Game</label>
+        <select id="startScore">
+          <option>101</option>
+          <option>301</option>
+          <option selected>501</option>
+          <option>601</option>
+        </select>
+      </div>
+      <div>
+        <label>Legs</label>
+        <input id="legsToWin" type="number" value="3" min="1">
+      </div>
+      <div>
+        <label>Sets</label>
+        <input id="setsToWin" type="number" value="1" min="1">
+      </div>
+    </div>
+ 
+    <button class="start-btn">START MATCH</button>
+  </div>
+</div>
+ 
+<!-- ================= MAIN APP ================= -->
 <div class="app">
   <div class="keypad">
  
-    <!-- SCORE WINDOW -->
     <div class="key score-view">
-      <div class="score-left">
-        <div class="player active">P1 - 501</div>
-        <div class="player">P2 - 501</div>
-        <div class="player">P3 - 501</div>
-        <div class="player">P4 - 501</div>
-      </div>
+      <div class="score-left"></div>
  
       <div class="score-center">
-        <div class="darts top-darts">○ ○ ○</div>
-        <div class="score-main score-txt">501</div>
+        <div class="top-darts">○ ○ ○</div>
+        <div class="score-main">501</div>
         <div class="score-meta">
-          <div class="legs">
-            <div class="label">Legs</div>
-            <div class="value">0</div>
-          </div>
+          <div class="legs"><div class="label">Legs</div><div>0</div></div>
           <div></div>
-          <div class="avg">
-            <div class="label">Avg</div>
-            <div class="value">0.0</div>
-          </div>
+          <div class="avg"><div class="label">Avg</div><div>0.0</div></div>
         </div>
       </div>
  
       <div class="score-right">SET UP</div>
     </div>
  
-    <!-- KEYPAD -->
-    <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
-    <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
-    <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
-    <div class="key num k0">0</div>
+    <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+    <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+    <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+    <div class="key">0</div>
  
     <div class="key del">DEL</div>
     <div class="key dart">🎯</div>
@@ -270,5 +321,85 @@ body {
  
   </div>
 </div>
+ 
+<script>
+ 
+/* =====================================================
+   GAME OBJECT (CONFIG ONLY — ENGINE/DISPLAY LOCKED)
+   ===================================================== */
+let game = null;
+ 
+/* =====================================================
+   START SCREEN LOGIC
+   ===================================================== */
+const playerCount = document.getElementById('playerCount');
+const startScoreSel = document.getElementById('startScore');
+const legsInput = document.getElementById('legsToWin');
+const setsInput = document.getElementById('setsToWin');
+const namesWrap = document.getElementById('playerNames');
+const startScreen = document.querySelector('.start-screen');
+const startBtn = document.querySelector('.start-btn');
+ 
+function renderNames() {
+  namesWrap.innerHTML = '';
+  for (let i = 1; i <= playerCount.value; i++) {
+    const input = document.createElement('input');
+    input.placeholder = `Player ${i}`;
+    namesWrap.appendChild(input);
+  }
+}
+ 
+playerCount.addEventListener('change', renderNames);
+renderNames();
+ 
+startBtn.addEventListener('click', () => {
+  const count = Number(playerCount.value);
+  const startScore = Number(startScoreSel.value);
+  const nameInputs = namesWrap.querySelectorAll('input');
+ 
+  game = {
+    mode: count === 1 ? 'practice' : 'match',
+    startScore,
+    legsToWin: Number(legsInput.value),
+    setsToWin: Number(setsInput.value),
+    players: [],
+    createdAt: Date.now()
+  };
+ 
+  const scoreLeft = document.querySelector('.score-left');
+  scoreLeft.innerHTML = '';
+ 
+  for (let i = 0; i < count; i++) {
+    const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
+    game.players.push({ name, score: startScore, legs: 0 });
+ 
+    const div = document.createElement('div');
+    div.className = 'player' + (i === 0 ? ' active' : '');
+    div.textContent = `${name} - ${startScore}`;
+    scoreLeft.appendChild(div);
+  }
+ 
+  document.querySelector('.score-main').textContent = startScore;
+ 
+  console.log('Game created:', game); // ✅ testing visibility
+  startScreen.style.display = 'none';
+});
+ 
+/* =====================================================
+   MODE HIGHLIGHTS (DISPLAY ONLY)
+   ===================================================== */
+const app = document.querySelector('.app');
+document.querySelector('.dart').addEventListener('click', e => {
+  app.classList.toggle('dart-mode');
+  e.currentTarget.classList.toggle('active');
+});
+ 
+document.querySelector('.help-btn').addEventListener('click', e => {
+  e.currentTarget.classList.toggle('active');
+});
+ 
+</script>
+ 
 </body>
 </html>
+``
