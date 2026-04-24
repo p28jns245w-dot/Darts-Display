@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta charset="UTF-8" />
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no,
-               viewport-fit=cover" />
-<title>Darts Master v39 - Snug Lock</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no,
+                 viewport-fit=cover" />
+  <title>Darts Master v39 - Snug Lock</title>
  
 <style>
-/* ===============================
-   YOUR ORIGINAL CSS (UNCHANGED)
-   =============================== */
 :root {
   --bg: #0d0d0d;
   --text: #ffffff;
@@ -35,8 +32,19 @@ body {
   touch-action: none;
 }
  
-.app { width: 100%; height: 100dvh; padding: 10px; display: flex; flex-direction: column; }
-.keypad { display: grid; flex: 1; gap: 8px; }
+.app {
+  width: 100%;
+  height: 100dvh;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.keypad {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+}
  
 .key {
   background: rgba(255, 255, 255, 0.03);
@@ -54,55 +62,68 @@ body {
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
- 
 .dart { font-size: 2.5rem !important; }
  
-/* ===============================
-   SCORE WINDOW — INTERNAL REWORK
-   =============================== */
+/* SCORE WINDOW */
 .score-view {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   padding: 6px;
 }
  
-/* LEFT — PLAYER LIST */
+/* LEFT */
 .score-left {
   display: flex;
   flex-direction: column;
   justify-content: center;
   font-size: 0.8rem;
 }
-.score-left .player {
-  color: rgba(255,255,255,0.5);
-}
-.score-left .active {
-  color: var(--accent);
-  font-weight: 700;
-}
+.score-left .player { color: rgba(255,255,255,0.5); }
+.score-left .active { color: var(--accent); font-weight: 700; }
  
-/* CENTER — SCORE + META */
+/* CENTER */
 .score-center {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
   text-align: center;
   align-items: center;
 }
+ 
+.top-darts {
+  color: var(--accent);
+  letter-spacing: 2px;
+  font-size: 0.8em;
+}
+ 
 .score-main {
-  font-size: inherit; /* controlled by existing media rules */
   font-weight: 800;
 }
+ 
 .score-meta {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 0.7fr auto 0.7fr;
   font-size: 0.7em;
   color: rgba(255,255,255,0.45);
 }
-.score-meta .legs { text-align: left; }
-.score-meta .darts { text-align: center; color: var(--accent); letter-spacing: 6px; }
-.score-meta .avg { text-align: right; }
  
-/* RIGHT — HELP */
+.score-meta .legs,
+.score-meta .avg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+ 
+.score-meta .label {
+  font-size: 0.65em;
+  opacity: 0.7;
+  line-height: 1;
+}
+ 
+.score-meta .value {
+  margin-top: 2px;
+}
+ 
+/* RIGHT */
 .score-right {
   display: flex;
   align-items: center;
@@ -111,27 +132,30 @@ body {
   font-size: 0.8rem;
 }
  
-/* ===============================
-   YOUR ORIGINAL MEDIA QUERIES
-   (UNCHANGED BELOW THIS POINT)
-   =============================== */
- 
-/* --- PORTRAIT --- */
+/* PORTRAIT */
 @media (orientation: portrait) {
-  .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
+  .keypad {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
+  }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
  
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
-  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
+  .enter { grid-area: 6 / 1 / 7 / 3; }
+  .help-btn { grid-area: 6 / 3 / 7 / 4; }
   .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
  
-/* --- LANDSCAPE --- */
+/* LANDSCAPE */
 @media (orientation: landscape) {
-  .keypad { grid-template-columns: repeat(7, 1fr); grid-template-rows: 2.2fr 1fr 1fr 1fr; gap: 10px; }
+  .keypad {
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 2.2fr 1fr 1fr 1fr;
+    gap: 10px;
+  }
   .score-view { grid-column: span 7; }
  
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
@@ -139,8 +163,12 @@ body {
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
   .k0 { grid-area: 2 / 4 / 4 / 5; }
  
-  .del { grid-area: 2 / 5; } .dart { grid-area: 2 / 6; } .undo { grid-area: 2 / 7; }
-  .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
+  .del { grid-area: 2 / 5; }
+  .dart { grid-area: 2 / 6; }
+  .undo { grid-area: 2 / 7; }
+  .help-btn { grid-area: 3 / 5; }
+  .bust { grid-area: 3 / 6; }
+  .miss { grid-area: 3 / 7; }
   .enter { grid-area: 4 / 4 / 5 / 8; }
 }
 </style>
@@ -150,36 +178,35 @@ body {
 <div class="app">
   <div class="keypad">
  
-    <!-- ===============================
-         SCORE WINDOW (ONLY HTML CHANGE)
-         =============================== -->
+    <!-- SCORE WINDOW -->
     <div class="key score-view">
- 
       <div class="score-left">
-        <div class="player active">P1 501</div>
-        <div class="player">P2 501</div>
-        <div class="player">P3 501</div>
-        <div class="player">P4 501</div>
+        <div class="player active">P1 - 501</div>
+        <div class="player">P2 - 501</div>
+        <div class="player">P3 - 501</div>
+        <div class="player">P4 - 501</div>
       </div>
  
       <div class="score-center">
+        <div class="darts top-darts">○ ○ ○</div>
         <div class="score-main score-txt">501</div>
         <div class="score-meta">
-          <div class="legs">Legs 0</div>
-          <div class="darts">○ ○ ○</div>
-          <div class="avg">Avg 0.0</div>
+          <div class="legs">
+            <div class="label">Legs</div>
+            <div class="value">0</div>
+          </div>
+          <div></div>
+          <div class="avg">
+            <div class="label">Avg</div>
+            <div class="value">0.0</div>
+          </div>
         </div>
       </div>
  
-      <div class="score-right">
-        SET UP
-      </div>
- 
+      <div class="score-right">SET UP</div>
     </div>
  
-    <!-- ===============================
-         KEYPAD — UNTOUCHED
-         =============================== -->
+    <!-- KEYPAD -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
@@ -194,5 +221,56 @@ body {
  
   </div>
 </div>
+ 
+<script>
+const game = {
+  players: [
+    { name: "P1", score: 501, legs: 0, darts: 0, totalScored: 0 },
+    { name: "P2", score: 501, legs: 0, darts: 0, totalScored: 0 },
+    { name: "P3", score: 501, legs: 0, darts: 0, totalScored: 0 },
+    { name: "P4", score: 501, legs: 0, darts: 0, totalScored: 0 }
+  ],
+  active: 0,
+  input: ""
+};
+ 
+const scoreTxt  = document.querySelector('.score-txt');
+const playersUI = document.querySelectorAll('.score-left .player');
+const dartsUI   = document.querySelector('.top-darts');
+const avgUI     = document.querySelector('.avg .value');
+const keysNum   = document.querySelectorAll('.num');
+const keyDel    = document.querySelector('.del');
+ 
+function render() {
+  const p = game.players[game.active];
+  scoreTxt.textContent = game.input || p.score;
+ 
+  playersUI.forEach((el, i) => {
+    el.classList.toggle('active', i === game.active);
+    el.textContent = `${game.players[i].name} - ${game.players[i].score}`;
+  });
+ 
+  dartsUI.textContent = '●'.repeat(p.darts) + '○'.repeat(3 - p.darts);
+ 
+  const avg = p.darts ? ((p.totalScored / p.darts) * 3).toFixed(1) : '0.0';
+  avgUI.textContent = avg;
+}
+ 
+keysNum.forEach(k => {
+  k.addEventListener('click', () => {
+    if (game.input.length < 3) {
+      game.input += k.textContent;
+      render();
+    }
+  });
+});
+ 
+keyDel.addEventListener('click', () => {
+  game.input = game.input.slice(0, -1);
+  render();
+});
+ 
+render();
+</script>
 </body>
 </html>
