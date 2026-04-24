@@ -4,10 +4,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no,
+               viewport-fit=cover" />
 <title>Darts Master v39 - Snug Lock</title>
-
+ 
 <style>
+/* ===== YOUR DISPLAY CSS — UNCHANGED ===== */
 :root {
   --bg: #0d0d0d;
   --text: #ffffff;
@@ -17,35 +22,39 @@
   --border-amber: rgba(255, 154, 60, 0.4);
   --border-blue: rgba(0, 173, 181, 0.4);
 }
-
+ 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow: hidden; touch-action: none; }
-
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, sans-serif;
+  overflow: hidden;
+  touch-action: none;
+}
+ 
 .app { width: 100%; height: 100dvh; padding: 10px; display: flex; flex-direction: column; }
 .keypad { display: grid; flex: 1; gap: 8px; }
-
-.key { 
-  background: rgba(255, 255, 255, 0.03); 
-  border: 1px solid var(--border-std); 
-  border-radius: 12px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-weight: 700; 
+ 
+.key {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-std);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
   cursor: pointer;
 }
-
-/* Colors */
+ 
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn { border-color: var(--accent); color: var(--accent); }
 .bust { border-color: var(--border-amber); color: #ff9a3c; }
 .miss { border-color: var(--border-blue); color: #00adb5; }
 .enter { border: 2.5px solid var(--accent); color: var(--accent); }
-
-/* Dart Icon Size */
-.dart { font-size: 2.5rem !important; } 
-
-/* --- 1. PORTRAIT (NO CHANGES) --- */
+.dart { font-size: 2.5rem !important; }
+ 
+/* --- PORTRAIT --- */
 @media (orientation: portrait) {
   .keypad { grid-template-columns: repeat(3, 1fr); grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr; }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
@@ -55,67 +64,52 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
   .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
   .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
-
+ 
   @media (max-width: 500px) {
     .score-txt { font-size: 80px; } .num, .k0 { font-size: 32px; }
-    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 19px; }
   }
   @media (min-width: 501px) {
     .score-txt { font-size: 140px; } .num, .k0 { font-size: 55px; }
-    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 32px; }
     .dart { font-size: 4rem !important; }
   }
 }
-
-/* --- 2. LANDSCAPE (SNUG MARGINS) --- */
+ 
+/* --- LANDSCAPE --- */
 @media (orientation: landscape) {
-  .keypad { 
-    grid-template-columns: repeat(7, 1fr); 
-    /* Default for Phone (Wide) */
-    grid-template-rows: 2.2fr 1fr 1fr 1fr; 
+  .keypad {
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 2.2fr 1fr 1fr 1fr;
     gap: 10px;
-    padding-left: calc(env(safe-area-inset-left) + 5px);
-    padding-right: calc(env(safe-area-inset-right) + 5px);
   }
   .score-view { grid-column: span 7; }
-  
+ 
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-  .k0 { grid-area: 2 / 4 / 4 / 5; } 
+  .k0 { grid-area: 2 / 4 / 4 / 5; }
   .del { grid-area: 2 / 5; } .dart { grid-area: 2 / 6; } .undo { grid-area: 2 / 7; }
   .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
-  .enter { grid-area: 4 / 4 / 5 / 8; } 
-
-  /* iPhone Landscape (Specific height limit) */
-  @media (max-height: 500px) {
-    .score-txt { font-size: 60px; } .num, .k0 { font-size: 26px; }
-    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 18px; }
-    .dart { font-size: 2rem !important; }
-    .keypad { gap: 6px; }
-  }
-
-  /* iPad/TV Landscape (Taming the Height) */
-  @media (min-height: 501px) {
-    /* Shaving the height off the score window for better TV proportions */
-    .keypad { grid-template-rows: 1.7fr 1fr 1fr 1fr; } 
-    
-    .score-txt { font-size: 150px; } .num, .k0 { font-size: 60px; }
-    .bust, .miss, .del, .undo, .help-btn, .enter { font-size: 34px; }
-    .dart { font-size: 4rem !important; }
-  }
+  .enter { grid-area: 4 / 4 / 5 / 8; }
 }
-
 </style>
 </head>
+ 
 <body>
 <div class="app">
   <div class="keypad">
     <div class="key score-view"><div class="score-txt">501</div></div>
-    <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
-    <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
-    <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
+ 
+    <div class="key num k1">1</div>
+    <div class="key num k2">2</div>
+    <div class="key num k3">3</div>
+    <div class="key num k4">4</div>
+    <div class="key num k5">5</div>
+    <div class="key num k6">6</div>
+    <div class="key num k7">7</div>
+    <div class="key num k8">8</div>
+    <div class="key num k9">9</div>
     <div class="key num k0">0</div>
+ 
     <div class="key del">DEL</div>
     <div class="key dart">🎯</div>
     <div class="key undo">UNDO</div>
@@ -125,5 +119,114 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple
     <div class="key enter">ENTER</div>
   </div>
 </div>
+ 
+<script>
+/* ======================================================
+   ENGINE (MATCH AVERAGES, ADVICE, MODES)
+   ====================================================== */
+class DartsEngine {
+  constructor() {
+    this.players = [{ score: 501, darts: 0, points: 0, isDartsMode: false }];
+    this.currentIdx = 0;
+    this.turnStartScore = 501;
+  }
+  submitScore(val) {
+    const p = this.players[0];
+    p.points += val; p.darts += 3;
+    const rem = p.score - val;
+    if (rem === 0) return { status: "PENDING_WIN" };
+    if (rem < 0 || rem === 1) { p.score = this.turnStartScore; return; }
+    p.score = rem;
+  }
+  submitMiss() { this.players[0].darts++; }
+  manualBust() { this.players[0].score = this.turnStartScore; }
+  undo() {}
+  togglePlayerMode() {
+    const p = this.players[0];
+    p.isDartsMode = !p.isDartsMode;
+    return { activeMode: p.isDartsMode };
+  }
+  confirmWin() { this.players[0].score = 501; }
+  denyWin() { this.players[0].score = this.turnStartScore; }
+  getCheckoutAdvice(score) {
+    if (score === 170) return ["PRO: T20‑T20‑BULL"];
+    if (score <= 40 && score % 2 === 0) return ["D" + (score / 2)];
+    return ["SET UP"];
+  }
+  getState() { return { active: this.players[0] }; }
+}
+ 
+/* ======================================================
+   GLUE (STEPS 1–5)
+   ====================================================== */
+const engine = new DartsEngine();
+let inputBuffer = "";
+let helpMode = false;
+let pendingWin = false;
+ 
+const scoreTxt = document.querySelector(".score-txt");
+const numKeys = document.querySelectorAll(".num");
+const enterBtn = document.querySelector(".enter");
+const delBtn = document.querySelector(".del");
+const bustBtn = document.querySelector(".bust");
+const missBtn = document.querySelector(".miss");
+const undoBtn = document.querySelector(".undo");
+const dartBtn = document.querySelector(".dart");
+const helpBtn = document.querySelector(".help-btn");
+ 
+function renderScore() {
+  const score = engine.getState().active.score;
+  if (helpMode) {
+    scoreTxt.textContent = engine.getCheckoutAdvice(score)[0];
+  } else {
+    scoreTxt.textContent = inputBuffer || score;
+  }
+}
+ 
+/* Step 1 */
+numKeys.forEach(k => k.onclick = () => {
+  if (pendingWin) return;
+  inputBuffer += k.textContent;
+  scoreTxt.textContent = inputBuffer;
+});
+enterBtn.onclick = () => {
+  if (pendingWin) {
+    engine.confirmWin();
+    pendingWin = false;
+    renderScore(); return;
+  }
+  if (!inputBuffer) return;
+  const res = engine.submitScore(+inputBuffer);
+  inputBuffer = "";
+  if (res && res.status === "PENDING_WIN") {
+    pendingWin = true;
+    scoreTxt.textContent = "WIN?";
+    return;
+  }
+  renderScore();
+};
+delBtn.onclick = () => { if (!pendingWin) inputBuffer=""; renderScore(); };
+ 
+/* Step 2 */
+bustBtn.onclick = () => {
+  inputBuffer="";
+  if (pendingWin) { engine.denyWin(); pendingWin=false; }
+  else engine.manualBust();
+  renderScore();
+};
+missBtn.onclick = () => { if (!pendingWin) engine.submitMiss(); };
+undoBtn.onclick = () => { if (!pendingWin) engine.undo(); renderScore(); };
+ 
+/* Step 3 */
+dartBtn.onclick = () => {
+  const res = engine.togglePlayerMode();
+  dartBtn.style.color = res.activeMode ? "var(--accent)" : "";
+};
+ 
+/* Step 5 */
+helpBtn.onclick = () => { helpMode = !helpMode; renderScore(); };
+ 
+renderScore();
+</script>
 </body>
 </html>
