@@ -127,8 +127,14 @@ input, select {
   cursor: pointer;
 }
  
+/* Active (toggle states e.g., HELP / 🎯) */
 .key.active {
   border-color: var(--accent);
+  background: rgba(80, 216, 144, 0.12);
+}
+ 
+/* Press flash feedback (all buttons) */
+.key.pressed {
   background: rgba(80, 216, 144, 0.12);
 }
  
@@ -156,9 +162,14 @@ input, select {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.8rem; /* JS will set uniform px size after start */
 }
-.score-left .player { color: rgba(255,255,255,0.5); }
+.score-left .player {
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .score-left .active { color: var(--accent); font-weight: 700; }
  
 /* CENTER */
@@ -176,23 +187,25 @@ input, select {
   letter-spacing: 2px;
   font-size: 0.6em;
   line-height: 1;
-  margin-top: -4px;  /* closer to top */
+  margin-top: -4px;
   margin-bottom: 0;
 }
 .dart-mode .top-darts { display: block; }
  
-/* score size tuned (iPad bigger, iPhone slightly bigger) */
+/* score sizing */
 .score-main {
   font-size: clamp(2.6rem, 6.5vw, 3.6rem);
   font-weight: 800;
   line-height: 1;
 }
  
+/* Legs/Avg a bit bigger + more separation */
 .score-meta {
   display: grid;
   grid-template-columns: 0.7fr auto 0.7fr;
-  font-size: 0.7em;
+  font-size: 0.8em;
   color: rgba(255,255,255,0.45);
+  margin-top: 6px;
 }
 .score-meta .legs,
 .score-meta .avg {
@@ -219,7 +232,7 @@ input, select {
 }
  
 /* =====================================================
-   PORTRAIT LAYOUT (RESTORED - LOCKED)
+   PORTRAIT LAYOUT (LOCKED)
    ===================================================== */
 @media (orientation: portrait) {
   .keypad {
@@ -237,7 +250,7 @@ input, select {
 }
  
 /* =====================================================
-   LANDSCAPE LAYOUT (RESTORED - LOCKED)
+   LANDSCAPE LAYOUT (LOCKED)
    ===================================================== */
 @media (orientation: landscape) {
   .keypad {
@@ -258,14 +271,13 @@ input, select {
 }
  
 /* =====================================================
-   iPAD / LARGE SCREEN TEXT (BOOSTED)
+   iPAD / LARGE SCREEN TEXT (SLIGHTLY BIGGER)
    ===================================================== */
 @media (min-width: 768px) {
-  .key   { font-size: 1.7rem; }
-  .enter { font-size: 1.9rem; }
-  .dart  { font-size: 3.4rem !important; }
+  .key   { font-size: 1.9rem; }
+  .enter { font-size: 2.1rem; }
+  .dart  { font-size: 3.6rem !important; }
 }
- 
 </style>
 </head>
  
@@ -343,7 +355,7 @@ input, select {
       <div class="score-right">SET UP</div>
     </div>
  
-    <!-- KEYPAD (LOCKED / RESTORED) -->
+    <!-- KEYPAD (LOCKED) -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
@@ -379,6 +391,7 @@ const startBtn = document.querySelector('.start-btn');
  
 const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
+const scoreRight = document.querySelector('.score-right'); // CL-005
  
 function renderNames() {
   namesWrap.innerHTML = '';
@@ -390,6 +403,51 @@ function renderNames() {
 }
 playerCount.addEventListener('change', renderNames);
 renderNames();
+ 
+/* =====================================================
+   PLAYER FONT AUTO-FIT (UNIFORM SIZE, NO WRAP, ELLIPSIS)
+   ===================================================== */
+function fitPlayerFont() {
+  const container = document.querySelector('.score-left');
+  const items = container.querySelectorAll('.player');
+  if (!items.length) return;
+ 
+  const maxWidth = container.clientWidth;
+ 
+  // reset any previous inline size
+  items.forEach(el => (el.style.fontSize = ''));
+ 
+  let lo = 10, hi = 22; // px range
+ 
+  const fits = (px) => {
+    items.forEach(el => (el.style.fontSize = px + 'px'));
+    return Array.from(items).every(el => el.scrollWidth <= maxWidth);
+  };
+ 
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (fits(mid)) lo = mid;
+    else hi = mid - 1;
+  }
+ 
+  items.forEach(el => (el.style.fontSize = lo + 'px'));
+}
+ 
+window.addEventListener('resize', fitPlayerFont);
+window.addEventListener('orientationchange', fitPlayerFont);
+ 
+/* =====================================================
+   NUMERIC INPUT (DISPLAY ONLY — ENGINE STILL LOCKED)
+   ===================================================== */
+let currentInput = '';
+ 
+function isStarted() {                 // CL-002
+  return !!game;
+}
+ 
+function syncVisitDisplay() {          // CL-005
+  scoreRight.textContent = currentInput || '';
+}
  
 /* =====================================================
    START MATCH: WIRE START -> UI + GAME CONFIG
@@ -408,6 +466,9 @@ startBtn.addEventListener('click', () => {
     createdAt: Date.now()
   };
  
+  currentInput = '';                  // CL-001
+  syncVisitDisplay();                 // CL-005 (blank)
+ 
   scoreLeft.innerHTML = '';
   for (let i = 0; i < count; i++) {
     const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
@@ -419,28 +480,32 @@ startBtn.addEventListener('click', () => {
     scoreLeft.appendChild(div);
   }
  
+  fitPlayerFont();
   scoreMain.textContent = startScore;
+ 
   startScreen.style.display = 'none';
   console.log('Game created:', game);
 });
  
 /* =====================================================
-   NUMERIC INPUT (DISPLAY ONLY — ENGINE STILL LOCKED)
+   KEYPAD: NUMERIC INPUT (GUARDED)
    ===================================================== */
-let currentInput = '';
- 
 document.querySelectorAll('.num').forEach(k => {
   k.addEventListener('click', () => {
+    if (!isStarted()) return;         // CL-002
     if (currentInput.length < 3) {
       currentInput += k.textContent;
       scoreMain.textContent = currentInput;
+      syncVisitDisplay();             // CL-005
     }
   });
 });
  
 document.querySelector('.del').addEventListener('click', () => {
+  if (!isStarted()) return;           // CL-002
   currentInput = currentInput.slice(0, -1);
   scoreMain.textContent = currentInput || game?.startScore || '0';
+  syncVisitDisplay();                 // CL-005
 });
  
 /* =====================================================
@@ -449,12 +514,25 @@ document.querySelector('.del').addEventListener('click', () => {
 const app = document.querySelector('.app');
  
 document.querySelector('.dart').addEventListener('click', (e) => {
+  if (!isStarted()) return;           // CL-002
   app.classList.toggle('dart-mode');
   e.currentTarget.classList.toggle('active');
 });
  
 document.querySelector('.help-btn').addEventListener('click', (e) => {
+  if (!isStarted()) return;           // CL-002
   e.currentTarget.classList.toggle('active');
+});
+ 
+/* =====================================================
+   PRESS FLASH FEEDBACK (ALL KEYPAD/ACTION BUTTONS)
+   ===================================================== */
+document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!isStarted()) return;         // CL-002
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 120);
+  });
 });
 </script>
  
