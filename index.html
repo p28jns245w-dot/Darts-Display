@@ -9,8 +9,8 @@
                  maximum-scale=1.0,
                  user-scalable=no,
                  viewport-fit=cover" />
-  <title>Darts Master v39</title>
- 
+  <title>Darts Master v1.9</title>
+
 <style>
 /* =====================================================
    GLOBAL THEME VARIABLES
@@ -24,7 +24,7 @@
   --border-amber: rgba(255, 154, 60, 0.4);
   --border-blue: rgba(0, 173, 181, 0.4);
 }
- 
+
 /* =====================================================
    GLOBAL BASE
    ===================================================== */
@@ -37,7 +37,7 @@ body {
   overflow: hidden;
   touch-action: none;
 }
- 
+
 /* =====================================================
    START SCREEN (CENTERED)
    ===================================================== */
@@ -92,7 +92,7 @@ input, select {
   color: var(--accent);
   font-weight: 700;
 }
- 
+
 /* =====================================================
    APP SHELL
    ===================================================== */
@@ -103,7 +103,7 @@ input, select {
   display: flex;
   flex-direction: column;
 }
- 
+
 /* =====================================================
    KEYPAD GRID
    ===================================================== */
@@ -112,7 +112,7 @@ input, select {
   flex: 1;
   gap: 8px;
 }
- 
+
 /* =====================================================
    GENERIC KEY STYLING
    ===================================================== */
@@ -126,18 +126,18 @@ input, select {
   font-weight: 700;
   cursor: pointer;
 }
- 
+
 /* Active (toggle states e.g., HELP / 🎯) */
 .key.active {
   border-color: var(--accent);
   background: rgba(80, 216, 144, 0.12);
 }
- 
+
 /* Press flash feedback (all buttons) */
 .key.pressed {
   background: rgba(80, 216, 144, 0.12);
 }
- 
+
 /* =====================================================
    ACTION / STATE KEYS
    ===================================================== */
@@ -147,7 +147,7 @@ input, select {
 .miss      { border-color: var(--border-blue); color: #00adb5; }
 .enter     { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart      { font-size: 2.5rem !important; }
- 
+
 /* =====================================================
    SCORE WINDOW
    ===================================================== */
@@ -156,7 +156,7 @@ input, select {
   grid-template-columns: 1fr 2fr 1fr;
   padding: 6px;
 }
- 
+
 /* LEFT */
 .score-left {
   display: flex;
@@ -171,7 +171,7 @@ input, select {
   text-overflow: ellipsis;
 }
 .score-left .active { color: var(--accent); font-weight: 700; }
- 
+
 /* CENTER */
 .score-center {
   display: grid;
@@ -179,7 +179,7 @@ input, select {
   text-align: center;
   align-items: center;
 }
- 
+
 /* dots only in dart-mode */
 .top-darts {
   display: none;
@@ -191,14 +191,14 @@ input, select {
   margin-bottom: 0;
 }
 .dart-mode .top-darts { display: block; }
- 
+
 /* score sizing */
 .score-main {
   font-size: clamp(2.6rem, 6.5vw, 3.6rem);
   font-weight: 800;
   line-height: 1;
 }
- 
+
 /* Legs/Avg a bit bigger + more separation */
 .score-meta {
   display: grid;
@@ -219,7 +219,7 @@ input, select {
   line-height: 1;
 }
 .score-meta .value { margin-top: 2px; }
- 
+
 /* RIGHT */
 .score-right {
   display: flex;
@@ -230,46 +230,58 @@ input, select {
   white-space: nowrap;
   line-height: 1;
 }
- 
+
 /* =====================================================
-   PORTRAIT LAYOUT (LOCKED)
+   PORTRAIT LAYOUT (UPDATED)
    ===================================================== */
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
+    grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
   }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
- 
+
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
-  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
-  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
+
+  /* ENTER now takes the full row (same height as other keys) */
+  .enter { grid-area: 6 / 1 / 7 / 4; }
+
+  /* Bottom row */
+  .bust { grid-area: 7 / 1; } .help-btn { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
- 
+
 /* =====================================================
-   LANDSCAPE LAYOUT (LOCKED)
+   LANDSCAPE LAYOUT (UPDATED TO 6 COLUMNS)
    ===================================================== */
 @media (orientation: landscape) {
   .keypad {
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     grid-template-rows: 2.2fr 1fr 1fr 1fr;
     gap: 10px;
   }
-  .score-view { grid-column: span 7; }
- 
+  .score-view { grid-column: span 6; }
+
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-  .k0 { grid-area: 2 / 4 / 4 / 5; }
- 
-  .del { grid-area: 2 / 5; } .dart { grid-area: 2 / 6; } .undo { grid-area: 2 / 7; }
-  .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
-  .enter { grid-area: 4 / 4 / 5 / 8; }
+
+  .del  { grid-area: 2 / 4; }  /* next to 3 */
+  .k0   { grid-area: 3 / 4; }  /* next to 6 */
+
+  .dart { grid-area: 2 / 5; }  /* above HELP */
+  .undo { grid-area: 2 / 6; }  /* above BUST */
+
+  .help-btn { grid-area: 3 / 5; } /* col 5 */
+  .bust     { grid-area: 3 / 6; } /* col 6 */
+
+  /* ENTER spans keypad row 3 (excluding score): CSS row 4, cols 4–6 */
+  .enter { grid-area: 4 / 4 / 5 / 7; }
 }
- 
+
 /* =====================================================
    iPAD / LARGE SCREEN TEXT (SLIGHTLY BIGGER)
    ===================================================== */
@@ -280,14 +292,14 @@ input, select {
 }
 </style>
 </head>
- 
+
 <body>
- 
+
 <!-- ================= START SCREEN ================= -->
 <div class="start-screen">
   <div class="start-card">
     <h1>Darts Master</h1>
- 
+
     <div class="group">
       <label>Players</label>
       <select id="playerCount">
@@ -299,9 +311,9 @@ input, select {
         <option value="6">6</option>
       </select>
     </div>
- 
+
     <div id="playerNames" class="group"></div>
- 
+
     <div class="group inline">
       <div>
         <label>Game</label>
@@ -323,19 +335,19 @@ input, select {
         <input id="setsToWin" type="number" value="1" min="1">
       </div>
     </div>
- 
+
     <button class="start-btn">START MATCH</button>
   </div>
 </div>
- 
+
 <!-- ================= MAIN APP ================= -->
 <div class="app">
   <div class="keypad">
- 
+
     <!-- SCORE WINDOW -->
     <div class="key score-view">
       <div class="score-left"></div>
- 
+
       <div class="score-center">
         <div class="top-darts">○ ○ ○</div>
         <div class="score-main">501</div>
@@ -351,33 +363,41 @@ input, select {
           </div>
         </div>
       </div>
- 
+
       <div class="score-right">SET UP</div>
     </div>
- 
-    <!-- KEYPAD (LOCKED) -->
+
+    <!-- KEYPAD -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
     <div class="key num k0">0</div>
- 
+
     <div class="key del">DEL</div>
     <div class="key dart">🎯</div>
     <div class="key undo">UNDO</div>
     <div class="key help-btn">HELP</div>
     <div class="key bust">BUST</div>
-    <div class="key miss">MISS</div>
     <div class="key enter">ENTER</div>
- 
+
   </div>
 </div>
- 
+
 <script>
+/* =====================================================
+   CHANGELOG
+   v1.9 - Engine wiring for testing (hybrid C)
+   - ENTER commits: dart-mode ON => per-dart (0–60), OFF => visit total (0–180)
+   - 3-dart turn tracking w/ dots, auto-advance, bust revert to turn-start snapshot
+   - Double-out confirm on exact 0; 'No' => bust + advance
+   - Leg starter rotates each leg (next-in-line starts new leg)
+   ===================================================== */
+
 /* =====================================================
    GAME OBJECT (CONFIG ONLY — ENGINE/DISPLAY LOCKED)
    ===================================================== */
 let game = null;
- 
+
 /* =====================================================
    START SCREEN: BUILD NAME INPUTS
    ===================================================== */
@@ -388,11 +408,18 @@ const setsInput = document.getElementById('setsToWin');
 const namesWrap = document.getElementById('playerNames');
 const startScreen = document.querySelector('.start-screen');
 const startBtn = document.querySelector('.start-btn');
- 
+
 const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
-const scoreRight = document.querySelector('.score-right'); // CL-005
- 
+const scoreRight = document.querySelector('.score-right'); // visit display
+const legsValueEl = document.querySelector('.score-meta .legs .value');
+const avgValueEl  = document.querySelector('.score-meta .avg .value');
+const topDartsEl  = document.querySelector('.top-darts');
+
+// Engine display state (testing)
+let dartsThisTurn = 0;       // 0-3
+let turnStartScore = null;   // snapshot for bust reverts
+
 function renderNames() {
   namesWrap.innerHTML = '';
   for (let i = 1; i <= Number(playerCount.value); i++) {
@@ -403,7 +430,7 @@ function renderNames() {
 }
 playerCount.addEventListener('change', renderNames);
 renderNames();
- 
+
 /* =====================================================
    PLAYER FONT AUTO-FIT (UNIFORM SIZE, NO WRAP, ELLIPSIS)
    ===================================================== */
@@ -411,44 +438,152 @@ function fitPlayerFont() {
   const container = document.querySelector('.score-left');
   const items = container.querySelectorAll('.player');
   if (!items.length) return;
- 
+
   const maxWidth = container.clientWidth;
- 
-  // reset any previous inline size
+
   items.forEach(el => (el.style.fontSize = ''));
- 
-  let lo = 10, hi = 22; // px range
- 
+
+  let lo = 10, hi = 22;
+
   const fits = (px) => {
     items.forEach(el => (el.style.fontSize = px + 'px'));
     return Array.from(items).every(el => el.scrollWidth <= maxWidth);
   };
- 
+
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
     if (fits(mid)) lo = mid;
     else hi = mid - 1;
   }
- 
+
   items.forEach(el => (el.style.fontSize = lo + 'px'));
 }
- 
+
 window.addEventListener('resize', fitPlayerFont);
 window.addEventListener('orientationchange', fitPlayerFont);
- 
+
 /* =====================================================
-   NUMERIC INPUT (DISPLAY ONLY — ENGINE STILL LOCKED)
+   VISIT INPUT (DISPLAY ONLY — ENGINE STILL LOCKED)
    ===================================================== */
 let currentInput = '';
- 
-function isStarted() {                 // CL-002
+
+function isStarted() {
   return !!game;
 }
- 
-function syncVisitDisplay() {          // CL-005
+
+const app = document.querySelector('.app');
+
+function syncVisitDisplay() {
   scoreRight.textContent = currentInput || '';
 }
- 
+
+function inDartMode() {
+  return app.classList.contains('dart-mode');
+}
+
+function activeIndex() {
+  return game?.activeIndex ?? 0;
+}
+
+function setActiveIndex(i) {
+  if (!game) return;
+  game.activeIndex = i;
+}
+
+function updateTopDarts() {
+  if (!topDartsEl) return;
+  const filled = Math.max(0, Math.min(3, dartsThisTurn));
+  topDartsEl.textContent = Array.from({ length: 3 }, (_, i) => (i < filled ? '●' : '○')).join(' ');
+}
+
+function updatePlayersList() {
+  const items = scoreLeft.querySelectorAll('.player');
+  items.forEach((el, idx) => {
+    const p = game.players[idx];
+    el.classList.toggle('active', idx === activeIndex());
+    el.textContent = `${p.name} - ${p.score}`;
+  });
+}
+
+function updateCenterDisplay() {
+  const p = game.players[activeIndex()];
+  scoreMain.textContent = p.score;
+  legsValueEl.textContent = p.legs;
+}
+
+function refreshUI() {
+  if (!isStarted()) return;
+  updatePlayersList();
+  updateCenterDisplay();
+  updateTopDarts();
+  fitPlayerFont();
+}
+
+function clearInput() {
+  currentInput = '';
+  syncVisitDisplay();
+}
+
+function endTurnAdvance() {
+  dartsThisTurn = 0;
+  turnStartScore = null;
+  updateTopDarts();
+  const next = (activeIndex() + 1) % game.players.length;
+  setActiveIndex(next);
+  refreshUI();
+}
+
+function bustAndAdvance() {
+  if (turnStartScore !== null) {
+    game.players[activeIndex()].score = turnStartScore;
+  }
+  clearInput();
+  endTurnAdvance();
+}
+
+function startTurnSnapshotIfNeeded() {
+  if (turnStartScore === null) {
+    turnStartScore = game.players[activeIndex()].score;
+  }
+}
+
+function handleLegReset() {
+  game.legStarterIndex = (game.legStarterIndex + 1) % game.players.length;
+  game.players.forEach(pl => (pl.score = game.startScore));
+
+  dartsThisTurn = 0;
+  turnStartScore = null;
+  clearInput();
+
+  setActiveIndex(game.legStarterIndex);
+  refreshUI();
+}
+
+function commitDelta(delta) {
+  const p = game.players[activeIndex()];
+  const newScore = p.score - delta;
+
+  if (newScore < 0) {
+    bustAndAdvance();
+    return;
+  }
+
+  if (newScore === 0) {
+    const ok = window.confirm('Doubled Out?');
+    if (!ok) {
+      bustAndAdvance();
+      return;
+    }
+    p.legs += 1;
+    handleLegReset();
+    return;
+  }
+
+  p.score = newScore;
+  clearInput();
+  refreshUI();
+}
+
 /* =====================================================
    START MATCH: WIRE START -> UI + GAME CONFIG
    ===================================================== */
@@ -456,85 +591,131 @@ startBtn.addEventListener('click', () => {
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
   const nameInputs = namesWrap.querySelectorAll('input');
- 
+
   game = {
     mode: count === 1 ? 'practice' : 'match',
     startScore,
     legsToWin: Number(legsInput.value),
     setsToWin: Number(setsInput.value),
     players: [],
+    activeIndex: 0,
+    legStarterIndex: 0,
     createdAt: Date.now()
   };
- 
-  currentInput = '';                  // CL-001
-  syncVisitDisplay();                 // CL-005 (blank)
- 
+
+  currentInput = '';
+  syncVisitDisplay();
+
   scoreLeft.innerHTML = '';
   for (let i = 0; i < count; i++) {
     const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
     game.players.push({ name, score: startScore, legs: 0 });
- 
+
     const div = document.createElement('div');
     div.className = 'player' + (i === 0 ? ' active' : '');
     div.textContent = `${name} - ${startScore}`;
     scoreLeft.appendChild(div);
   }
- 
+
   fitPlayerFont();
-  scoreMain.textContent = startScore;
- 
+
+  dartsThisTurn = 0;
+  turnStartScore = null;
+  updateTopDarts();
+
+  scoreMain.textContent = game.players[0].score;
+  legsValueEl.textContent = game.players[0].legs;
+
+
   startScreen.style.display = 'none';
   console.log('Game created:', game);
 });
- 
+
 /* =====================================================
-   KEYPAD: NUMERIC INPUT (GUARDED)
+   KEYPAD: VISIT INPUT (GUARDED) — MAIN SCORE DOES NOT CHANGE
    ===================================================== */
 document.querySelectorAll('.num').forEach(k => {
   k.addEventListener('click', () => {
-    if (!isStarted()) return;         // CL-002
+    if (!isStarted()) return;
     if (currentInput.length < 3) {
       currentInput += k.textContent;
-      scoreMain.textContent = currentInput;
-      syncVisitDisplay();             // CL-005
+      syncVisitDisplay();
     }
   });
 });
- 
+
 document.querySelector('.del').addEventListener('click', () => {
-  if (!isStarted()) return;           // CL-002
+  if (!isStarted()) return;
   currentInput = currentInput.slice(0, -1);
-  scoreMain.textContent = currentInput || game?.startScore || '0';
-  syncVisitDisplay();                 // CL-005
+  syncVisitDisplay();
 });
- 
+
+/* ENTER: accept visit (engine commit later), clear visit display */
+document.querySelector('.enter').addEventListener('click', () => {
+  if (!isStarted()) return;
+  if (!currentInput) return;
+
+  const val = Number(currentInput);
+  if (!Number.isFinite(val)) return;
+
+  if (inDartMode()) {
+    if (val < 0 || val > 60) return;
+    startTurnSnapshotIfNeeded();
+    commitDelta(val);
+
+    // If turnStartScore was cleared, a bust/leg reset already advanced.
+    if (turnStartScore !== null) {
+      dartsThisTurn += 1;
+      updateTopDarts();
+      if (dartsThisTurn >= 3) {
+        clearInput();
+        endTurnAdvance();
+      } else {
+        clearInput();
+      }
+    }
+  } else {
+    if (val < 0 || val > 180) return;
+    turnStartScore = game.players[activeIndex()].score;
+    commitDelta(val);
+    if (turnStartScore !== null) {
+      endTurnAdvance();
+    }
+  }
+});
+
 /* =====================================================
    MODE HIGHLIGHTS (DISPLAY ONLY)
    ===================================================== */
-const app = document.querySelector('.app');
- 
+
+
 document.querySelector('.dart').addEventListener('click', (e) => {
-  if (!isStarted()) return;           // CL-002
+  if (!isStarted()) return;
   app.classList.toggle('dart-mode');
   e.currentTarget.classList.toggle('active');
+
+  dartsThisTurn = 0;
+  turnStartScore = null;
+  clearInput();
+  updateTopDarts();
 });
- 
+
 document.querySelector('.help-btn').addEventListener('click', (e) => {
-  if (!isStarted()) return;           // CL-002
+  if (!isStarted()) return;
   e.currentTarget.classList.toggle('active');
 });
- 
+
 /* =====================================================
    PRESS FLASH FEEDBACK (ALL KEYPAD/ACTION BUTTONS)
    ===================================================== */
 document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
   btn.addEventListener('click', () => {
-    if (!isStarted()) return;         // CL-002
+    if (!isStarted()) return;
     btn.classList.add('pressed');
     setTimeout(() => btn.classList.remove('pressed'), 120);
   });
 });
 </script>
- 
+
 </body>
 </html>
