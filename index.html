@@ -1,216 +1,269 @@
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Darts Master v39</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no,
+                 viewport-fit=cover" />
+  <title>Darts Master v39</title>
  
 <style>
- 
-/* ===============================
-   ROOT THEME
-   =============================== */
-:root{
-  --bg:#0d0d0d;
-  --text:#ffffff;
-  --accent:#50d890;
-  --border-std:rgba(255,255,255,.15);
-  --border-red:rgba(255,75,92,.4);
-  --border-amber:rgba(255,154,60,.4);
-  --border-blue:rgba(0,173,181,.4);
+/* =====================================================
+   GLOBAL THEME VARIABLES
+   ===================================================== */
+:root {
+  --bg: #0d0d0d;
+  --text: #ffffff;
+  --accent: #50d890;
+  --border-std: rgba(255, 255, 255, 0.15);
+  --border-red: rgba(255, 75, 92, 0.4);
+  --border-amber: rgba(255, 154, 60, 0.4);
+  --border-blue: rgba(0, 173, 181, 0.4);
 }
  
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
- 
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,sans-serif;
-  overflow:hidden;
-  touch-action:none;
+/* =====================================================
+   GLOBAL BASE
+   ===================================================== */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, sans-serif;
+  overflow: hidden;
+  touch-action: none;
 }
  
-/* ===============================
-   START SCREEN
-   =============================== */
-.start-screen{
-  position:fixed;
-  inset:0;
-  background:var(--bg);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
+/* =====================================================
+   START SCREEN (CENTERED)
+   ===================================================== */
+.start-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
-.start-card{
-  width:90%;
-  max-width:380px;
-  padding:20px;
-  border-radius:16px;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--border-std);
-  text-align:center;
+.start-card {
+  width: 90%;
+  max-width: 380px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-std);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
 }
-.start-card h1{
-  margin-bottom:16px;
-  color:var(--accent);
+.start-card h1 {
+  margin: 0 0 16px;
+  color: var(--accent);
 }
-.group{margin-bottom:14px;}
-.group.inline{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
+.group { margin-bottom: 14px; }
+.group.inline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
-label{
-  font-size:.7rem;
-  opacity:.6;
-  margin-bottom:4px;
-  display:block;
+label {
+  display: block;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  margin-bottom: 4px;
 }
-input,select{
-  width:100%;
-  background:transparent;
-  color:var(--text);
-  border:1px solid var(--border-std);
-  border-radius:8px;
-  padding:6px;
+input, select {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-std);
+  border-radius: 8px;
+  padding: 6px;
+  color: var(--text);
 }
-.start-btn{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:2px solid var(--accent);
-  background:transparent;
-  color:var(--accent);
-  font-weight:700;
-}
- 
-/* ===============================
-   APP
-   =============================== */
-.app{
-  width:100%;
-  height:100dvh;
-  padding:10px;
-  display:flex;
-  flex-direction:column;
+.start-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
 }
  
-/* ===============================
-   KEYPAD
-   =============================== */
-.keypad{
-  flex:1;
-  display:grid;
-  gap:8px;
+/* =====================================================
+   APP SHELL
+   ===================================================== */
+.app {
+  width: 100%;
+  height: 100dvh;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
 }
  
-/* ===============================
-   KEYS
-   =============================== */
-.key{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-weight:700;
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--border-std);
-  border-radius:12px;
-  cursor:pointer;
+/* =====================================================
+   KEYPAD GRID
+   ===================================================== */
+.keypad {
+  display: grid;
+  flex: 1;
+  gap: 8px;
 }
-.key.active{
-  border-color:var(--accent);
-  background:rgba(80,216,144,.12);
-}
-.del,.undo{border-color:var(--border-red);color:#ff4b5c;}
-.help-btn{border-color:var(--accent);color:var(--accent);}
-.bust{border-color:var(--border-amber);color:#ff9a3c;}
-.miss{border-color:var(--border-blue);color:#00adb5;}
-.enter{border:2.5px solid var(--accent);color:var(--accent);}
-.dart{font-size:2.5rem!important;}
  
-/* ===============================
+/* =====================================================
+   GENERIC KEY STYLING
+   ===================================================== */
+.key {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-std);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+ 
+.key.active {
+  border-color: var(--accent);
+  background: rgba(80, 216, 144, 0.12);
+}
+ 
+/* =====================================================
+   ACTION / STATE KEYS
+   ===================================================== */
+.del, .undo { border-color: var(--border-red); color: #ff4b5c; }
+.help-btn  { border-color: var(--accent); color: var(--accent); }
+.bust      { border-color: var(--border-amber); color: #ff9a3c; }
+.miss      { border-color: var(--border-blue); color: #00adb5; }
+.enter     { border: 2.5px solid var(--accent); color: var(--accent); }
+.dart      { font-size: 2.5rem !important; }
+ 
+/* =====================================================
    SCORE WINDOW
-   =============================== */
-.score-view{
-  grid-column:span 7;
-  display:grid;
-  grid-template-columns:1fr 2fr 1fr;
-  padding:6px;
+   ===================================================== */
+.score-view {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  padding: 6px;
 }
-.score-left{
-  font-size:.8rem;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
+ 
+/* LEFT */
+.score-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.8rem;
 }
-.score-left .player{opacity:.5;}
-.score-left .active{opacity:1;color:var(--accent);}
-.score-center{
-  display:grid;
-  grid-template-rows:auto 1fr auto;
-  align-items:center;
-  text-align:center;
+.score-left .player { color: rgba(255,255,255,0.5); }
+.score-left .active { color: var(--accent); font-weight: 700; }
+ 
+/* CENTER */
+.score-center {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  text-align: center;
+  align-items: center;
 }
-.top-darts{
-  display:none;
-  font-size:.6em;
-  letter-spacing:2px;
-  margin-top:-4px;
-  color:var(--accent);
+ 
+/* dots only in dart-mode */
+.top-darts {
+  display: none;
+  color: var(--accent);
+  letter-spacing: 2px;
+  font-size: 0.6em;
+  line-height: 1;
+  margin-top: -4px;  /* closer to top */
+  margin-bottom: 0;
 }
-.dart-mode .top-darts{display:block;}
-.score-main{
-  font-size:clamp(2.6rem,6.5vw,3.6rem);
-  font-weight:800;
-  line-height:1;
+.dart-mode .top-darts { display: block; }
+ 
+/* score size tuned (iPad bigger, iPhone slightly bigger) */
+.score-main {
+  font-size: clamp(2.6rem, 6.5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1;
 }
-.score-meta{
-  display:grid;
-  grid-template-columns:.7fr auto .7fr;
-  font-size:.7em;
-  opacity:.7;
+ 
+.score-meta {
+  display: grid;
+  grid-template-columns: 0.7fr auto 0.7fr;
+  font-size: 0.7em;
+  color: rgba(255,255,255,0.45);
 }
 .score-meta .legs,
-.score-meta .avg{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+.score-meta .avg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.score-right{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  white-space:nowrap;
-  font-size:clamp(.75rem,2.2vw,.95rem);
-  color:var(--accent);
+.score-meta .label {
+  font-size: 0.65em;
+  opacity: 0.7;
+  line-height: 1;
+}
+.score-meta .value { margin-top: 2px; }
+ 
+/* RIGHT */
+.score-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: clamp(0.75rem, 2.2vw, 0.95rem);
+  white-space: nowrap;
+  line-height: 1;
 }
  
-/* ===============================
-   LAYOUTS
-   =============================== */
-@media(orientation:portrait){
-  .keypad{
-    grid-template-columns:repeat(3,1fr);
-    grid-template-rows:2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
+/* =====================================================
+   PORTRAIT LAYOUT (RESTORED - LOCKED)
+   ===================================================== */
+@media (orientation: portrait) {
+  .keypad {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 2.5fr 1fr 1fr 1fr 1fr 1.5fr 1fr;
   }
+  .score-view { grid-area: 1 / 1 / 2 / 4; }
+ 
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+  .enter { grid-area: 6 / 1 / 7 / 3; } .help-btn { grid-area: 6 / 3 / 7 / 4; }
+  .bust { grid-area: 7 / 1; } .miss { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
  
-@media(orientation:landscape){
-  .keypad{
-    grid-template-columns:repeat(7,1fr);
-    grid-template-rows:2.2fr 1fr 1fr 1fr;
-    gap:10px;
+/* =====================================================
+   LANDSCAPE LAYOUT (RESTORED - LOCKED)
+   ===================================================== */
+@media (orientation: landscape) {
+  .keypad {
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 2.2fr 1fr 1fr 1fr;
+    gap: 10px;
   }
+  .score-view { grid-column: span 7; }
+ 
+  .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
+  .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
+  .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
+  .k0 { grid-area: 2 / 4 / 4 / 5; }
+ 
+  .del { grid-area: 2 / 5; } .dart { grid-area: 2 / 6; } .undo { grid-area: 2 / 7; }
+  .help-btn { grid-area: 3 / 5; } .bust { grid-area: 3 / 6; } .miss { grid-area: 3 / 7; }
+  .enter { grid-area: 4 / 4 / 5 / 8; }
 }
  
-@media(min-width:768px){
-  .key{font-size:1.7rem;}
-  .enter{font-size:1.9rem;}
-  .dart{font-size:3.4rem!important;}
+/* =====================================================
+   iPAD / LARGE SCREEN TEXT (BOOSTED)
+   ===================================================== */
+@media (min-width: 768px) {
+  .key   { font-size: 1.7rem; }
+  .enter { font-size: 1.9rem; }
+  .dart  { font-size: 3.4rem !important; }
 }
  
 </style>
@@ -218,7 +271,7 @@ input,select{
  
 <body>
  
-<!-- START SCREEN -->
+<!-- ================= START SCREEN ================= -->
 <div class="start-screen">
   <div class="start-card">
     <h1>Darts Master</h1>
@@ -251,11 +304,11 @@ input,select{
       </div>
       <div>
         <label>Legs</label>
-        <input id="legsToWin" type="number" value="3">
+        <input id="legsToWin" type="number" value="3" min="1">
       </div>
       <div>
         <label>Sets</label>
-        <input id="setsToWin" type="number" value="1">
+        <input id="setsToWin" type="number" value="1" min="1">
       </div>
     </div>
  
@@ -263,29 +316,34 @@ input,select{
   </div>
 </div>
  
-<!-- APP -->
+<!-- ================= MAIN APP ================= -->
 <div class="app">
   <div class="keypad">
  
+    <!-- SCORE WINDOW -->
     <div class="key score-view">
       <div class="score-left"></div>
+ 
       <div class="score-center">
         <div class="top-darts">○ ○ ○</div>
         <div class="score-main">501</div>
         <div class="score-meta">
           <div class="legs">
-            <div>Legs</div><div>0</div>
+            <div class="label">Legs</div>
+            <div class="value">0</div>
           </div>
           <div></div>
           <div class="avg">
-            <div>Avg</div><div>0.0</div>
+            <div class="label">Avg</div>
+            <div class="value">0.0</div>
           </div>
         </div>
       </div>
+ 
       <div class="score-right">SET UP</div>
     </div>
  
-    <!-- KEYPAD (RESTORED) -->
+    <!-- KEYPAD (LOCKED / RESTORED) -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
@@ -303,86 +361,101 @@ input,select{
 </div>
  
 <script>
+/* =====================================================
+   GAME OBJECT (CONFIG ONLY — ENGINE/DISPLAY LOCKED)
+   ===================================================== */
+let game = null;
  
-/* ===============================
-   GAME (CONFIG ONLY)
-   =============================== */
-let game=null;
+/* =====================================================
+   START SCREEN: BUILD NAME INPUTS
+   ===================================================== */
+const playerCount = document.getElementById('playerCount');
+const startScoreSel = document.getElementById('startScore');
+const legsInput = document.getElementById('legsToWin');
+const setsInput = document.getElementById('setsToWin');
+const namesWrap = document.getElementById('playerNames');
+const startScreen = document.querySelector('.start-screen');
+const startBtn = document.querySelector('.start-btn');
  
-/* ===============================
-   START SCREEN LOGIC
-   =============================== */
-const playerCount=document.getElementById('playerCount');
-const namesWrap=document.getElementById('playerNames');
-const startScreen=document.querySelector('.start-screen');
-const scoreLeft=document.querySelector('.score-left');
-const scoreMain=document.querySelector('.score-main');
+const scoreLeft = document.querySelector('.score-left');
+const scoreMain = document.querySelector('.score-main');
  
-function renderNames(){
-  namesWrap.innerHTML='';
-  for(let i=1;i<=playerCount.value;i++){
-    const input=document.createElement('input');
-    input.placeholder=`Player ${i}`;
+function renderNames() {
+  namesWrap.innerHTML = '';
+  for (let i = 1; i <= Number(playerCount.value); i++) {
+    const input = document.createElement('input');
+    input.placeholder = `Player ${i}`;
     namesWrap.appendChild(input);
   }
 }
-playerCount.addEventListener('change',renderNames);
+playerCount.addEventListener('change', renderNames);
 renderNames();
  
-document.querySelector('.start-btn').onclick=()=>{
-  const startScore=Number(document.getElementById('startScore').value);
-  const nameInputs=namesWrap.querySelectorAll('input');
+/* =====================================================
+   START MATCH: WIRE START -> UI + GAME CONFIG
+   ===================================================== */
+startBtn.addEventListener('click', () => {
+  const count = Number(playerCount.value);
+  const startScore = Number(startScoreSel.value);
+  const nameInputs = namesWrap.querySelectorAll('input');
  
-  game={
+  game = {
+    mode: count === 1 ? 'practice' : 'match',
     startScore,
-    players:[],
-    createdAt:Date.now()
+    legsToWin: Number(legsInput.value),
+    setsToWin: Number(setsInput.value),
+    players: [],
+    createdAt: Date.now()
   };
  
-  scoreLeft.innerHTML='';
-  nameInputs.forEach((inp,i)=>{
-    const name=inp.value||`P${i+1}`;
-    game.players.push({name,score:startScore});
-    const div=document.createElement('div');
-    div.className='player'+(i===0?' active':'');
-    div.textContent=`${name} - ${startScore}`;
+  scoreLeft.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
+    game.players.push({ name, score: startScore, legs: 0 });
+ 
+    const div = document.createElement('div');
+    div.className = 'player' + (i === 0 ? ' active' : '');
+    div.textContent = `${name} - ${startScore}`;
     scoreLeft.appendChild(div);
-  });
+  }
  
-  scoreMain.textContent=startScore;
-  startScreen.style.display='none';
-  console.log('Game:',game);
-};
- 
-/* ===============================
-   NUMERIC INPUT (DISPLAY ONLY)
-   =============================== */
-let currentInput='';
-document.querySelectorAll('.num').forEach(k=>{
-  k.onclick=()=>{
-    if(currentInput.length<3){
-      currentInput+=k.textContent;
-      scoreMain.textContent=currentInput;
-    }
-  };
+  scoreMain.textContent = startScore;
+  startScreen.style.display = 'none';
+  console.log('Game created:', game);
 });
-document.querySelector('.del').onclick=()=>{
-  currentInput=currentInput.slice(0,-1);
-  scoreMain.textContent=currentInput || game?.startScore || '0';
-};
  
-/* ===============================
-   MODE HIGHLIGHTS
-   =============================== */
-const app=document.querySelector('.app');
-document.querySelector('.dart').onclick=e=>{
+/* =====================================================
+   NUMERIC INPUT (DISPLAY ONLY — ENGINE STILL LOCKED)
+   ===================================================== */
+let currentInput = '';
+ 
+document.querySelectorAll('.num').forEach(k => {
+  k.addEventListener('click', () => {
+    if (currentInput.length < 3) {
+      currentInput += k.textContent;
+      scoreMain.textContent = currentInput;
+    }
+  });
+});
+ 
+document.querySelector('.del').addEventListener('click', () => {
+  currentInput = currentInput.slice(0, -1);
+  scoreMain.textContent = currentInput || game?.startScore || '0';
+});
+ 
+/* =====================================================
+   MODE HIGHLIGHTS (DISPLAY ONLY)
+   ===================================================== */
+const app = document.querySelector('.app');
+ 
+document.querySelector('.dart').addEventListener('click', (e) => {
   app.classList.toggle('dart-mode');
   e.currentTarget.classList.toggle('active');
-};
-document.querySelector('.help-btn').onclick=e=>{
-  e.currentTarget.classList.toggle('active');
-};
+});
  
+document.querySelector('.help-btn').addEventListener('click', (e) => {
+  e.currentTarget.classList.toggle('active');
+});
 </script>
  
 </body>
