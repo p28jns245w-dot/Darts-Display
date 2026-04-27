@@ -9,8 +9,8 @@
                  maximum-scale=1.0,
                  user-scalable=no,
                  viewport-fit=cover" />
-  <title>Darts Master v1.9</title>
-
+  <title>Darts Master v1.14</title>
+ 
 <style>
 /* =====================================================
    GLOBAL THEME VARIABLES
@@ -22,9 +22,8 @@
   --border-std: rgba(255, 255, 255, 0.15);
   --border-red: rgba(255, 75, 92, 0.4);
   --border-amber: rgba(255, 154, 60, 0.4);
-  --border-blue: rgba(0, 173, 181, 0.4);
 }
-
+ 
 /* =====================================================
    GLOBAL BASE
    ===================================================== */
@@ -37,7 +36,7 @@ body {
   overflow: hidden;
   touch-action: none;
 }
-
+ 
 /* =====================================================
    START SCREEN (CENTERED)
    ===================================================== */
@@ -92,7 +91,7 @@ input, select {
   color: var(--accent);
   font-weight: 700;
 }
-
+ 
 /* =====================================================
    APP SHELL
    ===================================================== */
@@ -103,7 +102,7 @@ input, select {
   display: flex;
   flex-direction: column;
 }
-
+ 
 /* =====================================================
    KEYPAD GRID
    ===================================================== */
@@ -112,7 +111,7 @@ input, select {
   flex: 1;
   gap: 8px;
 }
-
+ 
 /* =====================================================
    GENERIC KEY STYLING
    ===================================================== */
@@ -126,28 +125,27 @@ input, select {
   font-weight: 700;
   cursor: pointer;
 }
-
+ 
 /* Active (toggle states e.g., HELP / 🎯) */
 .key.active {
   border-color: var(--accent);
   background: rgba(80, 216, 144, 0.12);
 }
-
+ 
 /* Press flash feedback (all buttons) */
 .key.pressed {
   background: rgba(80, 216, 144, 0.12);
 }
-
+ 
 /* =====================================================
    ACTION / STATE KEYS
    ===================================================== */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn  { border-color: var(--accent); color: var(--accent); }
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
-.miss      { border-color: var(--border-blue); color: #00adb5; }
 .enter     { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart      { font-size: 2.5rem !important; }
-
+ 
 /* =====================================================
    SCORE WINDOW
    ===================================================== */
@@ -156,7 +154,7 @@ input, select {
   grid-template-columns: 1fr 2fr 1fr;
   padding: 6px;
 }
-
+ 
 /* LEFT */
 .score-left {
   display: flex;
@@ -171,7 +169,7 @@ input, select {
   text-overflow: ellipsis;
 }
 .score-left .active { color: var(--accent); font-weight: 700; }
-
+ 
 /* CENTER */
 .score-center {
   display: grid;
@@ -179,7 +177,7 @@ input, select {
   text-align: center;
   align-items: center;
 }
-
+ 
 /* dots only in dart-mode */
 .top-darts {
   display: none;
@@ -191,15 +189,15 @@ input, select {
   margin-bottom: 0;
 }
 .dart-mode .top-darts { display: block; }
-
+ 
 /* score sizing */
 .score-main {
   font-size: clamp(2.6rem, 6.5vw, 3.6rem);
   font-weight: 800;
   line-height: 1;
 }
-
-/* Legs/Avg a bit bigger + more separation */
+ 
+/* Meta row: Legs (left), Avg (center), Sets (right) */
 .score-meta {
   display: grid;
   grid-template-columns: 0.7fr auto 0.7fr;
@@ -208,7 +206,8 @@ input, select {
   margin-top: 6px;
 }
 .score-meta .legs,
-.score-meta .avg {
+.score-meta .avg,
+.score-meta .sets {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -219,7 +218,7 @@ input, select {
   line-height: 1;
 }
 .score-meta .value { margin-top: 2px; }
-
+ 
 /* RIGHT */
 .score-right {
   display: flex;
@@ -230,9 +229,9 @@ input, select {
   white-space: nowrap;
   line-height: 1;
 }
-
+ 
 /* =====================================================
-   PORTRAIT LAYOUT (UPDATED)
+   PORTRAIT LAYOUT
    ===================================================== */
 @media (orientation: portrait) {
   .keypad {
@@ -240,22 +239,20 @@ input, select {
     grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
   }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
-
+ 
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-
+ 
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
-
-  /* ENTER now takes the full row (same height as other keys) */
+ 
   .enter { grid-area: 6 / 1 / 7 / 4; }
-
-  /* Bottom row */
+ 
   .bust { grid-area: 7 / 1; } .help-btn { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
-
+ 
 /* =====================================================
-   LANDSCAPE LAYOUT (UPDATED TO 6 COLUMNS)
+   LANDSCAPE LAYOUT (6 COLUMNS)
    ===================================================== */
 @media (orientation: landscape) {
   .keypad {
@@ -264,26 +261,25 @@ input, select {
     gap: 10px;
   }
   .score-view { grid-column: span 6; }
-
+ 
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
-
-  .del  { grid-area: 2 / 4; }  /* next to 3 */
-  .k0   { grid-area: 3 / 4; }  /* next to 6 */
-
-  .dart { grid-area: 2 / 5; }  /* above HELP */
-  .undo { grid-area: 2 / 6; }  /* above BUST */
-
-  .help-btn { grid-area: 3 / 5; } /* col 5 */
-  .bust     { grid-area: 3 / 6; } /* col 6 */
-
-  /* ENTER spans keypad row 3 (excluding score): CSS row 4, cols 4–6 */
+ 
+  .del  { grid-area: 2 / 4; }
+  .k0   { grid-area: 3 / 4; }
+ 
+  .dart { grid-area: 2 / 5; }
+  .undo { grid-area: 2 / 6; }
+ 
+  .help-btn { grid-area: 3 / 5; }
+  .bust     { grid-area: 3 / 6; }
+ 
   .enter { grid-area: 4 / 4 / 5 / 7; }
 }
-
+ 
 /* =====================================================
-   iPAD / LARGE SCREEN TEXT (SLIGHTLY BIGGER)
+   iPAD / LARGE SCREEN TEXT
    ===================================================== */
 @media (min-width: 768px) {
   .key   { font-size: 1.9rem; }
@@ -292,14 +288,14 @@ input, select {
 }
 </style>
 </head>
-
+ 
 <body>
-
+ 
 <!-- ================= START SCREEN ================= -->
 <div class="start-screen">
   <div class="start-card">
     <h1>Darts Master</h1>
-
+ 
     <div class="group">
       <label>Players</label>
       <select id="playerCount">
@@ -311,9 +307,9 @@ input, select {
         <option value="6">6</option>
       </select>
     </div>
-
+ 
     <div id="playerNames" class="group"></div>
-
+ 
     <div class="group inline">
       <div>
         <label>Game</label>
@@ -335,19 +331,19 @@ input, select {
         <input id="setsToWin" type="number" value="1" min="1">
       </div>
     </div>
-
+ 
     <button class="start-btn">START MATCH</button>
   </div>
 </div>
-
+ 
 <!-- ================= MAIN APP ================= -->
 <div class="app">
   <div class="keypad">
-
+ 
     <!-- SCORE WINDOW -->
     <div class="key score-view">
       <div class="score-left"></div>
-
+ 
       <div class="score-center">
         <div class="top-darts">○ ○ ○</div>
         <div class="score-main">501</div>
@@ -356,51 +352,51 @@ input, select {
             <div class="label">Legs</div>
             <div class="value">0</div>
           </div>
-          <div></div>
           <div class="avg">
             <div class="label">Avg</div>
-            <div class="value">0.0</div>
+            <div class="value">0.00</div>
+          </div>
+          <div class="sets">
+            <div class="label">Sets</div>
+            <div class="value">0/1</div>
           </div>
         </div>
       </div>
-
+ 
       <div class="score-right">SET UP</div>
     </div>
-
+ 
     <!-- KEYPAD -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
     <div class="key num k0">0</div>
-
+ 
     <div class="key del">DEL</div>
     <div class="key dart">🎯</div>
     <div class="key undo">UNDO</div>
     <div class="key help-btn">HELP</div>
     <div class="key bust">BUST</div>
     <div class="key enter">ENTER</div>
-
+ 
   </div>
 </div>
-
+ 
 <script>
 /* =====================================================
    CHANGELOG
-   v1.9 - Engine wiring for testing (hybrid C)
-   - ENTER commits: dart-mode ON => per-dart (0–60), OFF => visit total (0–180)
-   - 3-dart turn tracking w/ dots, auto-advance, bust revert to turn-start snapshot
-   - Double-out confirm on exact 0; 'No' => bust + advance
-   - Leg starter rotates each leg (next-in-line starts new leg)
+   v1.14 - Pro-setup build
+   - Pro set-play: legs within sets; rotate leg/set starters next-in-line
+   - Enforce double-out confirm on all checkouts; score=1 treated as bust
+   - Pro 3-dart match average with correct dart counting (bust=3, checkout=1-3)
+   - Center meta: Legs (left), Avg (center), Sets (right; active player X/target)
+   - Visit-mode checkout darts prompt: "Darts to Checkout? 1 2 or 3?" (2 tries, then default 3)
+   - Batched prior engine features preserved: BUST, UNDO, press flash, font fit
    ===================================================== */
-
-/* =====================================================
-   GAME OBJECT (CONFIG ONLY — ENGINE/DISPLAY LOCKED)
-   ===================================================== */
+ 
 let game = null;
-
-/* =====================================================
-   START SCREEN: BUILD NAME INPUTS
-   ===================================================== */
+ 
+// Start screen elements
 const playerCount = document.getElementById('playerCount');
 const startScoreSel = document.getElementById('startScore');
 const legsInput = document.getElementById('legsToWin');
@@ -408,18 +404,30 @@ const setsInput = document.getElementById('setsToWin');
 const namesWrap = document.getElementById('playerNames');
 const startScreen = document.querySelector('.start-screen');
 const startBtn = document.querySelector('.start-btn');
-
+ 
+// UI elements
+const app = document.querySelector('.app');
 const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
-const scoreRight = document.querySelector('.score-right'); // visit display
+const scoreRight = document.querySelector('.score-right');
+const topDartsEl = document.querySelector('.top-darts');
+ 
 const legsValueEl = document.querySelector('.score-meta .legs .value');
 const avgValueEl  = document.querySelector('.score-meta .avg .value');
-const topDartsEl  = document.querySelector('.top-darts');
-
-// Engine display state (testing)
-let dartsThisTurn = 0;       // 0-3
-let turnStartScore = null;   // snapshot for bust reverts
-
+const setsValueEl = document.querySelector('.score-meta .sets .value');
+ 
+// Input / turn state
+let currentInput = '';
+let turnStartScore = null;     // score at start of current visit/turn (for bust revert)
+let visitPoints = 0;           // accumulated points in current dart-mode visit
+let visitDartsUsed = 0;        // darts used in current dart-mode visit (0-3)
+ 
+// Undo stack
+let undoStack = [];            // { kind: 'dart'|'turn', snap: {...} }
+ 
+/* =====================================================
+   START SCREEN: BUILD NAME INPUTS
+   ===================================================== */
 function renderNames() {
   namesWrap.innerHTML = '';
   for (let i = 1; i <= Number(playerCount.value); i++) {
@@ -430,168 +438,266 @@ function renderNames() {
 }
 playerCount.addEventListener('change', renderNames);
 renderNames();
-
+ 
 /* =====================================================
    PLAYER FONT AUTO-FIT (UNIFORM SIZE, NO WRAP, ELLIPSIS)
    ===================================================== */
 function fitPlayerFont() {
-  const container = document.querySelector('.score-left');
+  const container = scoreLeft;
   const items = container.querySelectorAll('.player');
   if (!items.length) return;
-
+ 
   const maxWidth = container.clientWidth;
-
   items.forEach(el => (el.style.fontSize = ''));
-
+ 
   let lo = 10, hi = 22;
-
   const fits = (px) => {
     items.forEach(el => (el.style.fontSize = px + 'px'));
     return Array.from(items).every(el => el.scrollWidth <= maxWidth);
   };
-
+ 
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
     if (fits(mid)) lo = mid;
     else hi = mid - 1;
   }
-
   items.forEach(el => (el.style.fontSize = lo + 'px'));
 }
-
 window.addEventListener('resize', fitPlayerFont);
 window.addEventListener('orientationchange', fitPlayerFont);
-
+ 
 /* =====================================================
-   VISIT INPUT (DISPLAY ONLY — ENGINE STILL LOCKED)
+   CORE HELPERS
    ===================================================== */
-let currentInput = '';
-
-function isStarted() {
-  return !!game;
-}
-
-const app = document.querySelector('.app');
-
+function isStarted() { return !!game; }
+function isPlayable() { return !!game && !game.frozen; }
+function inDartMode() { return app.classList.contains('dart-mode'); }
+ 
+function activeIndex() { return game?.activeIndex ?? 0; }
+function setActiveIndex(i) { if (game) game.activeIndex = i; }
+ 
 function syncVisitDisplay() {
   scoreRight.textContent = currentInput || '';
 }
-
-function inDartMode() {
-  return app.classList.contains('dart-mode');
+ 
+function clearInput() {
+  currentInput = '';
+  syncVisitDisplay();
 }
-
-function activeIndex() {
-  return game?.activeIndex ?? 0;
+ 
+function resetVisitState() {
+  turnStartScore = null;
+  visitPoints = 0;
+  visitDartsUsed = 0;
+  updateTopDarts();
 }
-
-function setActiveIndex(i) {
-  if (!game) return;
-  game.activeIndex = i;
-}
-
+ 
 function updateTopDarts() {
   if (!topDartsEl) return;
-  const filled = Math.max(0, Math.min(3, dartsThisTurn));
+  const filled = Math.max(0, Math.min(3, visitDartsUsed));
   topDartsEl.textContent = Array.from({ length: 3 }, (_, i) => (i < filled ? '●' : '○')).join(' ');
 }
-
-function updatePlayersList() {
+ 
+function computeAvg(p) {
+  const darts = p.stats?.darts || 0;
+  const pts = p.stats?.points || 0;
+  if (!darts) return '0.00';
+  return ((pts / darts) * 3).toFixed(2);
+}
+ 
+function refreshUI() {
+  if (!isStarted()) return;
+ 
+  // left list
   const items = scoreLeft.querySelectorAll('.player');
   items.forEach((el, idx) => {
     const p = game.players[idx];
     el.classList.toggle('active', idx === activeIndex());
     el.textContent = `${p.name} - ${p.score}`;
   });
-}
-
-function updateCenterDisplay() {
+ 
+  // center
   const p = game.players[activeIndex()];
   scoreMain.textContent = p.score;
-  legsValueEl.textContent = p.legs;
-}
-
-function refreshUI() {
-  if (!isStarted()) return;
-  updatePlayersList();
-  updateCenterDisplay();
+  legsValueEl.textContent = String(p.legs);
+  avgValueEl.textContent = computeAvg(p);
+  setsValueEl.textContent = `${p.sets}/${game.setsToWin}`;
+ 
   updateTopDarts();
   fitPlayerFont();
 }
-
-function clearInput() {
-  currentInput = '';
-  syncVisitDisplay();
+ 
+function pushUndo(kind) {
+  if (!isStarted()) return;
+  const snap = {
+    game: JSON.parse(JSON.stringify(game)),
+    currentInput,
+    turnStartScore,
+    visitPoints,
+    visitDartsUsed
+  };
+  undoStack.push({ kind, snap });
+  if (undoStack.length > 250) undoStack.shift();
 }
-
-function endTurnAdvance() {
-  dartsThisTurn = 0;
-  turnStartScore = null;
-  updateTopDarts();
+ 
+function popUndoForMode() {
+  if (!undoStack.length) return null;
+  const want = inDartMode() ? 'dart' : 'turn';
+  while (undoStack.length) {
+    const item = undoStack.pop();
+    if (item.kind === want) return item;
+  }
+  return null;
+}
+ 
+function restoreUndoSnap(snap) {
+  if (!snap) return;
+  game = snap.game;
+  currentInput = snap.currentInput || '';
+  turnStartScore = snap.turnStartScore;
+  visitPoints = snap.visitPoints || 0;
+  visitDartsUsed = snap.visitDartsUsed || 0;
+  syncVisitDisplay();
+  refreshUI();
+}
+ 
+function undoWouldRevertLegOrSet(snapGame) {
+  const curLegs = (game?.players || []).reduce((a, pl) => a + (pl.legs || 0), 0);
+  const snapLegs = (snapGame?.players || []).reduce((a, pl) => a + (pl.legs || 0), 0);
+  const curSets = (game?.players || []).reduce((a, pl) => a + (pl.sets || 0), 0);
+  const snapSets = (snapGame?.players || []).reduce((a, pl) => a + (pl.sets || 0), 0);
+  return (curLegs !== snapLegs) || (curSets !== snapSets);
+}
+ 
+function advanceToNextPlayer() {
+  resetVisitState();
+  clearInput();
   const next = (activeIndex() + 1) % game.players.length;
   setActiveIndex(next);
   refreshUI();
 }
-
-function bustAndAdvance() {
-  if (turnStartScore !== null) {
-    game.players[activeIndex()].score = turnStartScore;
-  }
+ 
+function recordVisitStats(playerIdx, points, darts) {
+  const p = game.players[playerIdx];
+  if (!p.stats) p.stats = { points: 0, darts: 0 };
+  p.stats.points += points;
+  p.stats.darts += darts;
+}
+ 
+function bustCurrentTurn() {
+  // Score reverts to start-of-turn snapshot
+  const idx = activeIndex();
+  if (turnStartScore === null) turnStartScore = game.players[idx].score;
+  game.players[idx].score = turnStartScore;
+ 
+  // Pro-style: bust visit counts as 3 darts thrown, 0 points
+  recordVisitStats(idx, 0, 3);
+ 
+  resetVisitState();
   clearInput();
-  endTurnAdvance();
+  advanceToNextPlayer();
 }
-
-function startTurnSnapshotIfNeeded() {
-  if (turnStartScore === null) {
-    turnStartScore = game.players[activeIndex()].score;
+ 
+function promptCheckoutDarts() {
+  // 2 attempts total (invalid treated same as cancel). Default to 3 after.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const ans = window.prompt('Darts to Checkout? 1 2 or 3?');
+    if (ans === null) continue; // cancelled
+    const v = String(ans).trim();
+    if (v === '1' || v === '2' || v === '3') return Number(v);
+    // invalid -> counts as failed attempt
   }
+  return 3;
 }
-
-function handleLegReset() {
-  game.legStarterIndex = (game.legStarterIndex + 1) % game.players.length;
+ 
+/* =====================================================
+   LEG / SET / MATCH FLOW (PRO SET-PLAY GENERALIZED)
+   ===================================================== */
+function resetScoresForNewLeg() {
   game.players.forEach(pl => (pl.score = game.startScore));
-
-  dartsThisTurn = 0;
-  turnStartScore = null;
+  resetVisitState();
   clearInput();
-
+}
+ 
+function startNextLeg() {
+  // rotate leg starter next-in-line
+  game.legStarterIndex = (game.legStarterIndex + 1) % game.players.length;
   setActiveIndex(game.legStarterIndex);
+  resetScoresForNewLeg();
   refreshUI();
 }
-
-function commitDelta(delta) {
-  const p = game.players[activeIndex()];
-  const newScore = p.score - delta;
-
-  if (newScore < 0) {
-    bustAndAdvance();
+ 
+function startNextSet() {
+  // rotate set starter next-in-line
+  game.setStarterIndex = (game.setStarterIndex + 1) % game.players.length;
+  game.legStarterIndex = game.setStarterIndex;
+  setActiveIndex(game.legStarterIndex);
+ 
+  // reset legs-in-set
+  game.players.forEach(pl => (pl.legs = 0));
+ 
+  resetScoresForNewLeg();
+  refreshUI();
+}
+ 
+function handleMatchOver() {
+  const ok = window.confirm('Match Over. Start new match?');
+  if (ok) {
+    // back to setup
+    game = null;
+    undoStack = [];
+    resetVisitState();
+    currentInput = '';
+    syncVisitDisplay();
+    scoreLeft.innerHTML = '';
+    scoreRight.textContent = 'SET UP';
+    scoreMain.textContent = startScoreSel.value || '501';
+    legsValueEl.textContent = '0';
+    avgValueEl.textContent = '0.00';
+    setsValueEl.textContent = `0/${setsInput.value || 1}`;
+    startScreen.style.display = 'flex';
     return;
   }
-
-  if (newScore === 0) {
-    const ok = window.confirm('Doubled Out?');
-    if (!ok) {
-      bustAndAdvance();
+  // freeze
+  game.frozen = true;
+  clearInput();
+  resetVisitState();
+  refreshUI();
+}
+ 
+function awardLegTo(playerIdx) {
+  const p = game.players[playerIdx];
+  p.legs += 1;
+ 
+  // Set win?
+  if (p.legs >= game.legsToWin) {
+    p.sets += 1;
+ 
+    // Match win?
+    if (p.sets >= game.setsToWin) {
+      handleMatchOver();
       return;
     }
-    p.legs += 1;
-    handleLegReset();
+ 
+    // Start next set
+    startNextSet();
     return;
   }
-
-  p.score = newScore;
-  clearInput();
-  refreshUI();
+ 
+  // Start next leg
+  startNextLeg();
 }
-
+ 
 /* =====================================================
-   START MATCH: WIRE START -> UI + GAME CONFIG
+   START MATCH
    ===================================================== */
 startBtn.addEventListener('click', () => {
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
   const nameInputs = namesWrap.querySelectorAll('input');
-
+ 
+  undoStack = [];
+ 
   game = {
     mode: count === 1 ? 'practice' : 'match',
     startScore,
@@ -600,122 +706,228 @@ startBtn.addEventListener('click', () => {
     players: [],
     activeIndex: 0,
     legStarterIndex: 0,
+    setStarterIndex: 0,
+    frozen: false,
     createdAt: Date.now()
   };
-
-  currentInput = '';
-  syncVisitDisplay();
-
+ 
   scoreLeft.innerHTML = '';
   for (let i = 0; i < count; i++) {
     const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
-    game.players.push({ name, score: startScore, legs: 0 });
-
+    const pl = {
+      name,
+      score: startScore,
+      legs: 0,  // legs in current set
+      sets: 0,  // sets won
+      stats: { points: 0, darts: 0 }
+    };
+    game.players.push(pl);
+ 
     const div = document.createElement('div');
     div.className = 'player' + (i === 0 ? ' active' : '');
     div.textContent = `${name} - ${startScore}`;
     scoreLeft.appendChild(div);
   }
-
-  fitPlayerFont();
-
-  dartsThisTurn = 0;
-  turnStartScore = null;
-  updateTopDarts();
-
-  scoreMain.textContent = game.players[0].score;
-  legsValueEl.textContent = game.players[0].legs;
-
-
+ 
+  resetVisitState();
+  clearInput();
+ 
+  scoreMain.textContent = startScore;
+  legsValueEl.textContent = '0';
+  avgValueEl.textContent = '0.00';
+  setsValueEl.textContent = `0/${game.setsToWin}`;
+ 
   startScreen.style.display = 'none';
-  console.log('Game created:', game);
+  refreshUI();
 });
-
+ 
 /* =====================================================
-   KEYPAD: VISIT INPUT (GUARDED) — MAIN SCORE DOES NOT CHANGE
+   KEYPAD: VISIT INPUT (GUARDED)
    ===================================================== */
 document.querySelectorAll('.num').forEach(k => {
   k.addEventListener('click', () => {
-    if (!isStarted()) return;
+    if (!isPlayable()) return;
     if (currentInput.length < 3) {
       currentInput += k.textContent;
       syncVisitDisplay();
     }
   });
 });
-
+ 
 document.querySelector('.del').addEventListener('click', () => {
-  if (!isStarted()) return;
+  if (!isPlayable()) return;
   currentInput = currentInput.slice(0, -1);
   syncVisitDisplay();
 });
-
-/* ENTER: accept visit (engine commit later), clear visit display */
+ 
+/* =====================================================
+   ENTER: HYBRID COMMIT
+   - Dart-mode ON: per-dart (0-60)
+   - Dart-mode OFF: visit total (0-180)
+   ===================================================== */
 document.querySelector('.enter').addEventListener('click', () => {
-  if (!isStarted()) return;
+  if (!isPlayable()) return;
   if (!currentInput) return;
-
+ 
   const val = Number(currentInput);
   if (!Number.isFinite(val)) return;
-
+ 
+  const idx = activeIndex();
+  const p = game.players[idx];
+ 
   if (inDartMode()) {
+    // per-dart
     if (val < 0 || val > 60) return;
-    startTurnSnapshotIfNeeded();
-    commitDelta(val);
-
-    // If turnStartScore was cleared, a bust/leg reset already advanced.
-    if (turnStartScore !== null) {
-      dartsThisTurn += 1;
-      updateTopDarts();
-      if (dartsThisTurn >= 3) {
-        clearInput();
-        endTurnAdvance();
-      } else {
-        clearInput();
-      }
+ 
+    pushUndo('dart');
+ 
+    // snapshot at start of visit
+    if (turnStartScore === null) turnStartScore = p.score;
+ 
+    // apply dart
+    visitDartsUsed += 1;
+    visitPoints += val;
+ 
+    const newScore = p.score - val;
+ 
+    // bust if below 0 OR equals 1
+    if (newScore < 0 || newScore === 1) {
+      bustCurrentTurn();
+      return;
     }
-  } else {
-    if (val < 0 || val > 180) return;
-    turnStartScore = game.players[activeIndex()].score;
-    commitDelta(val);
-    if (turnStartScore !== null) {
-      endTurnAdvance();
+ 
+    // potential checkout
+    if (newScore === 0) {
+      const ok = window.confirm('Doubled Out?');
+      if (!ok) {
+        bustCurrentTurn();
+        return;
+      }
+      // record stats: points scored in this (successful) visit + darts actually thrown
+      recordVisitStats(idx, visitPoints, visitDartsUsed);
+      // leg win
+      awardLegTo(idx);
+      return;
+    }
+ 
+    // normal dart
+    p.score = newScore;
+    clearInput();
+    refreshUI();
+ 
+    // if 3 darts used, end turn (successful visit => points count, darts=3)
+    if (visitDartsUsed >= 3) {
+      recordVisitStats(idx, visitPoints, 3);
+      advanceToNextPlayer();
+      return;
+    }
+ 
+    updateTopDarts();
+    return;
+  }
+ 
+  // visit total
+  if (val < 0 || val > 180) return;
+ 
+  pushUndo('turn');
+ 
+  // snapshot at start of visit
+  turnStartScore = p.score;
+ 
+  const newScore = p.score - val;
+ 
+  // bust conditions: below 0 OR equals 1
+  if (newScore < 0 || newScore === 1) {
+    // visit-mode bust counts as 3 darts
+    bustCurrentTurn();
+    return;
+  }
+ 
+  if (newScore === 0) {
+    const ok = window.confirm('Doubled Out?');
+    if (!ok) {
+      bustCurrentTurn();
+      return;
+    }
+ 
+    const dartsCheckout = promptCheckoutDarts();
+ 
+    // record stats: successful checkout visit counts actual darts used
+    recordVisitStats(idx, val, dartsCheckout);
+ 
+    // leg win
+    awardLegTo(idx);
+    return;
+  }
+ 
+  // normal successful visit
+  p.score = newScore;
+  recordVisitStats(idx, val, 3);
+  clearInput();
+  refreshUI();
+  advanceToNextPlayer();
+});
+ 
+/* =====================================================
+   BUST BUTTON (IMMEDIATE BUST)
+   ===================================================== */
+document.querySelector('.bust').addEventListener('click', () => {
+  if (!isPlayable()) return;
+  pushUndo(inDartMode() ? 'dart' : 'turn');
+  bustCurrentTurn();
+});
+ 
+/* =====================================================
+   UNDO BUTTON (C): dart-mode => undo last dart; visit-mode => undo last turn
+   + confirm when undo would revert a leg or set
+   ===================================================== */
+document.querySelector('.undo').addEventListener('click', () => {
+  if (!isStarted()) return;
+  const item = popUndoForMode();
+  if (!item) return;
+ 
+  const snap = item.snap;
+  if (undoWouldRevertLegOrSet(snap.game)) {
+    const ok = window.confirm('Undo leg?');
+    if (!ok) {
+      undoStack.push(item);
+      return;
     }
   }
+ 
+  restoreUndoSnap(snap);
 });
-
+ 
 /* =====================================================
-   MODE HIGHLIGHTS (DISPLAY ONLY)
+   MODE HIGHLIGHTS
    ===================================================== */
-
-
 document.querySelector('.dart').addEventListener('click', (e) => {
-  if (!isStarted()) return;
+  if (!isPlayable()) return;
   app.classList.toggle('dart-mode');
   e.currentTarget.classList.toggle('active');
-
-  dartsThisTurn = 0;
-  turnStartScore = null;
+ 
+  // safety: reset any in-progress visit/input when switching modes
+  resetVisitState();
   clearInput();
-  updateTopDarts();
+  refreshUI();
 });
-
+ 
 document.querySelector('.help-btn').addEventListener('click', (e) => {
-  if (!isStarted()) return;
+  if (!isPlayable()) return;
   e.currentTarget.classList.toggle('active');
 });
-
+ 
 /* =====================================================
-   PRESS FLASH FEEDBACK (ALL KEYPAD/ACTION BUTTONS)
+   PRESS FLASH FEEDBACK
    ===================================================== */
 document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
   btn.addEventListener('click', () => {
-    if (!isStarted()) return;
+    if (!isPlayable()) return;
     btn.classList.add('pressed');
     setTimeout(() => btn.classList.remove('pressed'), 120);
   });
 });
 </script>
-
+ 
 </body>
 </html>
