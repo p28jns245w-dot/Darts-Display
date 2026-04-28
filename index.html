@@ -9,8 +9,8 @@
                  maximum-scale=1.0,
                  user-scalable=no,
                  viewport-fit=cover" />
-  <title>Darts Master v1.14</title>
- 
+  <title>Darts Master v1.16</title>
+
 <style>
 /* =====================================================
    GLOBAL THEME VARIABLES
@@ -23,7 +23,7 @@
   --border-red: rgba(255, 75, 92, 0.4);
   --border-amber: rgba(255, 154, 60, 0.4);
 }
- 
+
 /* =====================================================
    GLOBAL BASE
    ===================================================== */
@@ -36,7 +36,7 @@ body {
   overflow: hidden;
   touch-action: none;
 }
- 
+
 /* =====================================================
    START SCREEN (CENTERED)
    ===================================================== */
@@ -91,7 +91,7 @@ input, select {
   color: var(--accent);
   font-weight: 700;
 }
- 
+
 /* =====================================================
    APP SHELL
    ===================================================== */
@@ -102,7 +102,7 @@ input, select {
   display: flex;
   flex-direction: column;
 }
- 
+
 /* =====================================================
    KEYPAD GRID
    ===================================================== */
@@ -111,7 +111,7 @@ input, select {
   flex: 1;
   gap: 8px;
 }
- 
+
 /* =====================================================
    GENERIC KEY STYLING
    ===================================================== */
@@ -125,18 +125,16 @@ input, select {
   font-weight: 700;
   cursor: pointer;
 }
- 
-/* Active (toggle states e.g., HELP / 🎯) */
+
 .key.active {
   border-color: var(--accent);
   background: rgba(80, 216, 144, 0.12);
 }
- 
-/* Press flash feedback (all buttons) */
+
 .key.pressed {
   background: rgba(80, 216, 144, 0.12);
 }
- 
+
 /* =====================================================
    ACTION / STATE KEYS
    ===================================================== */
@@ -145,7 +143,7 @@ input, select {
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
 .enter     { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart      { font-size: 2.5rem !important; }
- 
+
 /* =====================================================
    SCORE WINDOW
    ===================================================== */
@@ -154,13 +152,12 @@ input, select {
   grid-template-columns: 1fr 2fr 1fr;
   padding: 6px;
 }
- 
-/* LEFT */
+
 .score-left {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 0.8rem; /* JS will set uniform px size after start */
+  font-size: 0.8rem;
 }
 .score-left .player {
   color: rgba(255,255,255,0.5);
@@ -169,16 +166,14 @@ input, select {
   text-overflow: ellipsis;
 }
 .score-left .active { color: var(--accent); font-weight: 700; }
- 
-/* CENTER */
+
 .score-center {
   display: grid;
   grid-template-rows: auto 1fr auto;
   text-align: center;
   align-items: center;
 }
- 
-/* dots only in dart-mode */
+
 .top-darts {
   display: none;
   color: var(--accent);
@@ -189,15 +184,13 @@ input, select {
   margin-bottom: 0;
 }
 .dart-mode .top-darts { display: block; }
- 
-/* score sizing */
+
 .score-main {
   font-size: clamp(2.6rem, 6.5vw, 3.6rem);
   font-weight: 800;
   line-height: 1;
 }
- 
-/* Meta row: Legs (left), Avg (center), Sets (right) */
+
 .score-meta {
   display: grid;
   grid-template-columns: 0.7fr auto 0.7fr;
@@ -218,8 +211,7 @@ input, select {
   line-height: 1;
 }
 .score-meta .value { margin-top: 2px; }
- 
-/* RIGHT */
+
 .score-right {
   display: flex;
   align-items: center;
@@ -229,7 +221,7 @@ input, select {
   white-space: nowrap;
   line-height: 1;
 }
- 
+
 /* =====================================================
    PORTRAIT LAYOUT
    ===================================================== */
@@ -239,18 +231,18 @@ input, select {
     grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
   }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
- 
+
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
- 
+
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
- 
+
   .enter { grid-area: 6 / 1 / 7 / 4; }
- 
+
   .bust { grid-area: 7 / 1; } .help-btn { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
- 
+
 /* =====================================================
    LANDSCAPE LAYOUT (6 COLUMNS)
    ===================================================== */
@@ -261,26 +253,23 @@ input, select {
     gap: 10px;
   }
   .score-view { grid-column: span 6; }
- 
+
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
   .k4 { grid-area: 3 / 1; } .k5 { grid-area: 3 / 2; } .k6 { grid-area: 3 / 3; }
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
- 
+
   .del  { grid-area: 2 / 4; }
   .k0   { grid-area: 3 / 4; }
- 
+
   .dart { grid-area: 2 / 5; }
   .undo { grid-area: 2 / 6; }
- 
+
   .help-btn { grid-area: 3 / 5; }
   .bust     { grid-area: 3 / 6; }
- 
+
   .enter { grid-area: 4 / 4 / 5 / 7; }
 }
- 
-/* =====================================================
-   iPAD / LARGE SCREEN TEXT
-   ===================================================== */
+
 @media (min-width: 768px) {
   .key   { font-size: 1.9rem; }
   .enter { font-size: 2.1rem; }
@@ -288,14 +277,14 @@ input, select {
 }
 </style>
 </head>
- 
+
 <body>
- 
+
 <!-- ================= START SCREEN ================= -->
 <div class="start-screen">
   <div class="start-card">
     <h1>Darts Master</h1>
- 
+
     <div class="group">
       <label>Players</label>
       <select id="playerCount">
@@ -307,9 +296,9 @@ input, select {
         <option value="6">6</option>
       </select>
     </div>
- 
+
     <div id="playerNames" class="group"></div>
- 
+
     <div class="group inline">
       <div>
         <label>Game</label>
@@ -331,19 +320,39 @@ input, select {
         <input id="setsToWin" type="number" value="1" min="1">
       </div>
     </div>
- 
+
+    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:10px; border-style:dashed; border-width:1px; opacity:0.85;">USER PRO OUTS</button>
     <button class="start-btn">START MATCH</button>
   </div>
 </div>
- 
+
+<!-- ================= USER PRO OUTS OVERLAY ================= -->
+<div id="userOutsOverlay" class="start-screen" style="display:none; z-index:1100;">
+  <div class="start-card" style="max-width:520px;">
+    <h1 style="font-size:1.2rem; margin-bottom:10px;">User Pro Outs</h1>
+    <div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">
+      Add up to 3 user-specific checkout routes (display-only boost). Each route targets a score (2–170).
+    </div>
+
+    <div id="userOutsList" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+    <div style="border-top:1px solid var(--border-std); margin:12px 0;"></div>
+
+    <div style="display:flex; gap:10px;">
+      <button type="button" id="userOutsSave" class="start-btn" style="flex:1; padding:10px;">SAVE</button>
+      <button type="button" id="userOutsClose" class="start-btn" style="flex:1; padding:10px; border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.85);">CLOSE</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= MAIN APP ================= -->
 <div class="app">
   <div class="keypad">
- 
+
     <!-- SCORE WINDOW -->
     <div class="key score-view">
       <div class="score-left"></div>
- 
+
       <div class="score-center">
         <div class="top-darts">○ ○ ○</div>
         <div class="score-main">501</div>
@@ -362,41 +371,448 @@ input, select {
           </div>
         </div>
       </div>
- 
+
       <div class="score-right">SET UP</div>
     </div>
- 
+
     <!-- KEYPAD -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
     <div class="key num k0">0</div>
- 
+
     <div class="key del">DEL</div>
     <div class="key dart">🎯</div>
     <div class="key undo">UNDO</div>
     <div class="key help-btn">HELP</div>
     <div class="key bust">BUST</div>
     <div class="key enter">ENTER</div>
- 
+
   </div>
 </div>
- 
+
 <script>
 /* =====================================================
    CHANGELOG
    v1.14 - Pro-setup build
-   - Pro set-play: legs within sets; rotate leg/set starters next-in-line
-   - Enforce double-out confirm on all checkouts; score=1 treated as bust
-   - Pro 3-dart match average with correct dart counting (bust=3, checkout=1-3)
-   - Center meta: Legs (left), Avg (center), Sets (right; active player X/target)
-   - Visit-mode checkout darts prompt: "Darts to Checkout? 1 2 or 3?" (2 tries, then default 3)
-   - Batched prior engine features preserved: BUST, UNDO, press flash, font fit
+   v1.16 - HELP rebuilt (pro-forward): checkout+setup suggestions, iconic+user boosts; user outs manager on start screen
    ===================================================== */
- 
+
 let game = null;
- 
-// Start screen elements
+
+/* =====================================================
+   USER PRO OUTS (LOCAL STORAGE)
+   - Stored as: { "121": ["T20","T11","D14"], ... }
+   - Used only as a ranking BOOST inside HELP (checkout range only)
+   ===================================================== */
+const USER_OUTS_KEY = 'darts_user_pro_outs_v1';
+
+function loadUserOuts() {
+  try {
+    const obj = JSON.parse(localStorage.getItem(USER_OUTS_KEY) || '{}');
+    return (obj && typeof obj === 'object') ? obj : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUserOuts(obj) {
+  localStorage.setItem(USER_OUTS_KEY, JSON.stringify(obj || {}));
+}
+
+/* =====================================================
+   HELP ENGINE (DISPLAY-ONLY)
+   - Checkout help: <=170 (dart-aware)
+   - Setup help: 171–350 (dart-aware)
+   - Pro-forward scoring and dart-by-dart updates
+   - Iconic boost (checkout-only) + user outs boost (checkout-only)
+   ===================================================== */
+const HelpEngine = (() => {
+  const BOGEY_3D = new Set([159,162,163,165,166,168,169]);
+
+  // iconic boost set (checkout-only)
+  const ICONIC = {
+    170: ['T20','T20','BULL'],
+    160: ['T20','T20','D20'],
+    100: ['T20','D20'],
+    40:  ['D20'],
+    32:  ['D16']
+  };
+
+  const prefFinish = new Map([
+    ['D20', 40],
+    ['D16', 34],
+    ['D18', 28],
+    ['D10', 18],
+    ['D12', 16],
+    ['BULL', 8]
+  ]);
+
+  const bullPenalty = 18;
+  const iconicBoost = 45;
+  const userBoost = 40;
+
+  const THROWS = (() => {
+    const out = [];
+    for (let n=1;n<=20;n++) out.push({lab:`S${n}`, val:n, type:'S'});
+    for (let n=1;n<=20;n++) out.push({lab:`D${n}`, val:2*n, type:'D'});
+    for (let n=1;n<=20;n++) out.push({lab:`T${n}`, val:3*n, type:'T'});
+    out.push({lab:'SB', val:25, type:'SB'});
+    out.push({lab:'BULL', val:50, type:'BULL'});
+    out.push({lab:'0', val:0, type:'MISS'});
+    return out;
+  })();
+
+  const SETUP_THROWS = [
+    {lab:'T20', val:60},{lab:'T19', val:57},{lab:'T18', val:54},{lab:'T17', val:51},{lab:'T16', val:48},
+    {lab:'T15', val:45},{lab:'T14', val:42},{lab:'T13', val:39},{lab:'T12', val:36},{lab:'T11', val:33},{lab:'T10', val:30},
+    {lab:'S20', val:20},{lab:'S19', val:19},{lab:'S18', val:18},{lab:'S17', val:17},{lab:'S16', val:16},{lab:'S15', val:15},
+    {lab:'SB', val:25},{lab:'BULL', val:50},{lab:'0', val:0}
+  ];
+
+  const isFinishDart = (t) => t.type === 'D' || t.type === 'BULL';
+
+  function arraysEqual(a,b){
+    if (!a || !b || a.length !== b.length) return false;
+    for (let i=0;i<a.length;i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+
+  function coverDepthFromFinishLab(finishLab){
+    if (!finishLab || finishLab[0] !== 'D') return 0;
+    const n = Number(finishLab.slice(1));
+    if (!Number.isFinite(n) || n < 1 || n > 20) return 0;
+    let score = 2*n;
+    let depth = 0;
+    while (score % 2 === 0 && score >= 4 && score <= 40) {
+      depth++;
+      score = score / 2;
+      if (score === 1) break;
+    }
+    return depth;
+  }
+
+  function routeScore(route, score){
+    const n = route.length;
+    let s = 1000 - n*250;
+
+    const last = route[route.length-1];
+    s += (prefFinish.get(last) || 0);
+
+    if (last === 'BULL') s -= bullPenalty;
+
+    s += coverDepthFromFinishLab(last) * 6;
+
+    // target switching allowed: T20/T19 bias
+    for (let i=0;i<route.length;i++) {
+      if (route[i] === 'T20') s += (i === 0 ? 10 : 6);
+      if (route[i] === 'T19') s += (i === 0 ? 7 : 4);
+    }
+
+    // Iconic + user boosts (checkout-only)
+    const iconic = ICONIC[score];
+    if (iconic && arraysEqual(route, iconic)) s += iconicBoost;
+
+    const user = loadUserOuts();
+    const u = user[String(score)];
+    if (u && arraysEqual(route, u)) s += userBoost;
+
+    return s;
+  }
+
+  function formatRoute(route) {
+    return route.join(' ');
+  }
+
+  function genCheckoutRoutes(score, dartsLeft){
+    if (score < 2 || score > 170) return [];
+    if (BOGEY_3D.has(score)) return [];
+    dartsLeft = Math.max(1, Math.min(3, dartsLeft || 3));
+
+    const routes = [];
+
+    if (dartsLeft >= 1) {
+      for (const a of THROWS) {
+        if (!isFinishDart(a)) continue;
+        if (a.val === score) routes.push([a.lab]);
+      }
+    }
+
+    if (dartsLeft >= 2) {
+      for (const a of THROWS) {
+        for (const b of THROWS) {
+          if (!isFinishDart(b)) continue;
+          if (a.val + b.val === score) routes.push([a.lab,b.lab]);
+        }
+      }
+    }
+
+    if (dartsLeft >= 3) {
+      for (const a of THROWS) {
+        for (const b of THROWS) {
+          for (const c of THROWS) {
+            if (!isFinishDart(c)) continue;
+            if (a.val + b.val + c.val === score) routes.push([a.lab,b.lab,c.lab]);
+          }
+        }
+      }
+    }
+
+    const scored = routes.map(r => ({ r, s: routeScore(r, score) }));
+    scored.sort((x,y)=>y.s-x.s);
+
+    const seen = new Set();
+    const top = [];
+    for (const it of scored) {
+      const key = it.r.join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      top.push(it.r);
+      if (top.length >= 3) break;
+    }
+    return top;
+  }
+
+  function leaveScore(leave){
+    // best checkout from leave in 3 darts (no boosts)
+    const outs = genCheckoutRoutes(leave, 3);
+    if (!outs.length) return -9999;
+
+    // compute routeScore but subtract any potential boosts
+    const baseScore = (r) => {
+      let s = routeScore(r, leave);
+      const iconic = ICONIC[leave];
+      if (iconic && arraysEqual(r, iconic)) s -= iconicBoost;
+      const user = loadUserOuts();
+      const u = user[String(leave)];
+      if (u && arraysEqual(r, u)) s -= userBoost;
+      return s;
+    };
+
+    let best = -9999;
+    for (const r of outs) best = Math.max(best, baseScore(r));
+
+    // pro-number bias (setup mode preference)
+    if ([170,167,164,161,160,158,157,156,152,151,150,141,140,139,138,137,136,135,132,121,120,100,80,60,40,32,36].includes(leave)) best += 12;
+    if (leave === 50) best -= 8;
+
+    return best;
+  }
+
+  function genSetupSuggestions(score, dartsLeft){
+    dartsLeft = Math.max(1, Math.min(3, dartsLeft || 3));
+    if (score < 171 || score > 350) return [];
+
+    // collapse to 1 clear path at very high scores
+    if (score >= 300 && dartsLeft === 3) {
+      const leave180 = score - 180;
+      if (leave180 > 1 && leave180 <= 170 && !BOGEY_3D.has(leave180)) {
+        return [{ leave: leave180, route: ['T20','T20','T20'], s: 0 }];
+      }
+      // adjust last dart to avoid bogey leave
+      const adjust = [ {lab:'T19',val:57},{lab:'T18',val:54},{lab:'T17',val:51},{lab:'T16',val:48} ];
+      for (const a of adjust) {
+        const leave = score - (60+60+a.val);
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          return [{ leave, route: ['T20','T20',a.lab], s: 0 }];
+        }
+      }
+      return [{ leave: score-180, route: ['T20','T20','T20'], s: 0 }];
+    }
+
+    const cands = [];
+
+    if (dartsLeft === 1) {
+      for (const a of SETUP_THROWS) {
+        const leave = score - a.val;
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          cands.push({ leave, route:[a.lab], s: leaveScore(leave) });
+        }
+      }
+    } else if (dartsLeft === 2) {
+      for (const a of SETUP_THROWS) for (const b of SETUP_THROWS) {
+        const leave = score - (a.val + b.val);
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          cands.push({ leave, route:[a.lab,b.lab], s: leaveScore(leave) });
+        }
+      }
+    } else {
+      for (const a of SETUP_THROWS) for (const b of SETUP_THROWS) for (const c of SETUP_THROWS) {
+        const leave = score - (a.val + b.val + c.val);
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          cands.push({ leave, route:[a.lab,b.lab,c.lab], s: leaveScore(leave) });
+        }
+      }
+    }
+
+    cands.sort((x,y)=>y.s-x.s);
+
+    const seen = new Set();
+    const top = [];
+    for (const it of cands) {
+      const key = it.leave + '|' + it.route.join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      top.push(it);
+      if (top.length >= 3) break;
+    }
+
+    return top;
+  }
+
+  function getHelpLines(score, dartsLeft){
+    const lines = [];
+    if (!Number.isFinite(score)) return lines;
+
+    if (score <= 170) {
+      const outs = genCheckoutRoutes(score, dartsLeft);
+      if (!outs.length) {
+        lines.push(`LEAVE: ${score}`);
+        lines.push('THROW: NO OUT');
+        return lines;
+      }
+      for (const r of outs) {
+        lines.push(`LEAVE: ${score}`);
+        lines.push(`THROW: ${formatRoute(r)}`);
+      }
+      return lines;
+    }
+
+    if (score <= 350) {
+      const sets = genSetupSuggestions(score, dartsLeft);
+      if (!sets.length) return lines;
+      for (const s of sets) {
+        lines.push(`LEAVE: ${s.leave}`);
+        lines.push(`THROW: ${s.route.join(' ')}`);
+      }
+      return lines;
+    }
+
+    return lines;
+  }
+
+  return { getHelpLines };
+})();
+
+/* =====================================================
+   USER OUTS UI (OVERLAY)
+   ===================================================== */
+function buildUserOutsRow(i, data) {
+  const row = document.createElement('div');
+  row.style.border = '1px solid var(--border-std)';
+  row.style.borderRadius = '12px';
+  row.style.padding = '10px';
+  row.style.background = 'rgba(255,255,255,0.03)';
+
+  row.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
+      <div style="font-size:0.75rem; opacity:0.75;">Route ${i+1}</div>
+      <input type="number" min="2" max="170" placeholder="Score" style="width:110px;" class="uo-score" />
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+      ${[0,1,2].map(()=>`
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+          <select class="uo-bed">
+            <option value="">-</option>
+            <option value="S">S</option>
+            <option value="D">D</option>
+            <option value="T">T</option>
+            <option value="BULL">BULL</option>
+          </select>
+          <select class="uo-num">
+            ${[''].concat(Array.from({length:20},(_,k)=>String(k+1))).map(v=>`<option value="${v}">${v||'-'}</option>`).join('')}
+          </select>
+        </div>
+      `).join('')}
+    </div>
+    <div style="font-size:0.7rem; opacity:0.6; margin-top:8px;">Example: T 20 | T 20 | D 20</div>
+  `;
+
+  const scoreInp = row.querySelector('.uo-score');
+  const beds = row.querySelectorAll('.uo-bed');
+  const nums = row.querySelectorAll('.uo-num');
+
+  if (data && data.score) scoreInp.value = data.score;
+  if (data && data.route) {
+    data.route.forEach((tok, idx) => {
+      const m = tok === 'BULL' ? ['BULL',''] : [tok[0], tok.slice(1)];
+      if (beds[idx]) beds[idx].value = m[0];
+      if (nums[idx]) nums[idx].value = m[1] || '';
+    });
+  }
+
+  function syncDisable(){
+    beds.forEach((b, idx) => {
+      if (b.value === 'BULL') {
+        nums[idx].value = '';
+        nums[idx].disabled = true;
+      } else {
+        nums[idx].disabled = false;
+      }
+    });
+  }
+
+  beds.forEach(b => b.addEventListener('change', syncDisable));
+  syncDisable();
+
+  return row;
+}
+
+function openUserOutsOverlay(){
+  const overlay = document.getElementById('userOutsOverlay');
+  const list = document.getElementById('userOutsList');
+  list.innerHTML = '';
+
+  const existing = loadUserOuts();
+  const entries = Object.keys(existing).slice(0,3).map(k => ({ score: k, route: existing[k] }));
+  while (entries.length < 3) entries.push(null);
+
+  entries.forEach((e, i) => list.appendChild(buildUserOutsRow(i, e)));
+
+  overlay.style.display = 'flex';
+}
+
+function closeUserOutsOverlay(){
+  document.getElementById('userOutsOverlay').style.display = 'none';
+}
+
+function saveUserOutsFromUI(){
+  const list = document.getElementById('userOutsList');
+  const rows = Array.from(list.children);
+  const out = {};
+
+  for (const row of rows) {
+    const scoreVal = row.querySelector('.uo-score').value;
+    if (!scoreVal) continue;
+    const s = Number(scoreVal);
+    if (!Number.isFinite(s) || s < 2 || s > 170) continue;
+
+    const beds = row.querySelectorAll('.uo-bed');
+    const nums = row.querySelectorAll('.uo-num');
+    const route = [];
+
+    for (let i=0;i<3;i++) {
+      const bed = beds[i]?.value || '';
+      const num = nums[i]?.value || '';
+      if (!bed) continue;
+      if (bed === 'BULL') route.push('BULL');
+      else {
+        const n = Number(num);
+        if (!Number.isFinite(n) || n < 1 || n > 20) { route.length = 0; break; }
+        route.push(bed + String(n));
+      }
+    }
+
+    if (route.length) out[String(s)] = route;
+  }
+
+  saveUserOuts(out);
+  closeUserOutsOverlay();
+}
+
+/* =====================================================
+   START SCREEN: BUILD NAME INPUTS
+   ===================================================== */
 const playerCount = document.getElementById('playerCount');
 const startScoreSel = document.getElementById('startScore');
 const legsInput = document.getElementById('legsToWin');
@@ -404,30 +820,17 @@ const setsInput = document.getElementById('setsToWin');
 const namesWrap = document.getElementById('playerNames');
 const startScreen = document.querySelector('.start-screen');
 const startBtn = document.querySelector('.start-btn');
- 
-// UI elements
-const app = document.querySelector('.app');
+
 const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
 const scoreRight = document.querySelector('.score-right');
 const topDartsEl = document.querySelector('.top-darts');
- 
 const legsValueEl = document.querySelector('.score-meta .legs .value');
 const avgValueEl  = document.querySelector('.score-meta .avg .value');
 const setsValueEl = document.querySelector('.score-meta .sets .value');
- 
-// Input / turn state
-let currentInput = '';
-let turnStartScore = null;     // score at start of current visit/turn (for bust revert)
-let visitPoints = 0;           // accumulated points in current dart-mode visit
-let visitDartsUsed = 0;        // darts used in current dart-mode visit (0-3)
- 
-// Undo stack
-let undoStack = [];            // { kind: 'dart'|'turn', snap: {...} }
- 
-/* =====================================================
-   START SCREEN: BUILD NAME INPUTS
-   ===================================================== */
+
+const app = document.querySelector('.app');
+
 function renderNames() {
   namesWrap.innerHTML = '';
   for (let i = 1; i <= Number(playerCount.value); i++) {
@@ -438,24 +841,24 @@ function renderNames() {
 }
 playerCount.addEventListener('change', renderNames);
 renderNames();
- 
+
 /* =====================================================
-   PLAYER FONT AUTO-FIT (UNIFORM SIZE, NO WRAP, ELLIPSIS)
+   PLAYER FONT AUTO-FIT
    ===================================================== */
 function fitPlayerFont() {
   const container = scoreLeft;
   const items = container.querySelectorAll('.player');
   if (!items.length) return;
- 
+
   const maxWidth = container.clientWidth;
   items.forEach(el => (el.style.fontSize = ''));
- 
+
   let lo = 10, hi = 22;
   const fits = (px) => {
     items.forEach(el => (el.style.fontSize = px + 'px'));
     return Array.from(items).every(el => el.scrollWidth <= maxWidth);
   };
- 
+
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
     if (fits(mid)) lo = mid;
@@ -465,68 +868,107 @@ function fitPlayerFont() {
 }
 window.addEventListener('resize', fitPlayerFont);
 window.addEventListener('orientationchange', fitPlayerFont);
- 
+
 /* =====================================================
-   CORE HELPERS
+   CORE STATE
    ===================================================== */
+let currentInput = '';
+let turnStartScore = null;
+let visitPoints = 0;
+let visitDartsUsed = 0;
+let undoStack = [];
+
 function isStarted() { return !!game; }
 function isPlayable() { return !!game && !game.frozen; }
 function inDartMode() { return app.classList.contains('dart-mode'); }
- 
 function activeIndex() { return game?.activeIndex ?? 0; }
 function setActiveIndex(i) { if (game) game.activeIndex = i; }
- 
-function syncVisitDisplay() {
-  scoreRight.textContent = currentInput || '';
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
- 
+
+function helpIsOn() {
+  const hb = document.querySelector('.help-btn');
+  return !!hb && hb.classList.contains('active');
+}
+
+function renderRightPanel() {
+  if (!isStarted()) {
+    scoreRight.textContent = 'SET UP';
+    return;
+  }
+
+  // adjust scoreRight container to allow stacked lines (runtime only)
+  scoreRight.style.display = 'block';
+  scoreRight.style.textAlign = 'center';
+  scoreRight.style.whiteSpace = 'normal';
+
+  const inputLine = currentInput || '';
+  const score = game.players[activeIndex()].score;
+  const dartsLeft = inDartMode() ? Math.max(0, 3 - visitDartsUsed) : 3;
+
+  const big = `<div style="font-size:1.35em; font-weight:800; line-height:1;">${escapeHtml(inputLine)}</div>`;
+
+  if (!helpIsOn()) {
+    scoreRight.innerHTML = big;
+    return;
+  }
+
+  const helpLines = HelpEngine.getHelpLines(score, dartsLeft);
+  const spacer = `<div style="height:8px;"></div>`;
+  const helpHtml = helpLines.map(l => `<div style="font-size:0.95em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>`).join('');
+
+  scoreRight.innerHTML = big + spacer + helpHtml;
+}
+
+function syncVisitDisplay() { renderRightPanel(); }
+
 function clearInput() {
   currentInput = '';
   syncVisitDisplay();
 }
- 
+
 function resetVisitState() {
   turnStartScore = null;
   visitPoints = 0;
   visitDartsUsed = 0;
   updateTopDarts();
 }
- 
+
 function updateTopDarts() {
-  if (!topDartsEl) return;
   const filled = Math.max(0, Math.min(3, visitDartsUsed));
   topDartsEl.textContent = Array.from({ length: 3 }, (_, i) => (i < filled ? '●' : '○')).join(' ');
 }
- 
+
 function computeAvg(p) {
   const darts = p.stats?.darts || 0;
   const pts = p.stats?.points || 0;
   if (!darts) return '0.00';
   return ((pts / darts) * 3).toFixed(2);
 }
- 
+
 function refreshUI() {
   if (!isStarted()) return;
- 
-  // left list
+
   const items = scoreLeft.querySelectorAll('.player');
   items.forEach((el, idx) => {
     const p = game.players[idx];
     el.classList.toggle('active', idx === activeIndex());
     el.textContent = `${p.name} - ${p.score}`;
   });
- 
-  // center
+
   const p = game.players[activeIndex()];
   scoreMain.textContent = p.score;
   legsValueEl.textContent = String(p.legs);
   avgValueEl.textContent = computeAvg(p);
   setsValueEl.textContent = `${p.sets}/${game.setsToWin}`;
- 
+
   updateTopDarts();
   fitPlayerFont();
+  renderRightPanel();
 }
- 
+
 function pushUndo(kind) {
   if (!isStarted()) return;
   const snap = {
@@ -539,7 +981,7 @@ function pushUndo(kind) {
   undoStack.push({ kind, snap });
   if (undoStack.length > 250) undoStack.shift();
 }
- 
+
 function popUndoForMode() {
   if (!undoStack.length) return null;
   const want = inDartMode() ? 'dart' : 'turn';
@@ -549,7 +991,7 @@ function popUndoForMode() {
   }
   return null;
 }
- 
+
 function restoreUndoSnap(snap) {
   if (!snap) return;
   game = snap.game;
@@ -557,10 +999,9 @@ function restoreUndoSnap(snap) {
   turnStartScore = snap.turnStartScore;
   visitPoints = snap.visitPoints || 0;
   visitDartsUsed = snap.visitDartsUsed || 0;
-  syncVisitDisplay();
   refreshUI();
 }
- 
+
 function undoWouldRevertLegOrSet(snapGame) {
   const curLegs = (game?.players || []).reduce((a, pl) => a + (pl.legs || 0), 0);
   const snapLegs = (snapGame?.players || []).reduce((a, pl) => a + (pl.legs || 0), 0);
@@ -568,7 +1009,14 @@ function undoWouldRevertLegOrSet(snapGame) {
   const snapSets = (snapGame?.players || []).reduce((a, pl) => a + (pl.sets || 0), 0);
   return (curLegs !== snapLegs) || (curSets !== snapSets);
 }
- 
+
+function recordVisitStats(playerIdx, points, darts) {
+  const p = game.players[playerIdx];
+  if (!p.stats) p.stats = { points: 0, darts: 0 };
+  p.stats.points += points;
+  p.stats.darts += darts;
+}
+
 function advanceToNextPlayer() {
   resetVisitState();
   clearInput();
@@ -576,79 +1024,62 @@ function advanceToNextPlayer() {
   setActiveIndex(next);
   refreshUI();
 }
- 
-function recordVisitStats(playerIdx, points, darts) {
-  const p = game.players[playerIdx];
-  if (!p.stats) p.stats = { points: 0, darts: 0 };
-  p.stats.points += points;
-  p.stats.darts += darts;
-}
- 
+
 function bustCurrentTurn() {
-  // Score reverts to start-of-turn snapshot
   const idx = activeIndex();
   if (turnStartScore === null) turnStartScore = game.players[idx].score;
   game.players[idx].score = turnStartScore;
- 
-  // Pro-style: bust visit counts as 3 darts thrown, 0 points
+
+  // pro-style bust counts as 3 darts, 0 points
   recordVisitStats(idx, 0, 3);
- 
+
   resetVisitState();
   clearInput();
   advanceToNextPlayer();
 }
- 
+
 function promptCheckoutDarts() {
-  // 2 attempts total (invalid treated same as cancel). Default to 3 after.
   for (let attempt = 0; attempt < 2; attempt++) {
     const ans = window.prompt('Darts to Checkout? 1 2 or 3?');
-    if (ans === null) continue; // cancelled
+    if (ans === null) continue;
     const v = String(ans).trim();
     if (v === '1' || v === '2' || v === '3') return Number(v);
-    // invalid -> counts as failed attempt
   }
   return 3;
 }
- 
+
 /* =====================================================
-   LEG / SET / MATCH FLOW (PRO SET-PLAY GENERALIZED)
+   LEG / SET / MATCH FLOW
    ===================================================== */
 function resetScoresForNewLeg() {
   game.players.forEach(pl => (pl.score = game.startScore));
   resetVisitState();
   clearInput();
 }
- 
+
 function startNextLeg() {
-  // rotate leg starter next-in-line
   game.legStarterIndex = (game.legStarterIndex + 1) % game.players.length;
   setActiveIndex(game.legStarterIndex);
   resetScoresForNewLeg();
   refreshUI();
 }
- 
+
 function startNextSet() {
-  // rotate set starter next-in-line
   game.setStarterIndex = (game.setStarterIndex + 1) % game.players.length;
   game.legStarterIndex = game.setStarterIndex;
   setActiveIndex(game.legStarterIndex);
- 
-  // reset legs-in-set
   game.players.forEach(pl => (pl.legs = 0));
- 
   resetScoresForNewLeg();
   refreshUI();
 }
- 
+
 function handleMatchOver() {
   const ok = window.confirm('Match Over. Start new match?');
   if (ok) {
-    // back to setup
     game = null;
     undoStack = [];
     resetVisitState();
     currentInput = '';
-    syncVisitDisplay();
     scoreLeft.innerHTML = '';
     scoreRight.textContent = 'SET UP';
     scoreMain.textContent = startScoreSel.value || '501';
@@ -658,36 +1089,29 @@ function handleMatchOver() {
     startScreen.style.display = 'flex';
     return;
   }
-  // freeze
   game.frozen = true;
   clearInput();
   resetVisitState();
   refreshUI();
 }
- 
+
 function awardLegTo(playerIdx) {
   const p = game.players[playerIdx];
   p.legs += 1;
- 
-  // Set win?
+
   if (p.legs >= game.legsToWin) {
     p.sets += 1;
- 
-    // Match win?
     if (p.sets >= game.setsToWin) {
       handleMatchOver();
       return;
     }
- 
-    // Start next set
     startNextSet();
     return;
   }
- 
-  // Start next leg
+
   startNextLeg();
 }
- 
+
 /* =====================================================
    START MATCH
    ===================================================== */
@@ -695,9 +1119,9 @@ startBtn.addEventListener('click', () => {
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
   const nameInputs = namesWrap.querySelectorAll('input');
- 
+
   undoStack = [];
- 
+
   game = {
     mode: count === 1 ? 'practice' : 'match',
     startScore,
@@ -710,39 +1134,39 @@ startBtn.addEventListener('click', () => {
     frozen: false,
     createdAt: Date.now()
   };
- 
+
   scoreLeft.innerHTML = '';
   for (let i = 0; i < count; i++) {
     const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
     const pl = {
       name,
       score: startScore,
-      legs: 0,  // legs in current set
-      sets: 0,  // sets won
+      legs: 0,
+      sets: 0,
       stats: { points: 0, darts: 0 }
     };
     game.players.push(pl);
- 
+
     const div = document.createElement('div');
     div.className = 'player' + (i === 0 ? ' active' : '');
     div.textContent = `${name} - ${startScore}`;
     scoreLeft.appendChild(div);
   }
- 
+
   resetVisitState();
   clearInput();
- 
+
   scoreMain.textContent = startScore;
   legsValueEl.textContent = '0';
   avgValueEl.textContent = '0.00';
   setsValueEl.textContent = `0/${game.setsToWin}`;
- 
+
   startScreen.style.display = 'none';
   refreshUI();
 });
- 
+
 /* =====================================================
-   KEYPAD: VISIT INPUT (GUARDED)
+   KEYPAD INPUT
    ===================================================== */
 document.querySelectorAll('.num').forEach(k => {
   k.addEventListener('click', () => {
@@ -753,139 +1177,116 @@ document.querySelectorAll('.num').forEach(k => {
     }
   });
 });
- 
+
 document.querySelector('.del').addEventListener('click', () => {
   if (!isPlayable()) return;
   currentInput = currentInput.slice(0, -1);
   syncVisitDisplay();
 });
- 
+
 /* =====================================================
    ENTER: HYBRID COMMIT
-   - Dart-mode ON: per-dart (0-60)
-   - Dart-mode OFF: visit total (0-180)
    ===================================================== */
 document.querySelector('.enter').addEventListener('click', () => {
   if (!isPlayable()) return;
   if (!currentInput) return;
- 
+
   const val = Number(currentInput);
   if (!Number.isFinite(val)) return;
- 
+
   const idx = activeIndex();
   const p = game.players[idx];
- 
+
   if (inDartMode()) {
-    // per-dart
     if (val < 0 || val > 60) return;
- 
+
     pushUndo('dart');
- 
-    // snapshot at start of visit
+
     if (turnStartScore === null) turnStartScore = p.score;
- 
-    // apply dart
+
     visitDartsUsed += 1;
     visitPoints += val;
- 
+
     const newScore = p.score - val;
- 
-    // bust if below 0 OR equals 1
+
     if (newScore < 0 || newScore === 1) {
       bustCurrentTurn();
       return;
     }
- 
-    // potential checkout
+
     if (newScore === 0) {
       const ok = window.confirm('Doubled Out?');
       if (!ok) {
         bustCurrentTurn();
         return;
       }
-      // record stats: points scored in this (successful) visit + darts actually thrown
       recordVisitStats(idx, visitPoints, visitDartsUsed);
-      // leg win
       awardLegTo(idx);
       return;
     }
- 
-    // normal dart
+
     p.score = newScore;
     clearInput();
     refreshUI();
- 
-    // if 3 darts used, end turn (successful visit => points count, darts=3)
+
     if (visitDartsUsed >= 3) {
       recordVisitStats(idx, visitPoints, 3);
       advanceToNextPlayer();
       return;
     }
- 
-    updateTopDarts();
+
     return;
   }
- 
-  // visit total
+
   if (val < 0 || val > 180) return;
- 
+
   pushUndo('turn');
- 
-  // snapshot at start of visit
+
   turnStartScore = p.score;
- 
   const newScore = p.score - val;
- 
-  // bust conditions: below 0 OR equals 1
+
   if (newScore < 0 || newScore === 1) {
-    // visit-mode bust counts as 3 darts
     bustCurrentTurn();
     return;
   }
- 
+
   if (newScore === 0) {
     const ok = window.confirm('Doubled Out?');
     if (!ok) {
       bustCurrentTurn();
       return;
     }
- 
+
     const dartsCheckout = promptCheckoutDarts();
- 
-    // record stats: successful checkout visit counts actual darts used
     recordVisitStats(idx, val, dartsCheckout);
- 
-    // leg win
     awardLegTo(idx);
     return;
   }
- 
-  // normal successful visit
+
   p.score = newScore;
   recordVisitStats(idx, val, 3);
   clearInput();
   refreshUI();
   advanceToNextPlayer();
 });
- 
+
 /* =====================================================
-   BUST BUTTON (IMMEDIATE BUST)
+   BUST BUTTON
    ===================================================== */
 document.querySelector('.bust').addEventListener('click', () => {
   if (!isPlayable()) return;
   pushUndo(inDartMode() ? 'dart' : 'turn');
   bustCurrentTurn();
 });
- 
+
 /* =====================================================
-   UNDO BUTTON (C): dart-mode => undo last dart; visit-mode => undo last turn
-   + confirm when undo would revert a leg or set
+   UNDO BUTTON
    ===================================================== */
 document.querySelector('.undo').addEventListener('click', () => {
   if (!isStarted()) return;
   const item = popUndoForMode();
   if (!item) return;
- 
+
   const snap = item.snap;
   if (undoWouldRevertLegOrSet(snap.game)) {
     const ok = window.confirm('Undo leg?');
@@ -894,29 +1295,29 @@ document.querySelector('.undo').addEventListener('click', () => {
       return;
     }
   }
- 
+
   restoreUndoSnap(snap);
 });
- 
+
 /* =====================================================
-   MODE HIGHLIGHTS
+   MODE TOGGLES
    ===================================================== */
 document.querySelector('.dart').addEventListener('click', (e) => {
   if (!isPlayable()) return;
   app.classList.toggle('dart-mode');
   e.currentTarget.classList.toggle('active');
- 
-  // safety: reset any in-progress visit/input when switching modes
+
   resetVisitState();
   clearInput();
   refreshUI();
 });
- 
+
 document.querySelector('.help-btn').addEventListener('click', (e) => {
   if (!isPlayable()) return;
   e.currentTarget.classList.toggle('active');
+  renderRightPanel();
 });
- 
+
 /* =====================================================
    PRESS FLASH FEEDBACK
    ===================================================== */
@@ -927,7 +1328,22 @@ document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
     setTimeout(() => btn.classList.remove('pressed'), 120);
   });
 });
+
+/* =====================================================
+   USER OUTS UI WIRES
+   ===================================================== */
+document.getElementById('openUserOuts').addEventListener('click', () => {
+  openUserOutsOverlay();
+});
+document.getElementById('userOutsSave').addEventListener('click', () => {
+  saveUserOutsFromUI();
+  if (isStarted()) refreshUI();
+});
+document.getElementById('userOutsClose').addEventListener('click', () => {
+  closeUserOutsOverlay();
+});
+
 </script>
- 
+
 </body>
 </html>
