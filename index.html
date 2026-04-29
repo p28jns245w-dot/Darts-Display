@@ -9,7 +9,7 @@
                  maximum-scale=1.0,
                  user-scalable=no,
                  viewport-fit=cover" />
-  <title>Darts Master v1.16</title>
+  <title>Darts Master v1.17</title>
 
 <style>
 /* =====================================================
@@ -281,7 +281,7 @@ input, select {
 <body>
 
 <!-- ================= START SCREEN ================= -->
-<div class="start-screen">
+<div class="start-screen" id="startScreen">
   <div class="start-card">
     <h1>Darts Master</h1>
 
@@ -321,17 +321,17 @@ input, select {
       </div>
     </div>
 
-    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:10px; border-style:dashed; border-width:1px; opacity:0.85;">USER PRO OUTS</button>
-    <button class="start-btn">START MATCH</button>
+    <button class="start-btn" id="startMatch" style="margin-top:4px;">START MATCH</button>
+    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:12px; border-style:dashed; border-width:1px; opacity:0.85;">Add User Preferred Out</button>
   </div>
 </div>
 
 <!-- ================= USER PRO OUTS OVERLAY ================= -->
 <div id="userOutsOverlay" class="start-screen" style="display:none; z-index:1100;">
   <div class="start-card" style="max-width:520px;">
-    <h1 style="font-size:1.2rem; margin-bottom:10px;">User Pro Outs</h1>
+    <h1 style="font-size:1.2rem; margin-bottom:10px;">User Preferred Outs</h1>
     <div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">
-      Add up to 3 user-specific checkout routes (display-only boost). Each route targets a score (2–170).
+      Add up to 3 preferred checkout routes. Saved on this device (no re-entry needed).
     </div>
 
     <div id="userOutsList" style="display:flex; flex-direction:column; gap:10px;"></div>
@@ -394,18 +394,16 @@ input, select {
 <script>
 /* =====================================================
    CHANGELOG
-   v1.14 - Pro-setup build
-   v1.16 - HELP rebuilt (pro-forward): checkout+setup suggestions, iconic+user boosts; user outs manager on start screen
+   v1.14 - Pro-setup engine
+   v1.17 - Fix start match button; USER Preferred Outs overlay; HELP caching + CHECKOUT/SETUP headers + spacing
    ===================================================== */
 
-let game = null;
-
 /* =====================================================
-   USER PRO OUTS (LOCAL STORAGE)
+   USER PREFERRED OUTS (LOCAL STORAGE)
    - Stored as: { "121": ["T20","T11","D14"], ... }
    - Used only as a ranking BOOST inside HELP (checkout range only)
    ===================================================== */
-const USER_OUTS_KEY = 'darts_user_pro_outs_v1';
+const USER_OUTS_KEY = 'darts_user_preferred_outs_v1';
 
 function loadUserOuts() {
   try {
@@ -424,13 +422,17 @@ function saveUserOuts(obj) {
    HELP ENGINE (DISPLAY-ONLY)
    - Checkout help: <=170 (dart-aware)
    - Setup help: 171–350 (dart-aware)
-   - Pro-forward scoring and dart-by-dart updates
+   - Pro-forward scoring:
+       * fewer darts first
+       * preferred doubles + cover
+       * bull penalized but allowed
+       * target switching allowed
    - Iconic boost (checkout-only) + user outs boost (checkout-only)
+   - Caching to prevent iPad slowdowns
    ===================================================== */
 const HelpEngine = (() => {
   const BOGEY_3D = new Set([159,162,163,165,166,168,169]);
 
-  // iconic boost set (checkout-only)
   const ICONIC = {
     170: ['T20','T20','BULL'],
     160: ['T20','T20','D20'],
@@ -451,6 +453,10 @@ const HelpEngine = (() => {
   const bullPenalty = 18;
   const iconicBoost = 45;
   const userBoost = 40;
+
+  const checkoutCache = new Map(); // key: score|dartsLeft -> [routes]
+  const leaveScoreCache = new Map(); // key: leave -> number
+  const setupCache = new Map(); // key: score|dartsLeft -> [{leave,route,s}]
 
   const THROWS = (() => {
     const out = [];
@@ -503,7 +509,7 @@ const HelpEngine = (() => {
 
     s += coverDepthFromFinishLab(last) * 6;
 
-    // target switching allowed: T20/T19 bias
+    // pro-ish bias: T20/T19 early; allows switching
     for (let i=0;i<route.length;i++) {
       if (route[i] === 'T20') s += (i === 0 ? 10 : 6);
       if (route[i] === 'T19') s += (i === 0 ? 7 : 4);
@@ -528,6 +534,9 @@ const HelpEngine = (() => {
     if (score < 2 || score > 170) return [];
     if (BOGEY_3D.has(score)) return [];
     dartsLeft = Math.max(1, Math.min(3, dartsLeft || 3));
+
+    const cacheKey = score + '|' + dartsLeft;
+    if (checkoutCache.has(cacheKey)) return checkoutCache.get(cacheKey);
 
     const routes = [];
 
@@ -570,15 +579,21 @@ const HelpEngine = (() => {
       top.push(it.r);
       if (top.length >= 3) break;
     }
+
+    checkoutCache.set(cacheKey, top);
     return top;
   }
 
   function leaveScore(leave){
-    // best checkout from leave in 3 darts (no boosts)
-    const outs = genCheckoutRoutes(leave, 3);
-    if (!outs.length) return -9999;
+    if (leaveScoreCache.has(leave)) return leaveScoreCache.get(leave);
 
-    // compute routeScore but subtract any potential boosts
+    const outs = genCheckoutRoutes(leave, 3);
+    if (!outs.length) {
+      leaveScoreCache.set(leave, -9999);
+      return -9999;
+    }
+
+    // remove boosts for leave scoring
     const baseScore = (r) => {
       let s = routeScore(r, leave);
       const iconic = ICONIC[leave];
@@ -592,10 +607,11 @@ const HelpEngine = (() => {
     let best = -9999;
     for (const r of outs) best = Math.max(best, baseScore(r));
 
-    // pro-number bias (setup mode preference)
-    if ([170,167,164,161,160,158,157,156,152,151,150,141,140,139,138,137,136,135,132,121,120,100,80,60,40,32,36].includes(leave)) best += 12;
+    // pro-number bias in setup
+    if ([170,167,164,161,160,158,157,156,152,151,150,141,140,139,138,137,136,135,132,121,120,110,100,90,80,60,40,36,32].includes(leave)) best += 12;
     if (leave === 50) best -= 8;
 
+    leaveScoreCache.set(leave, best);
     return best;
   }
 
@@ -603,21 +619,29 @@ const HelpEngine = (() => {
     dartsLeft = Math.max(1, Math.min(3, dartsLeft || 3));
     if (score < 171 || score > 350) return [];
 
-    // collapse to 1 clear path at very high scores
+    const cacheKey = score + '|' + dartsLeft;
+    if (setupCache.has(cacheKey)) return setupCache.get(cacheKey);
+
+    // collapse at very high scores (>=300) to one clear path
     if (score >= 300 && dartsLeft === 3) {
       const leave180 = score - 180;
       if (leave180 > 1 && leave180 <= 170 && !BOGEY_3D.has(leave180)) {
-        return [{ leave: leave180, route: ['T20','T20','T20'], s: 0 }];
+        const one = [{ leave: leave180, route: ['T20','T20','T20'], s: 0 }];
+        setupCache.set(cacheKey, one);
+        return one;
       }
-      // adjust last dart to avoid bogey leave
       const adjust = [ {lab:'T19',val:57},{lab:'T18',val:54},{lab:'T17',val:51},{lab:'T16',val:48} ];
       for (const a of adjust) {
         const leave = score - (60+60+a.val);
         if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
-          return [{ leave, route: ['T20','T20',a.lab], s: 0 }];
+          const one = [{ leave, route: ['T20','T20',a.lab], s: 0 }];
+          setupCache.set(cacheKey, one);
+          return one;
         }
       }
-      return [{ leave: score-180, route: ['T20','T20','T20'], s: 0 }];
+      const one = [{ leave: score-180, route: ['T20','T20','T20'], s: 0 }];
+      setupCache.set(cacheKey, one);
+      return one;
     }
 
     const cands = [];
@@ -657,180 +681,66 @@ const HelpEngine = (() => {
       if (top.length >= 3) break;
     }
 
+    setupCache.set(cacheKey, top);
     return top;
   }
 
-  function getHelpLines(score, dartsLeft){
-    const lines = [];
-    if (!Number.isFinite(score)) return lines;
+  function getHelpDisplay(score, dartsLeft){
+    if (!Number.isFinite(score)) return { header: '', lines: [] };
 
     if (score <= 170) {
       const outs = genCheckoutRoutes(score, dartsLeft);
-      if (!outs.length) {
-        lines.push(`LEAVE: ${score}`);
-        lines.push('THROW: NO OUT');
-        return lines;
-      }
-      for (const r of outs) {
-        lines.push(`LEAVE: ${score}`);
-        lines.push(`THROW: ${formatRoute(r)}`);
-      }
-      return lines;
+      if (!outs.length) return { header: 'CHECKOUT', lines: ['NO OUT'] };
+      return { header: 'CHECKOUT', lines: outs.map(r => formatRoute(r)) };
     }
 
     if (score <= 350) {
       const sets = genSetupSuggestions(score, dartsLeft);
-      if (!sets.length) return lines;
-      for (const s of sets) {
-        lines.push(`LEAVE: ${s.leave}`);
-        lines.push(`THROW: ${s.route.join(' ')}`);
-      }
-      return lines;
+      if (!sets.length) return { header: 'SETUP', lines: [] };
+      return { header: 'SETUP', lines: sets.map(s => `${s.route.join(' ')} (${s.leave})`) };
     }
 
-    return lines;
+    return { header: '', lines: [] };
   }
 
-  return { getHelpLines };
+  return { getHelpDisplay };
 })();
 
 /* =====================================================
-   USER OUTS UI (OVERLAY)
+   GAME ENGINE (v1.14 preserved)
    ===================================================== */
-function buildUserOutsRow(i, data) {
-  const row = document.createElement('div');
-  row.style.border = '1px solid var(--border-std)';
-  row.style.borderRadius = '12px';
-  row.style.padding = '10px';
-  row.style.background = 'rgba(255,255,255,0.03)';
+let game = null;
 
-  row.innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
-      <div style="font-size:0.75rem; opacity:0.75;">Route ${i+1}</div>
-      <input type="number" min="2" max="170" placeholder="Score" style="width:110px;" class="uo-score" />
-    </div>
-    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
-      ${[0,1,2].map(()=>`
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-          <select class="uo-bed">
-            <option value="">-</option>
-            <option value="S">S</option>
-            <option value="D">D</option>
-            <option value="T">T</option>
-            <option value="BULL">BULL</option>
-          </select>
-          <select class="uo-num">
-            ${[''].concat(Array.from({length:20},(_,k)=>String(k+1))).map(v=>`<option value="${v}">${v||'-'}</option>`).join('')}
-          </select>
-        </div>
-      `).join('')}
-    </div>
-    <div style="font-size:0.7rem; opacity:0.6; margin-top:8px;">Example: T 20 | T 20 | D 20</div>
-  `;
-
-  const scoreInp = row.querySelector('.uo-score');
-  const beds = row.querySelectorAll('.uo-bed');
-  const nums = row.querySelectorAll('.uo-num');
-
-  if (data && data.score) scoreInp.value = data.score;
-  if (data && data.route) {
-    data.route.forEach((tok, idx) => {
-      const m = tok === 'BULL' ? ['BULL',''] : [tok[0], tok.slice(1)];
-      if (beds[idx]) beds[idx].value = m[0];
-      if (nums[idx]) nums[idx].value = m[1] || '';
-    });
-  }
-
-  function syncDisable(){
-    beds.forEach((b, idx) => {
-      if (b.value === 'BULL') {
-        nums[idx].value = '';
-        nums[idx].disabled = true;
-      } else {
-        nums[idx].disabled = false;
-      }
-    });
-  }
-
-  beds.forEach(b => b.addEventListener('change', syncDisable));
-  syncDisable();
-
-  return row;
-}
-
-function openUserOutsOverlay(){
-  const overlay = document.getElementById('userOutsOverlay');
-  const list = document.getElementById('userOutsList');
-  list.innerHTML = '';
-
-  const existing = loadUserOuts();
-  const entries = Object.keys(existing).slice(0,3).map(k => ({ score: k, route: existing[k] }));
-  while (entries.length < 3) entries.push(null);
-
-  entries.forEach((e, i) => list.appendChild(buildUserOutsRow(i, e)));
-
-  overlay.style.display = 'flex';
-}
-
-function closeUserOutsOverlay(){
-  document.getElementById('userOutsOverlay').style.display = 'none';
-}
-
-function saveUserOutsFromUI(){
-  const list = document.getElementById('userOutsList');
-  const rows = Array.from(list.children);
-  const out = {};
-
-  for (const row of rows) {
-    const scoreVal = row.querySelector('.uo-score').value;
-    if (!scoreVal) continue;
-    const s = Number(scoreVal);
-    if (!Number.isFinite(s) || s < 2 || s > 170) continue;
-
-    const beds = row.querySelectorAll('.uo-bed');
-    const nums = row.querySelectorAll('.uo-num');
-    const route = [];
-
-    for (let i=0;i<3;i++) {
-      const bed = beds[i]?.value || '';
-      const num = nums[i]?.value || '';
-      if (!bed) continue;
-      if (bed === 'BULL') route.push('BULL');
-      else {
-        const n = Number(num);
-        if (!Number.isFinite(n) || n < 1 || n > 20) { route.length = 0; break; }
-        route.push(bed + String(n));
-      }
-    }
-
-    if (route.length) out[String(s)] = route;
-  }
-
-  saveUserOuts(out);
-  closeUserOutsOverlay();
-}
-
-/* =====================================================
-   START SCREEN: BUILD NAME INPUTS
-   ===================================================== */
+// Start screen elements
 const playerCount = document.getElementById('playerCount');
 const startScoreSel = document.getElementById('startScore');
 const legsInput = document.getElementById('legsToWin');
 const setsInput = document.getElementById('setsToWin');
 const namesWrap = document.getElementById('playerNames');
-const startScreen = document.querySelector('.start-screen');
-const startBtn = document.querySelector('.start-btn');
+const startScreen = document.getElementById('startScreen');
+const startBtn = document.getElementById('startMatch');
 
+// UI elements
+const app = document.querySelector('.app');
 const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
 const scoreRight = document.querySelector('.score-right');
 const topDartsEl = document.querySelector('.top-darts');
+
 const legsValueEl = document.querySelector('.score-meta .legs .value');
 const avgValueEl  = document.querySelector('.score-meta .avg .value');
 const setsValueEl = document.querySelector('.score-meta .sets .value');
 
-const app = document.querySelector('.app');
+// Input / turn state
+let currentInput = '';
+let turnStartScore = null;
+let visitPoints = 0;
+let visitDartsUsed = 0;
 
+// Undo
+let undoStack = [];
+
+/* ================= START SCREEN: NAMES ================= */
 function renderNames() {
   namesWrap.innerHTML = '';
   for (let i = 1; i <= Number(playerCount.value); i++) {
@@ -842,9 +752,7 @@ function renderNames() {
 playerCount.addEventListener('change', renderNames);
 renderNames();
 
-/* =====================================================
-   PLAYER FONT AUTO-FIT
-   ===================================================== */
+/* ================= FONT FIT ================= */
 function fitPlayerFont() {
   const container = scoreLeft;
   const items = container.querySelectorAll('.player');
@@ -869,15 +777,7 @@ function fitPlayerFont() {
 window.addEventListener('resize', fitPlayerFont);
 window.addEventListener('orientationchange', fitPlayerFont);
 
-/* =====================================================
-   CORE STATE
-   ===================================================== */
-let currentInput = '';
-let turnStartScore = null;
-let visitPoints = 0;
-let visitDartsUsed = 0;
-let undoStack = [];
-
+/* ================= HELPERS ================= */
 function isStarted() { return !!game; }
 function isPlayable() { return !!game && !game.frozen; }
 function inDartMode() { return app.classList.contains('dart-mode'); }
@@ -899,7 +799,7 @@ function renderRightPanel() {
     return;
   }
 
-  // adjust scoreRight container to allow stacked lines (runtime only)
+  // allow stacked lines without changing layout grids
   scoreRight.style.display = 'block';
   scoreRight.style.textAlign = 'center';
   scoreRight.style.whiteSpace = 'normal';
@@ -915,11 +815,21 @@ function renderRightPanel() {
     return;
   }
 
-  const helpLines = HelpEngine.getHelpLines(score, dartsLeft);
-  const spacer = `<div style="height:8px;"></div>`;
-  const helpHtml = helpLines.map(l => `<div style="font-size:0.95em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>`).join('');
+  let hd;
+  try {
+    hd = HelpEngine.getHelpDisplay(score, dartsLeft);
+  } catch {
+    hd = { header: '', lines: [] };
+  }
 
-  scoreRight.innerHTML = big + spacer + helpHtml;
+  const header = hd.header ? `<div style="font-size:0.8em; opacity:0.85; letter-spacing:0.5px;">${escapeHtml(hd.header)}</div>` : '';
+  const spacer = `<div style="height:10px;"></div>`;
+  const gap = `<div style="height:10px;"></div>`;
+
+  const lines = (hd.lines || []).slice(0,3);
+  const opts = lines.map((l, i) => `<div style="font-size:0.92em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>` + (i < lines.length-1 ? gap : '')).join('');
+
+  scoreRight.innerHTML = big + spacer + header + spacer + opts;
 }
 
 function syncVisitDisplay() { renderRightPanel(); }
@@ -1010,13 +920,6 @@ function undoWouldRevertLegOrSet(snapGame) {
   return (curLegs !== snapLegs) || (curSets !== snapSets);
 }
 
-function recordVisitStats(playerIdx, points, darts) {
-  const p = game.players[playerIdx];
-  if (!p.stats) p.stats = { points: 0, darts: 0 };
-  p.stats.points += points;
-  p.stats.darts += darts;
-}
-
 function advanceToNextPlayer() {
   resetVisitState();
   clearInput();
@@ -1025,12 +928,19 @@ function advanceToNextPlayer() {
   refreshUI();
 }
 
+function recordVisitStats(playerIdx, points, darts) {
+  const p = game.players[playerIdx];
+  if (!p.stats) p.stats = { points: 0, darts: 0 };
+  p.stats.points += points;
+  p.stats.darts += darts;
+}
+
 function bustCurrentTurn() {
   const idx = activeIndex();
   if (turnStartScore === null) turnStartScore = game.players[idx].score;
   game.players[idx].score = turnStartScore;
 
-  // pro-style bust counts as 3 darts, 0 points
+  // bust counts as 3 darts, 0 points
   recordVisitStats(idx, 0, 3);
 
   resetVisitState();
@@ -1048,9 +958,7 @@ function promptCheckoutDarts() {
   return 3;
 }
 
-/* =====================================================
-   LEG / SET / MATCH FLOW
-   ===================================================== */
+/* ================= LEG / SET / MATCH ================= */
 function resetScoresForNewLeg() {
   game.players.forEach(pl => (pl.score = game.startScore));
   resetVisitState();
@@ -1112,9 +1020,7 @@ function awardLegTo(playerIdx) {
   startNextLeg();
 }
 
-/* =====================================================
-   START MATCH
-   ===================================================== */
+/* ================= START MATCH ================= */
 startBtn.addEventListener('click', () => {
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
@@ -1165,9 +1071,7 @@ startBtn.addEventListener('click', () => {
   refreshUI();
 });
 
-/* =====================================================
-   KEYPAD INPUT
-   ===================================================== */
+/* ================= INPUT HANDLERS ================= */
 document.querySelectorAll('.num').forEach(k => {
   k.addEventListener('click', () => {
     if (!isPlayable()) return;
@@ -1184,9 +1088,7 @@ document.querySelector('.del').addEventListener('click', () => {
   syncVisitDisplay();
 });
 
-/* =====================================================
-   ENTER: HYBRID COMMIT
-   ===================================================== */
+/* ================= ENTER: HYBRID COMMIT ================= */
 document.querySelector('.enter').addEventListener('click', () => {
   if (!isPlayable()) return;
   if (!currentInput) return;
@@ -1209,6 +1111,7 @@ document.querySelector('.enter').addEventListener('click', () => {
 
     const newScore = p.score - val;
 
+    // bust on <0 or 1
     if (newScore < 0 || newScore === 1) {
       bustCurrentTurn();
       return;
@@ -1238,6 +1141,7 @@ document.querySelector('.enter').addEventListener('click', () => {
     return;
   }
 
+  // visit total
   if (val < 0 || val > 180) return;
 
   pushUndo('turn');
@@ -1270,18 +1174,14 @@ document.querySelector('.enter').addEventListener('click', () => {
   advanceToNextPlayer();
 });
 
-/* =====================================================
-   BUST BUTTON
-   ===================================================== */
+/* ================= BUST BUTTON ================= */
 document.querySelector('.bust').addEventListener('click', () => {
   if (!isPlayable()) return;
   pushUndo(inDartMode() ? 'dart' : 'turn');
   bustCurrentTurn();
 });
 
-/* =====================================================
-   UNDO BUTTON
-   ===================================================== */
+/* ================= UNDO BUTTON ================= */
 document.querySelector('.undo').addEventListener('click', () => {
   if (!isStarted()) return;
   const item = popUndoForMode();
@@ -1299,9 +1199,7 @@ document.querySelector('.undo').addEventListener('click', () => {
   restoreUndoSnap(snap);
 });
 
-/* =====================================================
-   MODE TOGGLES
-   ===================================================== */
+/* ================= MODE TOGGLES ================= */
 document.querySelector('.dart').addEventListener('click', (e) => {
   if (!isPlayable()) return;
   app.classList.toggle('dart-mode');
@@ -1318,9 +1216,7 @@ document.querySelector('.help-btn').addEventListener('click', (e) => {
   renderRightPanel();
 });
 
-/* =====================================================
-   PRESS FLASH FEEDBACK
-   ===================================================== */
+/* ================= PRESS FLASH FEEDBACK ================= */
 document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!isPlayable()) return;
@@ -1330,17 +1226,148 @@ document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
 });
 
 /* =====================================================
-   USER OUTS UI WIRES
+   USER OUTS OVERLAY UI
    ===================================================== */
+const userOutsOverlay = document.getElementById('userOutsOverlay');
+const userOutsList = document.getElementById('userOutsList');
+
+function buildUserOutRow(slot, existing) {
+  const row = document.createElement('div');
+  row.style.border = '1px solid var(--border-std)';
+  row.style.borderRadius = '12px';
+  row.style.padding = '10px';
+  row.style.background = 'rgba(255,255,255,0.03)';
+
+  row.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
+      <div style="font-size:0.75rem; opacity:0.75;">Route ${slot+1}</div>
+      <input type="number" min="2" max="170" placeholder="Score" style="width:110px;" class="uo-score" />
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+      ${[0,1,2].map(()=>`
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+          <select class="uo-bed">
+            <option value="">-</option>
+            <option value="S">S</option>
+            <option value="D">D</option>
+            <option value="T">T</option>
+            <option value="BULL">BULL</option>
+          </select>
+          <select class="uo-num">
+            ${[''].concat(Array.from({length:20},(_,k)=>String(k+1))).map(v=>`<option value="${v}">${v||'-'}</option>`).join('')}
+          </select>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  const scoreInp = row.querySelector('.uo-score');
+  const beds = row.querySelectorAll('.uo-bed');
+  const nums = row.querySelectorAll('.uo-num');
+
+  if (existing && existing.score) scoreInp.value = existing.score;
+
+  if (existing && existing.route) {
+    existing.route.forEach((tok, idx) => {
+      if (!beds[idx] || !nums[idx]) return;
+      if (tok === 'BULL') {
+        beds[idx].value = 'BULL';
+        nums[idx].value = '';
+      } else {
+        beds[idx].value = tok[0];
+        nums[idx].value = tok.slice(1);
+      }
+    });
+  } else {
+    beds.forEach(b => (b.value = ''));
+    nums.forEach(n => (n.value = ''));
+  }
+
+  function syncDisable(){
+    beds.forEach((b, idx) => {
+      if (b.value === 'BULL') {
+        nums[idx].value = '';
+        nums[idx].disabled = true;
+      } else {
+        nums[idx].disabled = false;
+      }
+    });
+  }
+
+  beds.forEach(b => b.addEventListener('change', syncDisable));
+  syncDisable();
+
+  return row;
+}
+
+function openUserOuts(){
+  userOutsList.innerHTML = '';
+
+  const existing = loadUserOuts();
+  const entries = Object.keys(existing).slice(0,3).map(k => ({ score: k, route: existing[k] }));
+  while (entries.length < 3) entries.push(null);
+
+  entries.forEach((e, i) => userOutsList.appendChild(buildUserOutRow(i, e)));
+
+  userOutsOverlay.style.display = 'flex';
+}
+
+function closeUserOuts(){
+  userOutsOverlay.style.display = 'none';
+}
+
+function saveUserOutsFromUI(){
+  const rows = Array.from(userOutsList.children);
+  const out = {};
+
+  for (const row of rows) {
+    const scoreVal = row.querySelector('.uo-score').value;
+    if (!scoreVal) continue;
+    const s = Number(scoreVal);
+    if (!Number.isFinite(s) || s < 2 || s > 170) continue;
+
+    const beds = row.querySelectorAll('.uo-bed');
+    const nums = row.querySelectorAll('.uo-num');
+    const route = [];
+
+    for (let i=0;i<3;i++) {
+      const bed = beds[i]?.value || '';
+      const num = nums[i]?.value || '';
+      if (!bed) continue;
+
+      if (bed === 'BULL') {
+        route.push('BULL');
+      } else {
+        const n = Number(num);
+        if (!Number.isFinite(n) || n < 1 || n > 20) {
+          route.length = 0;
+          break;
+        }
+        route.push(bed + String(n));
+      }
+    }
+
+    if (route.length) out[String(s)] = route;
+  }
+
+  saveUserOuts(out);
+  closeUserOuts();
+}
+
+// overlay wires
+
 document.getElementById('openUserOuts').addEventListener('click', () => {
-  openUserOutsOverlay();
+  openUserOuts();
 });
+
+document.getElementById('userOutsClose').addEventListener('click', () => {
+  closeUserOuts();
+});
+
 document.getElementById('userOutsSave').addEventListener('click', () => {
   saveUserOutsFromUI();
+  // refresh help immediately if in-game
   if (isStarted()) refreshUI();
-});
-document.getElementById('userOutsClose').addEventListener('click', () => {
-  closeUserOutsOverlay();
 });
 
 </script>
