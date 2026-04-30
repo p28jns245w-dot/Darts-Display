@@ -58,6 +58,18 @@ body {
   padding: 20px;
   text-align: center;
 }
+/* FIX: allow start-screen content (player names) to scroll */
+.start-card {
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+/* FIX: ensure player name inputs lay out correctly */
+#playerNames {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .start-card h1 {
   margin: 0 0 16px;
   color: var(--accent);
