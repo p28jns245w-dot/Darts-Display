@@ -4,10 +4,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.18</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no,
+                 viewport-fit=cover" />
+  <title>Darts Master v1.17</title>
 
 <style>
+/* =====================================================
+   GLOBAL THEME VARIABLES
+   ===================================================== */
 :root {
   --bg: #0d0d0d;
   --text: #ffffff;
@@ -17,6 +24,9 @@
   --border-amber: rgba(255, 154, 60, 0.4);
 }
 
+/* =====================================================
+   GLOBAL BASE
+   ===================================================== */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
   margin: 0;
@@ -27,6 +37,9 @@ body {
   touch-action: none;
 }
 
+/* =====================================================
+   START SCREEN (CENTERED)
+   ===================================================== */
 .start-screen {
   position: fixed;
   inset: 0;
@@ -69,19 +82,6 @@ input, select {
   padding: 6px;
   color: var(--text);
 }
-
-
-/* FIX: ensure player name inputs are visible */
-#playerNames {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-#playerNames input {
-  padding: 8px;
-  font-size: 0.85rem;
-}
-
 .start-btn {
   width: 100%;
   padding: 12px;
@@ -92,6 +92,9 @@ input, select {
   font-weight: 700;
 }
 
+/* =====================================================
+   APP SHELL
+   ===================================================== */
 .app {
   width: 100%;
   height: 100dvh;
@@ -100,12 +103,18 @@ input, select {
   flex-direction: column;
 }
 
+/* =====================================================
+   KEYPAD GRID
+   ===================================================== */
 .keypad {
   display: grid;
   flex: 1;
   gap: 8px;
 }
 
+/* =====================================================
+   GENERIC KEY STYLING
+   ===================================================== */
 .key {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-std);
@@ -116,20 +125,28 @@ input, select {
   font-weight: 700;
   cursor: pointer;
 }
+
 .key.active {
   border-color: var(--accent);
   background: rgba(80, 216, 144, 0.12);
 }
+
 .key.pressed {
   background: rgba(80, 216, 144, 0.12);
 }
 
+/* =====================================================
+   ACTION / STATE KEYS
+   ===================================================== */
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn  { border-color: var(--accent); color: var(--accent); }
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
 .enter     { border: 2.5px solid var(--accent); color: var(--accent); }
 .dart      { font-size: 2.5rem !important; }
 
+/* =====================================================
+   SCORE WINDOW
+   ===================================================== */
 .score-view {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
@@ -205,6 +222,9 @@ input, select {
   line-height: 1;
 }
 
+/* =====================================================
+   PORTRAIT LAYOUT
+   ===================================================== */
 @media (orientation: portrait) {
   .keypad {
     grid-template-columns: repeat(3, 1fr);
@@ -217,10 +237,15 @@ input, select {
   .k7 { grid-area: 4 / 1; } .k8 { grid-area: 4 / 2; } .k9 { grid-area: 4 / 3; }
 
   .del { grid-area: 5 / 1; } .k0 { grid-area: 5 / 2; } .undo { grid-area: 5 / 3; }
+
   .enter { grid-area: 6 / 1 / 7 / 4; }
+
   .bust { grid-area: 7 / 1; } .help-btn { grid-area: 7 / 2; } .dart { grid-area: 7 / 3; }
 }
 
+/* =====================================================
+   LANDSCAPE LAYOUT (6 COLUMNS)
+   ===================================================== */
 @media (orientation: landscape) {
   .keypad {
     grid-template-columns: repeat(6, 1fr);
@@ -252,8 +277,10 @@ input, select {
 }
 </style>
 </head>
+
 <body>
 
+<!-- ================= START SCREEN ================= -->
 <div class="start-screen" id="startScreen">
   <div class="start-card">
     <h1>Darts Master</h1>
@@ -294,17 +321,23 @@ input, select {
       </div>
     </div>
 
-    <button class="start-btn" id="startMatch" style="margin-top:4px; background: var(--accent); color:#0d0d0d; border-color: var(--accent);">START MATCH</button>
-    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:12px; border-style:solid; border-width:1px; opacity:0.9;">Add User Preferred Out</button>
+    <button class="start-btn" id="startMatch" style="margin-top:4px;">START MATCH</button>
+    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:12px; border-style:dashed; border-width:1px; opacity:0.85;">Add User Preferred Out</button>
   </div>
 </div>
 
+<!-- ================= USER PRO OUTS OVERLAY ================= -->
 <div id="userOutsOverlay" class="start-screen" style="display:none; z-index:1100;">
   <div class="start-card" style="max-width:520px;">
     <h1 style="font-size:1.2rem; margin-bottom:10px;">User Preferred Outs</h1>
-    <div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">Add up to 3 preferred checkout routes. Saved on this device.</div>
+    <div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">
+      Add up to 3 preferred checkout routes. Saved on this device (no re-entry needed).
+    </div>
+
     <div id="userOutsList" style="display:flex; flex-direction:column; gap:10px;"></div>
+
     <div style="border-top:1px solid var(--border-std); margin:12px 0;"></div>
+
     <div style="display:flex; gap:10px;">
       <button type="button" id="userOutsSave" class="start-btn" style="flex:1; padding:10px;">SAVE</button>
       <button type="button" id="userOutsClose" class="start-btn" style="flex:1; padding:10px; border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.85);">CLOSE</button>
@@ -312,9 +345,11 @@ input, select {
   </div>
 </div>
 
+<!-- ================= MAIN APP ================= -->
 <div class="app">
   <div class="keypad">
 
+    <!-- SCORE WINDOW -->
     <div class="key score-view">
       <div class="score-left"></div>
 
@@ -322,15 +357,25 @@ input, select {
         <div class="top-darts">○ ○ ○</div>
         <div class="score-main">501</div>
         <div class="score-meta">
-          <div class="legs"><div class="label">Legs</div><div class="value">0</div></div>
-          <div class="avg"><div class="label">Avg</div><div class="value">0.00</div></div>
-          <div class="sets"><div class="label">Sets</div><div class="value">0/1</div></div>
+          <div class="legs">
+            <div class="label">Legs</div>
+            <div class="value">0</div>
+          </div>
+          <div class="avg">
+            <div class="label">Avg</div>
+            <div class="value">0.00</div>
+          </div>
+          <div class="sets">
+            <div class="label">Sets</div>
+            <div class="value">0/1</div>
+          </div>
         </div>
       </div>
 
       <div class="score-right">SET UP</div>
     </div>
 
+    <!-- KEYPAD -->
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
     <div class="key num k4">4</div><div class="key num k5">5</div><div class="key num k6">6</div>
     <div class="key num k7">7</div><div class="key num k8">8</div><div class="key num k9">9</div>
@@ -342,445 +387,480 @@ input, select {
     <div class="key help-btn">HELP</div>
     <div class="key bust">BUST</div>
     <div class="key enter">ENTER</div>
+
   </div>
 </div>
 
 <script>
-// v1.18 integrated build
-const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+/* =====================================================
+   CHANGELOG
+   v1.14 - Pro-setup engine
+   v1.17 - Fix start match button; USER Preferred Outs overlay; HELP caching + CHECKOUT/SETUP headers + spacing
+   ===================================================== */
 
-/* ===== Modal (in-app cards) ===== */
-const Modal = (() => {
-  let overlay, card, titleEl, msgEl, btnRow;
-  let active = false;
-
-  function ensure() {
-    if (overlay) return;
-    overlay = document.createElement('div');
-    overlay.className = 'start-screen';
-    overlay.style.display = 'none';
-    overlay.style.zIndex = '2000';
-
-    card = document.createElement('div');
-    card.className = 'start-card';
-    card.style.maxWidth = '420px';
-
-    titleEl = document.createElement('h1');
-    titleEl.style.fontSize = '1.2rem';
-    titleEl.style.marginBottom = '10px';
-
-    msgEl = document.createElement('div');
-    msgEl.style.fontSize = '0.9rem';
-    msgEl.style.opacity = '0.85';
-    msgEl.style.marginBottom = '14px';
-
-    btnRow = document.createElement('div');
-    btnRow.style.display = 'flex';
-    btnRow.style.gap = '12px';
-
-    card.appendChild(titleEl);
-    card.appendChild(msgEl);
-    card.appendChild(btnRow);
-    overlay.appendChild(card);
-    document.body.appendChild(overlay);
-  }
-
-  async function show({ title, message = '', buttons }) {
-    ensure();
-    if (active) return null;
-    active = true;
-
-    titleEl.textContent = title || '';
-    msgEl.textContent = message || '';
-    btnRow.innerHTML = '';
-    overlay.style.display = 'flex';
-
-    return await new Promise(resolve => {
-      buttons.forEach(b => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'start-btn';
-        btn.style.flex = '1';
-        btn.style.padding = '12px';
-        btn.style.borderColor = b.variant === 'secondary' ? 'rgba(255,255,255,0.25)' : 'var(--accent)';
-        btn.style.color = b.variant === 'secondary' ? 'rgba(255,255,255,0.9)' : 'var(--accent)';
-        btn.style.background = b.variant === 'primaryFill' ? 'var(--accent)' : 'transparent';
-        if (b.variant === 'primaryFill') btn.style.color = '#0d0d0d';
-        btn.textContent = b.label;
-        btn.addEventListener('click', () => {
-          overlay.style.display = 'none';
-          active = false;
-          resolve(b.value);
-        });
-        btnRow.appendChild(btn);
-      });
-    });
-  }
-
-  return {
-    yesNo: (title, message='') => show({ title, message, buttons: [
-      { label:'YES', value:true, variant:'primaryFill' },
-      { label:'NO', value:false, variant:'secondary' }
-    ]}),
-    ok: (title, message='') => show({ title, message, buttons: [
-      { label:'OK', value:true, variant:'primaryFill' }
-    ]}),
-    pick123: (title, message='') => show({ title, message, buttons: [
-      { label:'1', value:1, variant:'primaryFill' },
-      { label:'2', value:2, variant:'primaryFill' },
-      { label:'3', value:3, variant:'primaryFill' }
-    ]}),
-    matchOver: () => show({ title:'MATCH OVER', message:'', buttons: [
-      { label:'NEW MATCH', value:'new', variant:'primaryFill' },
-      { label:'REPLAY SAME', value:'replay', variant:'secondary' }
-    ]})
-  };
-})();
-
-/* ===== User Preferred Outs ===== */
+/* =====================================================
+   USER PREFERRED OUTS (LOCAL STORAGE)
+   - Stored as: { "121": ["T20","T11","D14"], ... }
+   - Used only as a ranking BOOST inside HELP (checkout range only)
+   ===================================================== */
 const USER_OUTS_KEY = 'darts_user_preferred_outs_v1';
-function loadUserOuts(){ try { const o = JSON.parse(localStorage.getItem(USER_OUTS_KEY)||'{}'); return (o && typeof o==='object')?o:{}; } catch { return {}; } }
-function saveUserOuts(o){ localStorage.setItem(USER_OUTS_KEY, JSON.stringify(o||{})); }
 
-/* ===== Help Engine (from v1.17, cached) ===== */
+function loadUserOuts() {
+  try {
+    const obj = JSON.parse(localStorage.getItem(USER_OUTS_KEY) || '{}');
+    return (obj && typeof obj === 'object') ? obj : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUserOuts(obj) {
+  localStorage.setItem(USER_OUTS_KEY, JSON.stringify(obj || {}));
+}
+
+/* =====================================================
+   HELP ENGINE (DISPLAY-ONLY)
+   - Checkout help: <=170 (dart-aware)
+   - Setup help: 171–350 (dart-aware)
+   - Pro-forward scoring:
+       * fewer darts first
+       * preferred doubles + cover
+       * bull penalized but allowed
+       * target switching allowed
+   - Iconic boost (checkout-only) + user outs boost (checkout-only)
+   - Caching to prevent iPad slowdowns
+   ===================================================== */
 const HelpEngine = (() => {
   const BOGEY_3D = new Set([159,162,163,165,166,168,169]);
-  const ICONIC = { 170:['T20','T20','BULL'], 160:['T20','T20','D20'], 100:['T20','D20'], 40:['D20'], 32:['D16'] };
-  const prefFinish = new Map([['D20',40],['D16',34],['D18',28],['D10',18],['D12',16],['BULL',8]]);
-  const bullPenalty = 18, iconicBoost = 45, userBoost = 40;
 
-  const checkoutCache = new Map();
-  const leaveScoreCache = new Map();
-  const setupCache = new Map();
+  const ICONIC = {
+    170: ['T20','T20','BULL'],
+    160: ['T20','T20','D20'],
+    100: ['T20','D20'],
+    40:  ['D20'],
+    32:  ['D16']
+  };
+
+  const prefFinish = new Map([
+    ['D20', 40],
+    ['D16', 34],
+    ['D18', 28],
+    ['D10', 18],
+    ['D12', 16],
+    ['BULL', 8]
+  ]);
+
+  const bullPenalty = 18;
+  const iconicBoost = 45;
+  const userBoost = 40;
+
+  const checkoutCache = new Map(); // key: score|dartsLeft -> [routes]
+  const leaveScoreCache = new Map(); // key: leave -> number
+  const setupCache = new Map(); // key: score|dartsLeft -> [{leave,route,s}]
 
   const THROWS = (() => {
-    const out=[];
-    for(let n=1;n<=20;n++) out.push({lab:`S${n}`,val:n,type:'S'});
-    for(let n=1;n<=20;n++) out.push({lab:`D${n}`,val:2*n,type:'D'});
-    for(let n=1;n<=20;n++) out.push({lab:`T${n}`,val:3*n,type:'T'});
-    out.push({lab:'SB',val:25,type:'SB'});
-    out.push({lab:'BULL',val:50,type:'BULL'});
-    out.push({lab:'0',val:0,type:'MISS'});
+    const out = [];
+    for (let n=1;n<=20;n++) out.push({lab:`S${n}`, val:n, type:'S'});
+    for (let n=1;n<=20;n++) out.push({lab:`D${n}`, val:2*n, type:'D'});
+    for (let n=1;n<=20;n++) out.push({lab:`T${n}`, val:3*n, type:'T'});
+    out.push({lab:'SB', val:25, type:'SB'});
+    out.push({lab:'BULL', val:50, type:'BULL'});
+    out.push({lab:'0', val:0, type:'MISS'});
     return out;
   })();
-  const SETUP_THROWS = [
-    {lab:'T20',val:60},{lab:'T19',val:57},{lab:'T18',val:54},{lab:'T17',val:51},{lab:'T16',val:48},
-    {lab:'T15',val:45},{lab:'T14',val:42},{lab:'T13',val:39},{lab:'T12',val:36},{lab:'T11',val:33},{lab:'T10',val:30},
-    {lab:'S20',val:20},{lab:'S19',val:19},{lab:'S18',val:18},{lab:'S17',val:17},{lab:'S16',val:16},{lab:'S15',val:15},
-    {lab:'SB',val:25},{lab:'BULL',val:50},{lab:'0',val:0}
-  ];
-  const isFinishDart = (t)=> t.type==='D' || t.type==='BULL';
-  const arraysEqual=(a,b)=>a && b && a.length===b.length && a.every((v,i)=>v===b[i]);
 
-  function coverDepth(finishLab){
-    if(!finishLab || finishLab[0] !== 'D') return 0;
+  const SETUP_THROWS = [
+    {lab:'T20', val:60},{lab:'T19', val:57},{lab:'T18', val:54},{lab:'T17', val:51},{lab:'T16', val:48},
+    {lab:'T15', val:45},{lab:'T14', val:42},{lab:'T13', val:39},{lab:'T12', val:36},{lab:'T11', val:33},{lab:'T10', val:30},
+    {lab:'S20', val:20},{lab:'S19', val:19},{lab:'S18', val:18},{lab:'S17', val:17},{lab:'S16', val:16},{lab:'S15', val:15},
+    {lab:'SB', val:25},{lab:'BULL', val:50},{lab:'0', val:0}
+  ];
+
+  const isFinishDart = (t) => t.type === 'D' || t.type === 'BULL';
+
+  function arraysEqual(a,b){
+    if (!a || !b || a.length !== b.length) return false;
+    for (let i=0;i<a.length;i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+
+  function coverDepthFromFinishLab(finishLab){
+    if (!finishLab || finishLab[0] !== 'D') return 0;
     const n = Number(finishLab.slice(1));
-    if(!Number.isFinite(n) || n<1 || n>20) return 0;
-    let score = 2*n, depth=0;
-    while(score%2===0 && score>=4 && score<=40){ depth++; score/=2; if(score===1) break; }
+    if (!Number.isFinite(n) || n < 1 || n > 20) return 0;
+    let score = 2*n;
+    let depth = 0;
+    while (score % 2 === 0 && score >= 4 && score <= 40) {
+      depth++;
+      score = score / 2;
+      if (score === 1) break;
+    }
     return depth;
   }
 
   function routeScore(route, score){
     const n = route.length;
     let s = 1000 - n*250;
-    const last = route[n-1];
+
+    const last = route[route.length-1];
     s += (prefFinish.get(last) || 0);
-    if(last==='BULL') s -= bullPenalty;
-    s += coverDepth(last) * 6;
-    for(let i=0;i<n;i++){
-      if(route[i]==='T20') s += (i===0?10:6);
-      if(route[i]==='T19') s += (i===0?7:4);
+
+    if (last === 'BULL') s -= bullPenalty;
+
+    s += coverDepthFromFinishLab(last) * 6;
+
+    // pro-ish bias: T20/T19 early; allows switching
+    for (let i=0;i<route.length;i++) {
+      if (route[i] === 'T20') s += (i === 0 ? 10 : 6);
+      if (route[i] === 'T19') s += (i === 0 ? 7 : 4);
     }
+
+    // Iconic + user boosts (checkout-only)
     const iconic = ICONIC[score];
-    if(iconic && arraysEqual(route, iconic)) s += iconicBoost;
+    if (iconic && arraysEqual(route, iconic)) s += iconicBoost;
+
     const user = loadUserOuts();
     const u = user[String(score)];
-    if(u && arraysEqual(route, u)) s += userBoost;
+    if (u && arraysEqual(route, u)) s += userBoost;
+
     return s;
   }
 
+  function formatRoute(route) {
+    return route.join(' ');
+  }
+
   function genCheckoutRoutes(score, dartsLeft){
-    if(score<2 || score>170) return [];
-    if(BOGEY_3D.has(score)) return [];
-    dartsLeft = Math.max(1, Math.min(3, dartsLeft||3));
-    const key = score+'|'+dartsLeft;
-    if(checkoutCache.has(key)) return checkoutCache.get(key);
+    if (score < 2 || score > 170) return [];
+    if (BOGEY_3D.has(score)) return [];
+    dartsLeft = Math.max(1, Math.min(3, dartsLeft || 3));
 
-    const routes=[];
-    if(dartsLeft>=1){
-      for(const a of THROWS){ if(!isFinishDart(a)) continue; if(a.val===score) routes.push([a.lab]); }
-    }
-    if(dartsLeft>=2){
-      for(const a of THROWS) for(const b of THROWS){ if(!isFinishDart(b)) continue; if(a.val+b.val===score) routes.push([a.lab,b.lab]); }
-    }
-    if(dartsLeft>=3){
-      for(const a of THROWS) for(const b of THROWS) for(const c of THROWS){ if(!isFinishDart(c)) continue; if(a.val+b.val+c.val===score) routes.push([a.lab,b.lab,c.lab]); }
+    const cacheKey = score + '|' + dartsLeft;
+    if (checkoutCache.has(cacheKey)) return checkoutCache.get(cacheKey);
+
+    const routes = [];
+
+    if (dartsLeft >= 1) {
+      for (const a of THROWS) {
+        if (!isFinishDart(a)) continue;
+        if (a.val === score) routes.push([a.lab]);
+      }
     }
 
-    const scored = routes.map(r=>({r,s:routeScore(r,score)})).sort((x,y)=>y.s-x.s);
-    const seen=new Set();
-    const top=[];
-    for(const it of scored){
-      const k = it.r.join('|');
-      if(seen.has(k)) continue;
-      seen.add(k);
+    if (dartsLeft >= 2) {
+      for (const a of THROWS) {
+        for (const b of THROWS) {
+          if (!isFinishDart(b)) continue;
+          if (a.val + b.val === score) routes.push([a.lab,b.lab]);
+        }
+      }
+    }
+
+    if (dartsLeft >= 3) {
+      for (const a of THROWS) {
+        for (const b of THROWS) {
+          for (const c of THROWS) {
+            if (!isFinishDart(c)) continue;
+            if (a.val + b.val + c.val === score) routes.push([a.lab,b.lab,c.lab]);
+          }
+        }
+      }
+    }
+
+    const scored = routes.map(r => ({ r, s: routeScore(r, score) }));
+    scored.sort((x,y)=>y.s-x.s);
+
+    const seen = new Set();
+    const top = [];
+    for (const it of scored) {
+      const key = it.r.join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
       top.push(it.r);
-      if(top.length>=3) break;
+      if (top.length >= 3) break;
     }
-    checkoutCache.set(key, top);
+
+    checkoutCache.set(cacheKey, top);
     return top;
   }
 
   function leaveScore(leave){
-    if(leaveScoreCache.has(leave)) return leaveScoreCache.get(leave);
-    const outs = genCheckoutRoutes(leave,3);
-    if(!outs.length){ leaveScoreCache.set(leave,-9999); return -9999; }
+    if (leaveScoreCache.has(leave)) return leaveScoreCache.get(leave);
 
-    const baseScore = (r)=>{
+    const outs = genCheckoutRoutes(leave, 3);
+    if (!outs.length) {
+      leaveScoreCache.set(leave, -9999);
+      return -9999;
+    }
+
+    // remove boosts for leave scoring
+    const baseScore = (r) => {
       let s = routeScore(r, leave);
       const iconic = ICONIC[leave];
-      if(iconic && arraysEqual(r, iconic)) s -= iconicBoost;
+      if (iconic && arraysEqual(r, iconic)) s -= iconicBoost;
       const user = loadUserOuts();
       const u = user[String(leave)];
-      if(u && arraysEqual(r, u)) s -= userBoost;
+      if (u && arraysEqual(r, u)) s -= userBoost;
       return s;
     };
-    let best=-9999;
-    for(const r of outs) best = Math.max(best, baseScore(r));
-    if([170,167,164,161,160,158,157,156,152,151,150,141,140,139,138,137,136,135,132,121,120,110,100,90,80,60,40,36,32].includes(leave)) best+=12;
-    if(leave===50) best-=8;
+
+    let best = -9999;
+    for (const r of outs) best = Math.max(best, baseScore(r));
+
+    // pro-number bias in setup
+    if ([170,167,164,161,160,158,157,156,152,151,150,141,140,139,138,137,136,135,132,121,120,110,100,90,80,60,40,36,32].includes(leave)) best += 12;
+    if (leave === 50) best -= 8;
+
     leaveScoreCache.set(leave, best);
     return best;
   }
 
   function genSetupSuggestions(score, dartsLeft){
-    dartsLeft = Math.max(1, Math.min(3, dartsLeft||3));
-    if(score<171 || score>350) return [];
-    const key = score+'|'+dartsLeft;
-    if(setupCache.has(key)) return setupCache.get(key);
+    dartsLeft = Math.max(1, Math.min(3, dartsLeft || 3));
+    if (score < 171 || score > 350) return [];
 
-    if(score>=300 && dartsLeft===3){
-      const leave180 = score-180;
-      if(leave180>1 && leave180<=170 && !BOGEY_3D.has(leave180)){
-        const one=[{leave:leave180, route:['T20','T20','T20']}];
-        setupCache.set(key, one);
+    const cacheKey = score + '|' + dartsLeft;
+    if (setupCache.has(cacheKey)) return setupCache.get(cacheKey);
+
+    // collapse at very high scores (>=300) to one clear path
+    if (score >= 300 && dartsLeft === 3) {
+      const leave180 = score - 180;
+      if (leave180 > 1 && leave180 <= 170 && !BOGEY_3D.has(leave180)) {
+        const one = [{ leave: leave180, route: ['T20','T20','T20'], s: 0 }];
+        setupCache.set(cacheKey, one);
         return one;
       }
-      const adjust=[{lab:'T19',val:57},{lab:'T18',val:54},{lab:'T17',val:51},{lab:'T16',val:48}];
-      for(const a of adjust){
-        const leave = score-(60+60+a.val);
-        if(leave>1 && leave<=170 && !BOGEY_3D.has(leave)){
-          const one=[{leave, route:['T20','T20',a.lab]}];
-          setupCache.set(key, one);
+      const adjust = [ {lab:'T19',val:57},{lab:'T18',val:54},{lab:'T17',val:51},{lab:'T16',val:48} ];
+      for (const a of adjust) {
+        const leave = score - (60+60+a.val);
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          const one = [{ leave, route: ['T20','T20',a.lab], s: 0 }];
+          setupCache.set(cacheKey, one);
           return one;
         }
       }
-      const one=[{leave:score-180, route:['T20','T20','T20']}];
-      setupCache.set(key, one);
+      const one = [{ leave: score-180, route: ['T20','T20','T20'], s: 0 }];
+      setupCache.set(cacheKey, one);
       return one;
     }
 
-    const cands=[];
-    if(dartsLeft===1){
-      for(const a of SETUP_THROWS){
-        const leave = score-a.val;
-        if(leave>1 && leave<=170 && !BOGEY_3D.has(leave)) cands.push({leave, route:[a.lab], s:leaveScore(leave)});
+    const cands = [];
+
+    if (dartsLeft === 1) {
+      for (const a of SETUP_THROWS) {
+        const leave = score - a.val;
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          cands.push({ leave, route:[a.lab], s: leaveScore(leave) });
+        }
       }
-    } else if(dartsLeft===2){
-      for(const a of SETUP_THROWS) for(const b of SETUP_THROWS){
-        const leave = score-(a.val+b.val);
-        if(leave>1 && leave<=170 && !BOGEY_3D.has(leave)) cands.push({leave, route:[a.lab,b.lab], s:leaveScore(leave)});
+    } else if (dartsLeft === 2) {
+      for (const a of SETUP_THROWS) for (const b of SETUP_THROWS) {
+        const leave = score - (a.val + b.val);
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          cands.push({ leave, route:[a.lab,b.lab], s: leaveScore(leave) });
+        }
       }
     } else {
-      for(const a of SETUP_THROWS) for(const b of SETUP_THROWS) for(const c of SETUP_THROWS){
-        const leave = score-(a.val+b.val+c.val);
-        if(leave>1 && leave<=170 && !BOGEY_3D.has(leave)) cands.push({leave, route:[a.lab,b.lab,c.lab], s:leaveScore(leave)});
+      for (const a of SETUP_THROWS) for (const b of SETUP_THROWS) for (const c of SETUP_THROWS) {
+        const leave = score - (a.val + b.val + c.val);
+        if (leave > 1 && leave <= 170 && !BOGEY_3D.has(leave)) {
+          cands.push({ leave, route:[a.lab,b.lab,c.lab], s: leaveScore(leave) });
+        }
       }
     }
+
     cands.sort((x,y)=>y.s-x.s);
-    const seen=new Set();
-    const top=[];
-    for(const it of cands){
-      const k2 = it.leave+'|'+it.route.join('|');
-      if(seen.has(k2)) continue;
-      seen.add(k2);
-      top.push({leave:it.leave, route:it.route});
-      if(top.length>=3) break;
+
+    const seen = new Set();
+    const top = [];
+    for (const it of cands) {
+      const key = it.leave + '|' + it.route.join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      top.push(it);
+      if (top.length >= 3) break;
     }
-    setupCache.set(key, top);
+
+    setupCache.set(cacheKey, top);
     return top;
   }
 
   function getHelpDisplay(score, dartsLeft){
-    if(!Number.isFinite(score)) return {header:'', lines:[]};
-    if(score<=170){
+    if (!Number.isFinite(score)) return { header: '', lines: [] };
+
+    if (score <= 170) {
       const outs = genCheckoutRoutes(score, dartsLeft);
-      if(!outs.length) return {header:'CHECKOUT', lines:['NO OUT']};
-      return {header:'CHECKOUT', lines: outs.map(r=>r.join(' '))};
+      if (!outs.length) return { header: 'CHECKOUT', lines: ['NO OUT'] };
+      return { header: 'CHECKOUT', lines: outs.map(r => formatRoute(r)) };
     }
-    if(score<=350){
+
+    if (score <= 350) {
       const sets = genSetupSuggestions(score, dartsLeft);
-      if(!sets.length) return {header:'SETUP', lines:[]};
-      return {header:'SETUP', lines: sets.map(s=>`${s.route.join(' ')} (${s.leave})`)};
+      if (!sets.length) return { header: 'SETUP', lines: [] };
+      return { header: 'SETUP', lines: sets.map(s => `${s.route.join(' ')} (${s.leave})`) };
     }
-    return {header:'', lines:[]};
+
+    return { header: '', lines: [] };
   }
 
   return { getHelpDisplay };
 })();
 
-/* ===== Game Engine ===== */
+/* =====================================================
+   GAME ENGINE (v1.14 preserved)
+   ===================================================== */
 let game = null;
-let currentInput = '';
-let turnStartScore = null;
-let visitPoints = 0;
-let visitDartsUsed = 0;
-let undoStack = [];
-let holdActive = false;
-let modalActive = false;
 
-const VALID_DART_VALUES = new Set([
-  0, 25, 50,
-  ...Array.from({length:20},(_,i)=>i+1),
-  ...Array.from({length:20},(_,i)=>(i+1)*2),
-  ...Array.from({length:20},(_,i)=>(i+1)*3)
-]);
-const VALID_FINISH_VALUES = new Set([50, ...Array.from({length:19},(_,i)=>(i+2)*2)]); // 4..40 even + 50
-
-const app = document.querySelector('.app');
-const scoreLeft = document.querySelector('.score-left');
-const scoreMain = document.querySelector('.score-main');
-const scoreRight = document.querySelector('.score-right');
-const topDartsEl = document.querySelector('.top-darts');
-const legsValueEl = document.querySelector('.score-meta .legs .value');
-const avgValueEl  = document.querySelector('.score-meta .avg .value');
-const setsValueEl = document.querySelector('.score-meta .sets .value');
-
-const startScreen = document.getElementById('startScreen');
+// Start screen elements
 const playerCount = document.getElementById('playerCount');
 const startScoreSel = document.getElementById('startScore');
 const legsInput = document.getElementById('legsToWin');
 const setsInput = document.getElementById('setsToWin');
 const namesWrap = document.getElementById('playerNames');
+const startScreen = document.getElementById('startScreen');
 const startBtn = document.getElementById('startMatch');
 
-const btnHelp = document.querySelector('.help-btn');
-const btnDart = document.querySelector('.dart');
+// UI elements
+const app = document.querySelector('.app');
+const scoreLeft = document.querySelector('.score-left');
+const scoreMain = document.querySelector('.score-main');
+const scoreRight = document.querySelector('.score-right');
+const topDartsEl = document.querySelector('.top-darts');
 
-let takeoverEl = null;
-function ensureTakeover(){
-  if(takeoverEl) return;
-  const center = document.querySelector('.score-center');
-  center.style.position = 'relative';
-  takeoverEl = document.createElement('div');
-  takeoverEl.style.position = 'absolute';
-  takeoverEl.style.inset = '0';
-  takeoverEl.style.display = 'none';
-  takeoverEl.style.alignItems = 'center';
-  takeoverEl.style.justifyContent = 'center';
-  takeoverEl.style.fontWeight = '900';
-  takeoverEl.style.fontSize = '4.0rem';
-  takeoverEl.style.letterSpacing = '1px';
-  takeoverEl.style.textAlign = 'center';
-  center.appendChild(takeoverEl);
+const legsValueEl = document.querySelector('.score-meta .legs .value');
+const avgValueEl  = document.querySelector('.score-meta .avg .value');
+const setsValueEl = document.querySelector('.score-meta .sets .value');
+
+// Input / turn state
+let currentInput = '';
+let turnStartScore = null;
+let visitPoints = 0;
+let visitDartsUsed = 0;
+
+// Undo
+let undoStack = [];
+
+/* ================= START SCREEN: NAMES ================= */
+function renderNames() {
+  namesWrap.innerHTML = '';
+  for (let i = 1; i <= Number(playerCount.value); i++) {
+    const input = document.createElement('input');
+    input.placeholder = `Player ${i}`;
+    namesWrap.appendChild(input);
+  }
 }
-function showTakeover(text, color){
-  ensureTakeover();
-  takeoverEl.textContent = text;
-  takeoverEl.style.color = color || 'var(--accent)';
-  takeoverEl.style.display = 'flex';
-  const center = document.querySelector('.score-center');
-  Array.from(center.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
-}
-function hideTakeover(){
-  if(!takeoverEl) return;
-  takeoverEl.style.display = 'none';
-  const center = document.querySelector('.score-center');
-  Array.from(center.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = ''; });
-}
+playerCount.addEventListener('change', renderNames);
+renderNames();
 
-function isStarted(){ return !!game; }
-function isPlayable(){ return !!game && !game.frozen && !holdActive && !modalActive; }
-function inDartMode(){ return app.classList.contains('dart-mode'); }
-function activeIndex(){ return game?.activeIndex ?? 0; }
-function setActiveIndex(i){ if(game) game.activeIndex = i; }
-
-function initPlayerPrefs(count){ return Array.from({length:count},()=>({help:true,dart:false,lock:false})); }
-function resetPrefsForNewLeg(){ game.prefs = initPlayerPrefs(game.players.length); }
-
-function setDartMode(on, silent=false){
-  const cur = inDartMode();
-  if(!!on === cur){ if(!silent) refreshUI(); return; }
-  app.classList.toggle('dart-mode', !!on);
-  btnDart.classList.toggle('active', !!on);
-  resetVisitState();
-  clearInput();
-  if(!silent) refreshUI();
-}
-
-function applyPrefsForPlayer(idx){
-  const pref = game.prefs[idx];
-  btnHelp.classList.toggle('active', !!pref.help);
-
-  if(game.players[idx].score <= 170 && !pref.lock) pref.dart = true;
-  if(game.players[idx].score > 170){ pref.dart = false; pref.lock = false; }
-
-  setDartMode(pref.dart, true);
-  renderRightPanel();
-}
-
-function fitPlayerFont(){
+/* ================= FONT FIT ================= */
+function fitPlayerFont() {
   const container = scoreLeft;
   const items = container.querySelectorAll('.player');
   if (!items.length) return;
+
   const maxWidth = container.clientWidth;
   items.forEach(el => (el.style.fontSize = ''));
-  let lo=10, hi=22;
-  const fits=(px)=>{ items.forEach(el => (el.style.fontSize = px+'px')); return Array.from(items).every(el => el.scrollWidth <= maxWidth); };
-  while(lo<hi){ const mid=(lo+hi+1)//2; if(fits(mid)) lo=mid; else hi=mid-1; }
-  items.forEach(el => (el.style.fontSize = lo+'px'));
+
+  let lo = 10, hi = 22;
+  const fits = (px) => {
+    items.forEach(el => (el.style.fontSize = px + 'px'));
+    return Array.from(items).every(el => el.scrollWidth <= maxWidth);
+  };
+
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (fits(mid)) lo = mid;
+    else hi = mid - 1;
+  }
+  items.forEach(el => (el.style.fontSize = lo + 'px'));
+}
+window.addEventListener('resize', fitPlayerFont);
+window.addEventListener('orientationchange', fitPlayerFont);
+
+/* ================= HELPERS ================= */
+function isStarted() { return !!game; }
+function isPlayable() { return !!game && !game.frozen; }
+function inDartMode() { return app.classList.contains('dart-mode'); }
+function activeIndex() { return game?.activeIndex ?? 0; }
+function setActiveIndex(i) { if (game) game.activeIndex = i; }
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function helpIsOn() {
+  const hb = document.querySelector('.help-btn');
+  return !!hb && hb.classList.contains('active');
 }
 
-function renderRightPanel(){
-  if(!isStarted()){ scoreRight.textContent='SET UP'; return; }
+function renderRightPanel() {
+  if (!isStarted()) {
+    scoreRight.textContent = 'SET UP';
+    return;
+  }
 
-  scoreRight.style.display='block';
-  scoreRight.style.textAlign='center';
-  scoreRight.style.whiteSpace='normal';
+  // allow stacked lines without changing layout grids
+  scoreRight.style.display = 'block';
+  scoreRight.style.textAlign = 'center';
+  scoreRight.style.whiteSpace = 'normal';
 
-  const big = `<div style="font-size:1.35em; font-weight:800; line-height:1;">${escapeHtml(currentInput||'')}</div>`;
-
-  if(!btnHelp.classList.contains('active')){ scoreRight.innerHTML = big; return; }
-
+  const inputLine = currentInput || '';
   const score = game.players[activeIndex()].score;
   const dartsLeft = inDartMode() ? Math.max(0, 3 - visitDartsUsed) : 3;
 
+  const big = `<div style="font-size:1.35em; font-weight:800; line-height:1;">${escapeHtml(inputLine)}</div>`;
+
+  if (!helpIsOn()) {
+    scoreRight.innerHTML = big;
+    return;
+  }
+
   let hd;
-  try { hd = HelpEngine.getHelpDisplay(score, dartsLeft); } catch { hd = {header:'',lines:[]}; }
+  try {
+    hd = HelpEngine.getHelpDisplay(score, dartsLeft);
+  } catch {
+    hd = { header: '', lines: [] };
+  }
 
   const header = hd.header ? `<div style="font-size:0.8em; opacity:0.85; letter-spacing:0.5px;">${escapeHtml(hd.header)}</div>` : '';
   const spacer = `<div style="height:10px;"></div>`;
   const gap = `<div style="height:10px;"></div>`;
-  const lines = (hd.lines||[]).slice(0,3);
-  const opts = lines.map((l,i)=>`<div style="font-size:0.92em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>`+(i<lines.length-1?gap:'' )).join('');
+
+  const lines = (hd.lines || []).slice(0,3);
+  const opts = lines.map((l, i) => `<div style="font-size:0.92em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>` + (i < lines.length-1 ? gap : '')).join('');
 
   scoreRight.innerHTML = big + spacer + header + spacer + opts;
 }
 
-function computeAvg(p){
-  const darts = p.stats?.darts || 0;
-  const pts = p.stats?.points || 0;
-  if(!darts) return '0.00';
-  return ((pts/darts)*3).toFixed(2);
+function syncVisitDisplay() { renderRightPanel(); }
+
+function clearInput() {
+  currentInput = '';
+  syncVisitDisplay();
 }
 
-function refreshUI(){
-  if(!isStarted()) return;
+function resetVisitState() {
+  turnStartScore = null;
+  visitPoints = 0;
+  visitDartsUsed = 0;
+  updateTopDarts();
+}
+
+function updateTopDarts() {
+  const filled = Math.max(0, Math.min(3, visitDartsUsed));
+  topDartsEl.textContent = Array.from({ length: 3 }, (_, i) => (i < filled ? '●' : '○')).join(' ');
+}
+
+function computeAvg(p) {
+  const darts = p.stats?.darts || 0;
+  const pts = p.stats?.points || 0;
+  if (!darts) return '0.00';
+  return ((pts / darts) * 3).toFixed(2);
+}
+
+function refreshUI() {
+  if (!isStarted()) return;
+
   const items = scoreLeft.querySelectorAll('.player');
   items.forEach((el, idx) => {
     const p = game.players[idx];
@@ -799,13 +879,8 @@ function refreshUI(){
   renderRightPanel();
 }
 
-function syncVisitDisplay(){ renderRightPanel(); }
-function clearInput(){ currentInput=''; syncVisitDisplay(); }
-function resetVisitState(){ turnStartScore=null; visitPoints=0; visitDartsUsed=0; updateTopDarts(); }
-function updateTopDarts(){ const filled=Math.max(0,Math.min(3,visitDartsUsed)); topDartsEl.textContent=Array.from({length:3},(_,i)=>(i<filled?'●':'○')).join(' '); }
-
-function pushUndo(kind){
-  if(!isStarted()) return;
+function pushUndo(kind) {
+  if (!isStarted()) return;
   const snap = {
     game: JSON.parse(JSON.stringify(game)),
     currentInput,
@@ -813,199 +888,152 @@ function pushUndo(kind){
     visitPoints,
     visitDartsUsed
   };
-  undoStack.push({kind,snap});
-  if(undoStack.length>250) undoStack.shift();
+  undoStack.push({ kind, snap });
+  if (undoStack.length > 250) undoStack.shift();
 }
 
-function popUndoForMode(){
-  if(!undoStack.length) return null;
+function popUndoForMode() {
+  if (!undoStack.length) return null;
   const want = inDartMode() ? 'dart' : 'turn';
-  while(undoStack.length){
+  while (undoStack.length) {
     const item = undoStack.pop();
-    if(item.kind===want) return item;
+    if (item.kind === want) return item;
   }
   return null;
 }
 
-function restoreUndoSnap(snap){
+function restoreUndoSnap(snap) {
+  if (!snap) return;
   game = snap.game;
   currentInput = snap.currentInput || '';
   turnStartScore = snap.turnStartScore;
   visitPoints = snap.visitPoints || 0;
   visitDartsUsed = snap.visitDartsUsed || 0;
   refreshUI();
-  applyPrefsForPlayer(activeIndex());
 }
 
-function undoWouldRevertLegOrSet(snapGame){
-  const curLegs=(game?.players||[]).reduce((a,p)=>a+(p.legs||0),0);
-  const snapLegs=(snapGame?.players||[]).reduce((a,p)=>a+(p.legs||0),0);
-  const curSets=(game?.players||[]).reduce((a,p)=>a+(p.sets||0),0);
-  const snapSets=(snapGame?.players||[]).reduce((a,p)=>a+(p.sets||0),0);
-  return curLegs!==snapLegs || curSets!==snapSets;
+function undoWouldRevertLegOrSet(snapGame) {
+  const curLegs = (game?.players || []).reduce((a, pl) => a + (pl.legs || 0), 0);
+  const snapLegs = (snapGame?.players || []).reduce((a, pl) => a + (pl.legs || 0), 0);
+  const curSets = (game?.players || []).reduce((a, pl) => a + (pl.sets || 0), 0);
+  const snapSets = (snapGame?.players || []).reduce((a, pl) => a + (pl.sets || 0), 0);
+  return (curLegs !== snapLegs) || (curSets !== snapSets);
 }
 
-async function holdThenAdvance({ takeoverText=null, takeoverColor=null, nextFn=null }){
-  holdActive = true;
-  if(takeoverText) showTakeover(takeoverText, takeoverColor);
-  refreshUI();
-  await sleep(3000);
-  hideTakeover();
-  if(nextFn) nextFn();
-  holdActive = false;
+function advanceToNextPlayer() {
+  resetVisitState();
+  clearInput();
+  const next = (activeIndex() + 1) % game.players.length;
+  setActiveIndex(next);
   refreshUI();
 }
 
-async function showUndoTakeover(){
-  showTakeover('UNDO', 'rgba(255,255,255,0.85)');
-  await sleep(1000);
-  hideTakeover();
-  refreshUI();
-}
-
-function recordVisitStats(playerIdx, points, darts){
+function recordVisitStats(playerIdx, points, darts) {
   const p = game.players[playerIdx];
-  if(!p.stats) p.stats = {points:0,darts:0};
+  if (!p.stats) p.stats = { points: 0, darts: 0 };
   p.stats.points += points;
   p.stats.darts += darts;
 }
 
-function advanceToNextPlayerImmediate(){
-  resetVisitState();
-  clearInput();
-  const next = (activeIndex()+1)%game.players.length;
-  setActiveIndex(next);
-  applyPrefsForPlayer(next);
-  refreshUI();
-}
-
-async function advanceToNextPlayerHold(over){
-  await holdThenAdvance({ takeoverText: over?.text||null, takeoverColor: over?.color||null, nextFn: advanceToNextPlayerImmediate });
-}
-
-async function bustAndAdvance(){
+function bustCurrentTurn() {
   const idx = activeIndex();
-  if(turnStartScore===null) turnStartScore = game.players[idx].score;
+  if (turnStartScore === null) turnStartScore = game.players[idx].score;
   game.players[idx].score = turnStartScore;
+
+  // bust counts as 3 darts, 0 points
   recordVisitStats(idx, 0, 3);
-  await advanceToNextPlayerHold({text:'BUST', color:'#ff9a3c'});
+
+  resetVisitState();
+  clearInput();
+  advanceToNextPlayer();
 }
 
-function resetScoresForNewLeg(){
-  game.players.forEach(pl=>pl.score=game.startScore);
+function promptCheckoutDarts() {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const ans = window.prompt('Darts to Checkout? 1 2 or 3?');
+    if (ans === null) continue;
+    const v = String(ans).trim();
+    if (v === '1' || v === '2' || v === '3') return Number(v);
+  }
+  return 3;
+}
+
+/* ================= LEG / SET / MATCH ================= */
+function resetScoresForNewLeg() {
+  game.players.forEach(pl => (pl.score = game.startScore));
   resetVisitState();
   clearInput();
 }
 
-function startNextLegImmediate(){
-  game.legStarterIndex = (game.legStarterIndex+1)%game.players.length;
+function startNextLeg() {
+  game.legStarterIndex = (game.legStarterIndex + 1) % game.players.length;
   setActiveIndex(game.legStarterIndex);
   resetScoresForNewLeg();
-  resetPrefsForNewLeg();
-  applyPrefsForPlayer(activeIndex());
   refreshUI();
 }
 
-function startNextSetImmediate(){
-  game.setStarterIndex = (game.setStarterIndex+1)%game.players.length;
+function startNextSet() {
+  game.setStarterIndex = (game.setStarterIndex + 1) % game.players.length;
   game.legStarterIndex = game.setStarterIndex;
   setActiveIndex(game.legStarterIndex);
-  game.players.forEach(pl=>pl.legs=0);
+  game.players.forEach(pl => (pl.legs = 0));
   resetScoresForNewLeg();
-  resetPrefsForNewLeg();
-  applyPrefsForPlayer(activeIndex());
   refreshUI();
 }
 
-function resetMatchSame(){
-  game.players.forEach(pl=>{
-    pl.score=game.startScore;
-    pl.legs=0;
-    pl.sets=0;
-    pl.stats={points:0,darts:0};
-  });
-  game.activeIndex=0;
-  game.legStarterIndex=0;
-  game.setStarterIndex=0;
-  game.frozen=false;
-  undoStack=[];
-  resetVisitState();
-  clearInput();
-  resetPrefsForNewLeg();
-  applyPrefsForPlayer(0);
-  refreshUI();
-}
-
-async function handleMatchOverAsync(){
-  modalActive=true;
-  const choice = await Modal.matchOver();
-  modalActive=false;
-
-  if(choice==='new'){
-    game=null;
-    undoStack=[];
+function handleMatchOver() {
+  const ok = window.confirm('Match Over. Start new match?');
+  if (ok) {
+    game = null;
+    undoStack = [];
     resetVisitState();
-    currentInput='';
-    scoreLeft.innerHTML='';
-    scoreRight.textContent='SET UP';
-    scoreMain.textContent=startScoreSel.value||'501';
-    legsValueEl.textContent='0';
-    avgValueEl.textContent='0.00';
-    setsValueEl.textContent=`0/${setsInput.value||1}`;
-    startScreen.style.display='flex';
+    currentInput = '';
+    scoreLeft.innerHTML = '';
+    scoreRight.textContent = 'SET UP';
+    scoreMain.textContent = startScoreSel.value || '501';
+    legsValueEl.textContent = '0';
+    avgValueEl.textContent = '0.00';
+    setsValueEl.textContent = `0/${setsInput.value || 1}`;
+    startScreen.style.display = 'flex';
     return;
   }
-  resetMatchSame();
+  game.frozen = true;
+  clearInput();
+  resetVisitState();
+  refreshUI();
 }
 
-async function nextLegModalThen(fn){
-  modalActive=true;
-  await Modal.ok('NEXT LEG','');
-  modalActive=false;
-  fn();
-}
-
-async function awardLegToAsync(playerIdx){
+function awardLegTo(playerIdx) {
   const p = game.players[playerIdx];
   p.legs += 1;
 
-  if(p.legs >= game.legsToWin){
+  if (p.legs >= game.legsToWin) {
     p.sets += 1;
-    if(p.sets >= game.setsToWin){
-      await handleMatchOverAsync();
+    if (p.sets >= game.setsToWin) {
+      handleMatchOver();
       return;
     }
-    await nextLegModalThen(startNextSetImmediate);
+    startNextSet();
     return;
   }
 
-  await nextLegModalThen(startNextLegImmediate);
+  startNextLeg();
 }
 
-function renderNames(){
-  namesWrap.innerHTML='';
-  for(let i=1;i<=Number(playerCount.value);i++){
-    const input=document.createElement('input');
-    input.placeholder = `Player ${i}`;
-    namesWrap.appendChild(input);
-  }
-}
-playerCount.addEventListener('change', renderNames);
-renderNames();
-
+/* ================= START MATCH ================= */
 startBtn.addEventListener('click', () => {
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
   const nameInputs = namesWrap.querySelectorAll('input');
 
-  undoStack=[];
+  undoStack = [];
+
   game = {
-    mode: count===1?'practice':'match',
+    mode: count === 1 ? 'practice' : 'match',
     startScore,
     legsToWin: Number(legsInput.value),
     setsToWin: Number(setsInput.value),
     players: [],
-    prefs: [],
     activeIndex: 0,
     legStarterIndex: 0,
     setStarterIndex: 0,
@@ -1013,117 +1041,90 @@ startBtn.addEventListener('click', () => {
     createdAt: Date.now()
   };
 
-  scoreLeft.innerHTML='';
-  for(let i=0;i<count;i++){
-    const name = nameInputs[i]?.value.trim() || `P${i+1}`;
-    const pl = {name, score:startScore, legs:0, sets:0, stats:{points:0,darts:0}};
+  scoreLeft.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const name = nameInputs[i]?.value.trim() || `P${i + 1}`;
+    const pl = {
+      name,
+      score: startScore,
+      legs: 0,
+      sets: 0,
+      stats: { points: 0, darts: 0 }
+    };
     game.players.push(pl);
-    const div=document.createElement('div');
-    div.className='player'+(i===0?' active':'');
+
+    const div = document.createElement('div');
+    div.className = 'player' + (i === 0 ? ' active' : '');
     div.textContent = `${name} - ${startScore}`;
     scoreLeft.appendChild(div);
   }
 
-  resetPrefsForNewLeg();
   resetVisitState();
   clearInput();
 
-  scoreMain.textContent=startScore;
-  legsValueEl.textContent='0';
-  avgValueEl.textContent='0.00';
-  setsValueEl.textContent=`0/${game.setsToWin}`;
+  scoreMain.textContent = startScore;
+  legsValueEl.textContent = '0';
+  avgValueEl.textContent = '0.00';
+  setsValueEl.textContent = `0/${game.setsToWin}`;
 
-  startScreen.style.display='none';
-  applyPrefsForPlayer(0);
+  startScreen.style.display = 'none';
   refreshUI();
 });
 
-btnHelp.addEventListener('click', () => {
-  if(!isStarted()) return;
-  if(!isPlayable()) return;
-  const idx = activeIndex();
-  game.prefs[idx].help = !game.prefs[idx].help;
-  btnHelp.classList.toggle('active', game.prefs[idx].help);
-  renderRightPanel();
-});
-
-btnDart.addEventListener('click', () => {
-  if(!isStarted()) return;
-  if(!isPlayable()) return;
-  const idx = activeIndex();
-  const pref = game.prefs[idx];
-  const newOn = !inDartMode();
-  pref.dart = newOn;
-  if(!newOn && game.players[idx].score<=170) pref.lock=true;
-  setDartMode(newOn);
-  renderRightPanel();
-});
-
-// keypad
-for(const k of document.querySelectorAll('.num')){
+/* ================= INPUT HANDLERS ================= */
+document.querySelectorAll('.num').forEach(k => {
   k.addEventListener('click', () => {
-    if(!isPlayable()) return;
-    if(currentInput.length<3){
+    if (!isPlayable()) return;
+    if (currentInput.length < 3) {
       currentInput += k.textContent;
       syncVisitDisplay();
     }
   });
-}
+});
 
 document.querySelector('.del').addEventListener('click', () => {
-  if(!isPlayable()) return;
-  currentInput = currentInput.slice(0,-1);
+  if (!isPlayable()) return;
+  currentInput = currentInput.slice(0, -1);
   syncVisitDisplay();
 });
 
-// ENTER
-
-document.querySelector('.enter').addEventListener('click', async () => {
-  if(!isPlayable()) return;
-  if(!currentInput) return;
+/* ================= ENTER: HYBRID COMMIT ================= */
+document.querySelector('.enter').addEventListener('click', () => {
+  if (!isPlayable()) return;
+  if (!currentInput) return;
 
   const val = Number(currentInput);
-  if(!Number.isFinite(val)) return;
+  if (!Number.isFinite(val)) return;
 
   const idx = activeIndex();
   const p = game.players[idx];
 
-  if(inDartMode()){
-    if(!VALID_DART_VALUES.has(val)) return;
+  if (inDartMode()) {
+    if (val < 0 || val > 60) return;
 
     pushUndo('dart');
-    if(turnStartScore===null) turnStartScore = p.score;
+
+    if (turnStartScore === null) turnStartScore = p.score;
 
     visitDartsUsed += 1;
     visitPoints += val;
 
     const newScore = p.score - val;
 
-    if(newScore < 0 || newScore === 1){
-      await bustAndAdvance();
+    // bust on <0 or 1
+    if (newScore < 0 || newScore === 1) {
+      bustCurrentTurn();
       return;
     }
 
-    if(newScore === 0){
-      if(!VALID_FINISH_VALUES.has(val)){
-        await bustAndAdvance();
+    if (newScore === 0) {
+      const ok = window.confirm('Doubled Out?');
+      if (!ok) {
+        bustCurrentTurn();
         return;
       }
-
-      modalActive=true;
-      const ok = await Modal.yesNo('Doubled Out?','');
-      modalActive=false;
-      if(!ok){
-        await bustAndAdvance();
-        return;
-      }
-
       recordVisitStats(idx, visitPoints, visitDartsUsed);
-      p.score = 0;
-      refreshUI();
-
-      await holdThenAdvance({takeoverText:'CHECKOUT', takeoverColor:'var(--accent)', nextFn:null});
-      await awardLegToAsync(idx);
+      awardLegTo(idx);
       return;
     }
 
@@ -1131,47 +1132,38 @@ document.querySelector('.enter').addEventListener('click', async () => {
     clearInput();
     refreshUI();
 
-    if(visitDartsUsed >= 3){
+    if (visitDartsUsed >= 3) {
       recordVisitStats(idx, visitPoints, 3);
-      await advanceToNextPlayerHold();
+      advanceToNextPlayer();
       return;
     }
 
     return;
   }
 
-  // visit mode
-  if(val<0 || val>180) return;
+  // visit total
+  if (val < 0 || val > 180) return;
 
   pushUndo('turn');
+
   turnStartScore = p.score;
   const newScore = p.score - val;
 
-  if(newScore < 0 || newScore === 1){
-    await bustAndAdvance();
+  if (newScore < 0 || newScore === 1) {
+    bustCurrentTurn();
     return;
   }
 
-  if(newScore === 0){
-    modalActive=true;
-    const ok = await Modal.yesNo('Doubled Out?','');
-    modalActive=false;
-    if(!ok){
-      await bustAndAdvance();
+  if (newScore === 0) {
+    const ok = window.confirm('Doubled Out?');
+    if (!ok) {
+      bustCurrentTurn();
       return;
     }
 
-    modalActive=true;
-    const dartsUsed = await Modal.pick123('Darts to Checkout?','');
-    modalActive=false;
-
-    recordVisitStats(idx, val, dartsUsed);
-    p.score = 0;
-    clearInput();
-    refreshUI();
-
-    await holdThenAdvance({takeoverText:'CHECKOUT', takeoverColor:'var(--accent)', nextFn:null});
-    await awardLegToAsync(idx);
+    const dartsCheckout = promptCheckoutDarts();
+    recordVisitStats(idx, val, dartsCheckout);
+    awardLegTo(idx);
     return;
   }
 
@@ -1179,61 +1171,73 @@ document.querySelector('.enter').addEventListener('click', async () => {
   recordVisitStats(idx, val, 3);
   clearInput();
   refreshUI();
-
-  await advanceToNextPlayerHold();
+  advanceToNextPlayer();
 });
 
-// BUST
-
-document.querySelector('.bust').addEventListener('click', async () => {
-  if(!isPlayable()) return;
-  pushUndo(inDartMode()?'dart':'turn');
-  await bustAndAdvance();
+/* ================= BUST BUTTON ================= */
+document.querySelector('.bust').addEventListener('click', () => {
+  if (!isPlayable()) return;
+  pushUndo(inDartMode() ? 'dart' : 'turn');
+  bustCurrentTurn();
 });
 
-// UNDO
-
-document.querySelector('.undo').addEventListener('click', async () => {
-  if(!isStarted()) return;
-  if(holdActive || modalActive) return;
-
+/* ================= UNDO BUTTON ================= */
+document.querySelector('.undo').addEventListener('click', () => {
+  if (!isStarted()) return;
   const item = popUndoForMode();
-  if(!item) return;
+  if (!item) return;
 
-  if(undoWouldRevertLegOrSet(item.snap.game)){
-    modalActive=true;
-    const ok = await Modal.yesNo('Undo leg?','');
-    modalActive=false;
-    if(!ok){ undoStack.push(item); return; }
+  const snap = item.snap;
+  if (undoWouldRevertLegOrSet(snap.game)) {
+    const ok = window.confirm('Undo leg?');
+    if (!ok) {
+      undoStack.push(item);
+      return;
+    }
   }
 
-  restoreUndoSnap(item.snap);
-  await showUndoTakeover();
+  restoreUndoSnap(snap);
 });
 
-// Press flash
-for(const btn of document.querySelectorAll('.keypad .key:not(.score-view)')){
-  btn.addEventListener('click', () => {
-    if(!isPlayable()) return;
-    btn.classList.add('pressed');
-    setTimeout(()=>btn.classList.remove('pressed'),120);
-  });
-}
+/* ================= MODE TOGGLES ================= */
+document.querySelector('.dart').addEventListener('click', (e) => {
+  if (!isPlayable()) return;
+  app.classList.toggle('dart-mode');
+  e.currentTarget.classList.toggle('active');
 
-// User outs overlay
+  resetVisitState();
+  clearInput();
+  refreshUI();
+});
+
+document.querySelector('.help-btn').addEventListener('click', (e) => {
+  if (!isPlayable()) return;
+  e.currentTarget.classList.toggle('active');
+  renderRightPanel();
+});
+
+/* ================= PRESS FLASH FEEDBACK ================= */
+document.querySelectorAll('.keypad .key:not(.score-view)').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!isPlayable()) return;
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 120);
+  });
+});
+
+/* =====================================================
+   USER OUTS OVERLAY UI
+   ===================================================== */
 const userOutsOverlay = document.getElementById('userOutsOverlay');
 const userOutsList = document.getElementById('userOutsList');
 
-document.getElementById('openUserOuts').addEventListener('click', () => { openUserOuts(); });
-document.getElementById('userOutsClose').addEventListener('click', () => { closeUserOuts(); });
-document.getElementById('userOutsSave').addEventListener('click', () => { saveUserOutsFromUI(); if(isStarted()) refreshUI(); });
+function buildUserOutRow(slot, existing) {
+  const row = document.createElement('div');
+  row.style.border = '1px solid var(--border-std)';
+  row.style.borderRadius = '12px';
+  row.style.padding = '10px';
+  row.style.background = 'rgba(255,255,255,0.03)';
 
-function buildUserOutRow(slot, existing){
-  const row=document.createElement('div');
-  row.style.border='1px solid var(--border-std)';
-  row.style.borderRadius='12px';
-  row.style.padding='10px';
-  row.style.background='rgba(255,255,255,0.03)';
   row.innerHTML = `
     <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
       <div style="font-size:0.75rem; opacity:0.75;">Route ${slot+1}</div>
@@ -1257,74 +1261,116 @@ function buildUserOutRow(slot, existing){
     </div>
   `;
 
-  const scoreInp=row.querySelector('.uo-score');
-  const beds=row.querySelectorAll('.uo-bed');
-  const nums=row.querySelectorAll('.uo-num');
+  const scoreInp = row.querySelector('.uo-score');
+  const beds = row.querySelectorAll('.uo-bed');
+  const nums = row.querySelectorAll('.uo-num');
 
-  if(existing && existing.score) scoreInp.value=existing.score;
-  if(existing && existing.route){
-    existing.route.forEach((tok,idx)=>{
-      if(!beds[idx]||!nums[idx]) return;
-      if(tok==='BULL'){ beds[idx].value='BULL'; nums[idx].value=''; }
-      else { beds[idx].value=tok[0]; nums[idx].value=tok.slice(1); }
+  if (existing && existing.score) scoreInp.value = existing.score;
+
+  if (existing && existing.route) {
+    existing.route.forEach((tok, idx) => {
+      if (!beds[idx] || !nums[idx]) return;
+      if (tok === 'BULL') {
+        beds[idx].value = 'BULL';
+        nums[idx].value = '';
+      } else {
+        beds[idx].value = tok[0];
+        nums[idx].value = tok.slice(1);
+      }
     });
   } else {
-    beds.forEach(b=>b.value='');
-    nums.forEach(n=>n.value='');
+    beds.forEach(b => (b.value = ''));
+    nums.forEach(n => (n.value = ''));
   }
 
   function syncDisable(){
-    beds.forEach((b,idx)=>{
-      if(b.value==='BULL'){ nums[idx].value=''; nums[idx].disabled=true; }
-      else nums[idx].disabled=false;
+    beds.forEach((b, idx) => {
+      if (b.value === 'BULL') {
+        nums[idx].value = '';
+        nums[idx].disabled = true;
+      } else {
+        nums[idx].disabled = false;
+      }
     });
   }
-  beds.forEach(b=>b.addEventListener('change', syncDisable));
+
+  beds.forEach(b => b.addEventListener('change', syncDisable));
   syncDisable();
 
   return row;
 }
 
 function openUserOuts(){
-  userOutsList.innerHTML='';
-  const existing=loadUserOuts();
-  const entries=Object.keys(existing).slice(0,3).map(k=>({score:k, route:existing[k]}));
-  while(entries.length<3) entries.push(null);
-  entries.forEach((e,i)=>userOutsList.appendChild(buildUserOutRow(i,e)));
-  userOutsOverlay.style.display='flex';
+  userOutsList.innerHTML = '';
+
+  const existing = loadUserOuts();
+  const entries = Object.keys(existing).slice(0,3).map(k => ({ score: k, route: existing[k] }));
+  while (entries.length < 3) entries.push(null);
+
+  entries.forEach((e, i) => userOutsList.appendChild(buildUserOutRow(i, e)));
+
+  userOutsOverlay.style.display = 'flex';
 }
-function closeUserOuts(){ userOutsOverlay.style.display='none'; }
+
+function closeUserOuts(){
+  userOutsOverlay.style.display = 'none';
+}
+
 function saveUserOutsFromUI(){
-  const rows=Array.from(userOutsList.children);
-  const out={};
-  for(const row of rows){
-    const scoreVal=row.querySelector('.uo-score').value;
-    if(!scoreVal) continue;
-    const s=Number(scoreVal);
-    if(!Number.isFinite(s)||s<2||s>170) continue;
+  const rows = Array.from(userOutsList.children);
+  const out = {};
 
-    const beds=row.querySelectorAll('.uo-bed');
-    const nums=row.querySelectorAll('.uo-num');
-    const route=[];
+  for (const row of rows) {
+    const scoreVal = row.querySelector('.uo-score').value;
+    if (!scoreVal) continue;
+    const s = Number(scoreVal);
+    if (!Number.isFinite(s) || s < 2 || s > 170) continue;
 
-    for(let i=0;i<3;i++){
-      const bed=beds[i]?.value||'';
-      const num=nums[i]?.value||'';
-      if(!bed) continue;
-      if(bed==='BULL') route.push('BULL');
-      else {
-        const n=Number(num);
-        if(!Number.isFinite(n)||n<1||n>20){ route.length=0; break; }
-        route.push(bed+String(n));
+    const beds = row.querySelectorAll('.uo-bed');
+    const nums = row.querySelectorAll('.uo-num');
+    const route = [];
+
+    for (let i=0;i<3;i++) {
+      const bed = beds[i]?.value || '';
+      const num = nums[i]?.value || '';
+      if (!bed) continue;
+
+      if (bed === 'BULL') {
+        route.push('BULL');
+      } else {
+        const n = Number(num);
+        if (!Number.isFinite(n) || n < 1 || n > 20) {
+          route.length = 0;
+          break;
+        }
+        route.push(bed + String(n));
       }
     }
 
-    if(route.length) out[String(s)] = route;
+    if (route.length) out[String(s)] = route;
   }
+
   saveUserOuts(out);
   closeUserOuts();
 }
 
+// overlay wires
+
+document.getElementById('openUserOuts').addEventListener('click', () => {
+  openUserOuts();
+});
+
+document.getElementById('userOutsClose').addEventListener('click', () => {
+  closeUserOuts();
+});
+
+document.getElementById('userOutsSave').addEventListener('click', () => {
+  saveUserOutsFromUI();
+  // refresh help immediately if in-game
+  if (isStarted()) refreshUI();
+});
+
 </script>
+
 </body>
 </html>
