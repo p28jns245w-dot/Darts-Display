@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.20</title>
+  <title>Darts Master v1.22</title>
 
 <style>
 :root {
@@ -154,7 +154,7 @@ input, select {
 
 .score-center {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr auto auto;
   text-align: center;
   align-items: center;
 }
@@ -165,10 +165,21 @@ input, select {
   letter-spacing: 2px;
   font-size: 0.6em;
   line-height: 1;
-  margin-top: -4px;
+  margin-top: 8px;
   margin-bottom: 0;
 }
 .dart-mode .top-darts { display: block; }
+.active-name {
+  color: rgba(255,255,255,0.85);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.05;
+  margin-bottom: 4px;
+}
+
 
 .score-main {
   font-size: clamp(2.6rem, 6.5vw, 3.6rem);
@@ -321,10 +332,12 @@ input, select {
       <div class="score-left"></div>
 
       <div class="score-center">
-        <div class="top-darts">● ● ●</div>
-        <div class="score-main">501</div>
-        <div class="score-meta">
-          <div class="legs"><div class="label">Legs</div><div class="value">0</div></div>
+ <div class="active-name"></div>
+ <div class="score-main">501</div>
+ <div class="score-meta">
+          <div class="legs"><div class="label">Legs</div><div class="value">0</div>
+ <div class="top-darts">● ● ●</div>
+</div>
           <div class="avg"><div class="label">Avg</div><div class="value">0.00</div></div>
           <div class="sets"><div class="label">Sets</div><div class="value">0/1</div></div>
         </div>
@@ -348,7 +361,7 @@ input, select {
 </div>
 
 <script>
-// v1.20 integrated build
+// v1.22 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
 /* ===== Modal (in-app cards) ===== */
@@ -489,6 +502,7 @@ const Modal = (() => {
     ]}, { preempt:true })
   };
 })();
+
 
 
 /* ===== User Preferred Outs ===== */
@@ -708,6 +722,7 @@ const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
 const scoreRight = document.querySelector('.score-right');
 const topDartsEl = document.querySelector('.top-darts');
+const activeNameEl = document.querySelector('.active-name');
 const legsValueEl = document.querySelector('.score-meta .legs .value');
 const avgValueEl  = document.querySelector('.score-meta .avg .value');
 const setsValueEl = document.querySelector('.score-meta .sets .value');
@@ -724,35 +739,56 @@ const btnDart = document.querySelector('.dart');
 let takeoverEl = null;
 function ensureTakeover(){
   if(takeoverEl) return;
-  const center = document.querySelector('.score-center');
-  center.style.position = 'relative';
+  const wrap = document.querySelector('.score-view');
+  if(!wrap) return;
+  wrap.style.position = 'relative';
   takeoverEl = document.createElement('div');
   takeoverEl.style.position = 'absolute';
   takeoverEl.style.inset = '0';
   takeoverEl.style.display = 'none';
   takeoverEl.style.alignItems = 'center';
   takeoverEl.style.justifyContent = 'center';
-  takeoverEl.style.fontWeight = '900';
-  takeoverEl.style.fontSize = '4.0rem';
-  takeoverEl.style.letterSpacing = '1px';
   takeoverEl.style.textAlign = 'center';
-  center.appendChild(takeoverEl);
+  takeoverEl.style.fontWeight = '900';
+  takeoverEl.style.letterSpacing = '1px';
+  takeoverEl.style.padding = '8px';
+  takeoverEl.style.background = 'rgba(13,13,13,0.25)';
+  takeoverEl.style.zIndex = '10';
+  wrap.appendChild(takeoverEl);
+}
+function fitTakeoverFont(){
+  const wrap = document.querySelector('.score-view');
+  if(!wrap || !takeoverEl) return;
+  const maxW = wrap.clientWidth - 16;
+  const maxH = wrap.clientHeight - 16;
+  if(maxW <= 0 || maxH <= 0) return;
+  let lo = 18, hi = 80;
+  const fits = (px) => {
+    takeoverEl.style.fontSize = px + 'px';
+    return takeoverEl.scrollWidth <= maxW && takeoverEl.scrollHeight <= maxH;
+  };
+  while(lo < hi){
+    const mid = Math.floor((lo + hi + 1) / 2);
+    if(fits(mid)) lo = mid; else hi = mid - 1;
+  }
+  takeoverEl.style.fontSize = lo + 'px';
 }
 function showTakeover(text, color){
   ensureTakeover();
+  if(!takeoverEl) return;
   takeoverEl.textContent = text;
   takeoverEl.style.color = color || 'var(--accent)';
   takeoverEl.style.display = 'flex';
-  const center = document.querySelector('.score-center');
-  Array.from(center.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
+  fitTakeoverFont();
+  const wrap = document.querySelector('.score-view');
+  Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
 }
 function hideTakeover(){
   if(!takeoverEl) return;
   takeoverEl.style.display = 'none';
-  const center = document.querySelector('.score-center');
-  Array.from(center.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = ''; });
+  const wrap = document.querySelector('.score-view');
+  Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = ''; });
 }
-
 function isStarted(){ return !!game; }
 function isPlayable(){ return !!game && !game.frozen && !holdActive && !modalActive; }
 function inDartMode(){ return app.classList.contains('dart-mode'); }
@@ -802,12 +838,31 @@ function fitPlayerFont(){
   items.forEach(el => (el.style.fontSize = lo+'px'));
 }
 
+
+// Fit active name line (shrink-to-fit then ellipsis)
+function fitActiveNameFont(){
+  if(!activeNameEl) return;
+  const container = document.querySelector('.score-center');
+  if(!container || container.clientWidth===0) return;
+  const maxWidth = container.clientWidth;
+  activeNameEl.style.fontSize = '';
+  let lo = 12, hi = 26;
+  const fits = (px) => {
+    activeNameEl.style.fontSize = px + 'px';
+    return activeNameEl.scrollWidth <= maxWidth;
+  };
+  while(lo < hi){
+    const mid = Math.floor((lo + hi + 1) / 2);
+    if(fits(mid)) lo = mid; else hi = mid - 1;
+  }
+  activeNameEl.style.fontSize = lo + 'px';
+}
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, (c) => ({
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
-    '\"': '&quot;',
+    '"': '&quot;',
     "'": '&#39;'
   }[c]));
 }
@@ -850,7 +905,7 @@ function refreshUI(){
   items.forEach((el, idx) => {
     const p = game.players[idx];
     el.classList.toggle('active', idx === activeIndex());
-    el.textContent = `${p.name} - ${p.score}`;
+    el.textContent = String(p.score);
   });
 
   const p = game.players[activeIndex()];
@@ -914,7 +969,7 @@ async function holdThenAdvance({ takeoverText=null, takeoverColor=null, nextFn=n
   holdActive = true;
   if(takeoverText) showTakeover(takeoverText, takeoverColor);
   refreshUI();
-  await sleep(3000);
+  await sleep(1000);
   hideTakeover();
   if(nextFn) nextFn();
   holdActive = false;
@@ -1093,7 +1148,7 @@ startBtn.addEventListener('click', () => {
     game.players.push(pl);
     const div=document.createElement('div');
     div.className='player'+(i===0?' active':'');
-    div.textContent = `${name} - ${startScore}`;
+    div.textContent = String(startScore);
     scoreLeft.appendChild(div);
   }
 
@@ -1136,11 +1191,14 @@ btnDart.addEventListener('click', () => {
 for(const k of document.querySelectorAll('.num')){
   k.addEventListener('click', () => {
     if(!isPlayable()) return;
-    if(currentInput.length<3){
-      currentInput += k.textContent;
-      syncVisitDisplay();
-    }
-  });
+    const d = k.textContent;
+   if(currentInput === '0'){
+     if(d !== '0') currentInput = d;
+   } else if(currentInput.length < 3){
+     currentInput += d;
+   }
+   syncVisitDisplay();
+});
 }
 
 document.querySelector('.del').addEventListener('click', () => {
