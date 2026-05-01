@@ -153,6 +153,7 @@ input, select {
 .score-left .active { color: var(--accent); font-weight: 700; }
 
 .score-center {
+ position: relative;
   display: grid;
   grid-template-rows: auto 1fr auto auto;
   text-align: center;
@@ -160,13 +161,16 @@ input, select {
 }
 
 .top-darts {
-  display: none;
-  color: var(--accent);
-  letter-spacing: 2px;
-  font-size: 0.6em;
-  line-height: 1;
-  margin-top: 8px;
-  margin-bottom: 0;
+ display: none;
+ position: absolute;
+ left: 50%;
+ transform: translateX(-50%);
+ bottom: 2px;
+ color: var(--accent);
+ letter-spacing: 2px;
+ font-size: 0.6em;
+ line-height: 1;
+ pointer-events: none;
 }
 .dart-mode .top-darts { display: block; }
 .active-name {
@@ -336,14 +340,14 @@ input, select {
  <div class="score-main">501</div>
  <div class="score-meta">
           <div class="legs"><div class="label">Legs</div><div class="value">0</div>
- <div class="top-darts">● ● ●</div>
 </div>
           <div class="avg"><div class="label">Avg</div><div class="value">0.00</div></div>
           <div class="sets"><div class="label">Sets</div><div class="value">0/1</div></div>
         </div>
       </div>
 
-      <div class="score-right">SET UP</div>
+      <div class=\"top-darts\">● ● ●</div>
+<div class=\"score-right\">SET UP</div>
     </div>
 
     <div class="key num k1">1</div><div class="key num k2">2</div><div class="key num k3">3</div>
@@ -738,56 +742,44 @@ const btnDart = document.querySelector('.dart');
 
 let takeoverEl = null;
 function ensureTakeover(){
-  if(takeoverEl) return;
-  const wrap = document.querySelector('.score-view');
-  if(!wrap) return;
-  wrap.style.position = 'relative';
-  takeoverEl = document.createElement('div');
-  takeoverEl.style.position = 'absolute';
-  takeoverEl.style.inset = '0';
-  takeoverEl.style.display = 'none';
-  takeoverEl.style.alignItems = 'center';
-  takeoverEl.style.justifyContent = 'center';
-  takeoverEl.style.textAlign = 'center';
-  takeoverEl.style.fontWeight = '900';
-  takeoverEl.style.letterSpacing = '1px';
-  takeoverEl.style.padding = '8px';
-  takeoverEl.style.background = 'rgba(13,13,13,0.25)';
-  takeoverEl.style.zIndex = '10';
-  wrap.appendChild(takeoverEl);
-}
-function fitTakeoverFont(){
-  const wrap = document.querySelector('.score-view');
-  if(!wrap || !takeoverEl) return;
-  const maxW = wrap.clientWidth - 16;
-  const maxH = wrap.clientHeight - 16;
-  if(maxW <= 0 || maxH <= 0) return;
-  let lo = 18, hi = 80;
-  const fits = (px) => {
-    takeoverEl.style.fontSize = px + 'px';
-    return takeoverEl.scrollWidth <= maxW && takeoverEl.scrollHeight <= maxH;
-  };
-  while(lo < hi){
-    const mid = Math.floor((lo + hi + 1) / 2);
-    if(fits(mid)) lo = mid; else hi = mid - 1;
-  }
-  takeoverEl.style.fontSize = lo + 'px';
+ if(takeoverEl) return;
+ const wrap = document.querySelector('.score-view');
+ if(!wrap) return;
+ wrap.style.position = 'relative';
+ takeoverEl = document.createElement('div');
+ takeoverEl.style.position = 'absolute';
+ takeoverEl.style.inset = '0';
+ takeoverEl.style.display = 'none';
+ takeoverEl.style.alignItems = 'center';
+ takeoverEl.style.justifyContent = 'center';
+ takeoverEl.style.textAlign = 'center';
+ takeoverEl.style.fontWeight = '950';
+ takeoverEl.style.letterSpacing = '1px';
+ takeoverEl.style.padding = '10px';
+ takeoverEl.style.background = 'rgba(13,13,13,0.62)';
+ takeoverEl.style.backdropFilter = 'blur(2px)';
+ takeoverEl.style.webkitBackdropFilter = 'blur(2px)';
+ takeoverEl.style.fontSize = 'clamp(2.6rem, 9vw, 5.2rem)';
+ takeoverEl.style.textShadow = '0 3px 14px rgba(0,0,0,0.9)';
+ takeoverEl.style.zIndex = '10';
+ wrap.appendChild(takeoverEl);
 }
 function showTakeover(text, color){
-  ensureTakeover();
-  if(!takeoverEl) return;
-  takeoverEl.textContent = text;
-  takeoverEl.style.color = color || 'var(--accent)';
-  takeoverEl.style.display = 'flex';
-  fitTakeoverFont();
-  const wrap = document.querySelector('.score-view');
-  Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
+ ensureTakeover();
+ if(!takeoverEl) return;
+ takeoverEl.textContent = text;
+ takeoverEl.style.color = color || 'var(--accent)';
+ takeoverEl.style.display = 'flex';
+ const wrap = document.querySelector('.score-view');
+ Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
 }
 function hideTakeover(){
-  if(!takeoverEl) return;
-  takeoverEl.style.display = 'none';
-  const wrap = document.querySelector('.score-view');
-  Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = ''; });
+ if(!takeoverEl) return;
+ takeoverEl.style.display = 'none';
+ const wrap = document.querySelector('.score-view');
+ Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = ''; });
+}
+);
 }
 function isStarted(){ return !!game; }
 function isPlayable(){ return !!game && !game.frozen && !holdActive && !modalActive; }
@@ -866,6 +858,8 @@ function escapeHtml(str){
     "'": '&#39;'
   }[c]));
 }
+[c]));
+}
 function renderRightPanel(){
   if(!isStarted()){ scoreRight.textContent='SET UP'; return; }
 
@@ -909,7 +903,9 @@ function refreshUI(){
   });
 
   const p = game.players[activeIndex()];
-  scoreMain.textContent = p.score;
+ if(activeNameEl) activeNameEl.textContent = p.name;
+ fitActiveNameFont();
+ scoreMain.textContent = p.score;
   legsValueEl.textContent = String(p.legs);
   avgValueEl.textContent = computeAvg(p);
   setsValueEl.textContent = `${p.sets}/${game.setsToWin}`;
