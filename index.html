@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.19.1</title>
+  <title>Darts Master v1.20</title>
 
 <style>
 :root {
@@ -24,7 +24,8 @@ body {
   color: var(--text);
   font-family: -apple-system, sans-serif;
   overflow: hidden;
-  touch-action: none;
+  /* Reduced restriction to allow better scrolling on start screen */
+  touch-action: manipulation; 
 }
 
 .start-screen {
@@ -73,8 +74,6 @@ input, select {
   color: var(--text);
 }
 
-
-/* FIX: ensure player name inputs are visible */
 #playerNames {
   display: flex;
   flex-direction: column;
@@ -322,7 +321,7 @@ input, select {
       <div class="score-left"></div>
 
       <div class="score-center">
-        <div class="top-darts">○ ○ ○</div>
+        <div class="top-darts">● ● ●</div>
         <div class="score-main">501</div>
         <div class="score-meta">
           <div class="legs"><div class="label">Legs</div><div class="value">0</div></div>
@@ -349,7 +348,7 @@ input, select {
 </div>
 
 <script>
-// v1.19.1 integrated build
+// v1.20 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
 /* ===== Modal (in-app cards) ===== */
@@ -649,7 +648,8 @@ const VALID_DART_VALUES = new Set([
   ...Array.from({length:20},(_,i)=>(i+1)*2),
   ...Array.from({length:20},(_,i)=>(i+1)*3)
 ]);
-const VALID_FINISH_VALUES = new Set([50, ...Array.from({length:19},(_,i)=>(i+2)*2)]); // 4..40 even + 50
+// FIX: Include Double 1 (2)
+const VALID_FINISH_VALUES = new Set([50, ...Array.from({length:20},(_,i)=>(i+1)*2)]); 
 
 const app = document.querySelector('.app');
 const scoreLeft = document.querySelector('.score-left');
@@ -663,8 +663,6 @@ const setsValueEl = document.querySelector('.score-meta .sets .value');
 const startScreen = document.getElementById('startScreen');
 const playerCount = document.getElementById('playerCount');
 const startScoreSel = document.getElementById('startScore');
-const legsInput = document.getElementById('legsToWin');
-const setsInput = document.getElementById('setsToWin');
 const namesWrap = document.getElementById('playerNames');
 const startBtn = document.getElementById('startMatch');
 
@@ -733,26 +731,27 @@ function applyPrefsForPlayer(idx){
   renderRightPanel();
 }
 
+// FIX: Correct integer division and safety check for clientWidth
 function fitPlayerFont(){
   const container = scoreLeft;
   const items = container.querySelectorAll('.player');
-  if (!items.length) return;
+  if (!items.length || container.clientWidth === 0) return;
   const maxWidth = container.clientWidth;
   items.forEach(el => (el.style.fontSize = ''));
   let lo=10, hi=22;
-  const fits=(px)=>{ items.forEach(el => (el.style.fontSize = px+'px')); return Array.from(items).every(el => el.scrollWidth <= maxWidth); };
-  while(lo<hi){ const mid=(lo+hi+1)//2; if(fits(mid)) lo=mid; else hi=mid-1; }
+  const fits=(px)=>{ 
+    items.forEach(el => (el.style.fontSize = px+'px')); 
+    return Array.from(items).every(el => el.scrollWidth <= maxWidth); 
+  };
+  while(lo<hi){ 
+    const mid = Math.floor((lo + hi + 1) / 2); 
+    if(fits(mid)) lo=mid; else hi=mid-1; 
+  }
   items.forEach(el => (el.style.fontSize = lo+'px'));
 }
 
 function escapeHtml(str){
-  return String(str).replace(/[&<>\"']/g, (c)=>({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
+  return String(str).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function renderRightPanel(){
@@ -892,11 +891,15 @@ async function advanceToNextPlayerHold(over){
   await holdThenAdvance({ takeoverText: over?.text||null, takeoverColor: over?.color||null, nextFn: advanceToNextPlayerImmediate });
 }
 
+// FIX: Record accurate darts for bust in Dart Mode
 async function bustAndAdvance(){
   const idx = activeIndex();
   if(turnStartScore===null) turnStartScore = game.players[idx].score;
   game.players[idx].score = turnStartScore;
-  recordVisitStats(idx, 0, 3);
+  
+  const dartsToRecord = inDartMode() ? Math.max(1, visitDartsUsed) : 3;
+  recordVisitStats(idx, 0, dartsToRecord);
+  
   await advanceToNextPlayerHold({text:'BUST', color:'#ff9a3c'});
 }
 
@@ -960,7 +963,7 @@ async function handleMatchOverAsync(){
     scoreMain.textContent=startScoreSel.value||'501';
     legsValueEl.textContent='0';
     avgValueEl.textContent='0.00';
-    setsValueEl.textContent=`0/${setsInput.value||1}`;
+    setsValueEl.textContent=`0/${document.getElementById('setsToWin').value||1}`;
     startScreen.style.display='flex';
     return;
   }
@@ -1002,17 +1005,20 @@ function renderNames(){
 playerCount.addEventListener('change', renderNames);
 renderNames();
 
+// FIX: Ensure all input variables are correctly fetched from DOM
 startBtn.addEventListener('click', () => {
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
+  const lToWin = Number(document.getElementById('legsToWin').value);
+  const sToWin = Number(document.getElementById('setsToWin').value);
   const nameInputs = namesWrap.querySelectorAll('input');
 
   undoStack=[];
   game = {
     mode: count===1?'practice':'match',
     startScore,
-    legsToWin: Number(legsInput.value),
-    setsToWin: Number(setsInput.value),
+    legsToWin: lToWin,
+    setsToWin: sToWin,
     players: [],
     prefs: [],
     activeIndex: 0,
