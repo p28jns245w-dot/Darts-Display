@@ -355,6 +355,8 @@ const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 const Modal = (() => {
   let overlay, card, titleEl, msgEl, btnRow;
   let active = false;
+  const queue = []; // FIFO
+  let preemptItem = null; // {req, resolve}
 
   function ensure() {
     if (overlay) return;
@@ -387,36 +389,85 @@ const Modal = (() => {
     document.body.appendChild(overlay);
   }
 
-  async function show({ title, message = '', buttons }) {
-    ensure();
-    if (active) return null;
-    active = true;
+  function coalesceKey(req){
+    // Optional: coalesce duplicate OK modals (same title+message, single OK button)
+    if (!req || !req.buttons || req.buttons.length !== 1) return null;
+    const b = req.buttons[0];
+    if (b.label !== 'OK') return null;
+    return 'OK|' + (req.title || '') + '|' + (req.message || '');
+  }
 
-    titleEl.textContent = title || '';
-    msgEl.textContent = message || '';
+  function render(req, resolve){
+    ensure();
+    active = true;
+    titleEl.textContent = req.title || '';
+    msgEl.textContent = req.message || '';
     btnRow.innerHTML = '';
     overlay.style.display = 'flex';
 
-    return await new Promise(resolve => {
-      buttons.forEach(b => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'start-btn';
-        btn.style.flex = '1';
-        btn.style.padding = '12px';
-        btn.style.borderColor = b.variant === 'secondary' ? 'rgba(255,255,255,0.25)' : 'var(--accent)';
-        btn.style.color = b.variant === 'secondary' ? 'rgba(255,255,255,0.9)' : 'var(--accent)';
-        btn.style.background = b.variant === 'primaryFill' ? 'var(--accent)' : 'transparent';
-        if (b.variant === 'primaryFill') btn.style.color = '#0d0d0d';
-        btn.textContent = b.label;
-        btn.addEventListener('click', () => {
-          overlay.style.display = 'none';
-          active = false;
-          resolve(b.value);
-        });
-        btnRow.appendChild(btn);
-      });
+    req.buttons.forEach(b => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'start-btn';
+      btn.style.flex = '1';
+      btn.style.padding = '12px';
+      btn.style.borderColor = b.variant === 'secondary' ? 'rgba(255,255,255,0.25)' : 'var(--accent)';
+      btn.style.color = b.variant === 'secondary' ? 'rgba(255,255,255,0.9)' : 'var(--accent)';
+      btn.style.background = b.variant === 'primaryFill' ? 'var(--accent)' : 'transparent';
+      if (b.variant === 'primaryFill') btn.style.color = '#0d0d0d';
+      btn.textContent = b.label;
+      btn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+        active = false;
+        resolve(b.value);
+        pump();
+      }, { once:true });
+      btnRow.appendChild(btn);
     });
+  }
+
+  function pump(){
+    if (active) return;
+
+    // Preempt (MATCH OVER): show next and clear everything pending
+    if (preemptItem){
+      const item = preemptItem;
+      preemptItem = null;
+      queue.length = 0;
+      render(item.req, item.resolve);
+      return;
+    }
+
+    if (!queue.length) return;
+    const item = queue.shift();
+    render(item.req, item.resolve);
+  }
+
+  function show(req, opts){
+    opts = opts || {};
+    ensure();
+    const preempt = !!opts.preempt;
+
+    let resolve;
+    const promise = new Promise(res => (resolve = res));
+
+    if (preempt){
+      preemptItem = { req, resolve };
+      queue.length = 0;
+      if (!active) pump();
+      return promise;
+    }
+
+    const key = coalesceKey(req);
+    if (key){
+      for (const it of queue){
+        if (it.key === key) return it.promise;
+      }
+    }
+
+    queue.push({ req, resolve, key, promise });
+    if (!active) pump();
+    return promise;
   }
 
   return {
@@ -435,9 +486,10 @@ const Modal = (() => {
     matchOver: () => show({ title:'MATCH OVER', message:'', buttons: [
       { label:'NEW MATCH', value:'new', variant:'primaryFill' },
       { label:'REPLAY SAME', value:'replay', variant:'secondary' }
-    ]})
+    ]}, { preempt:true })
   };
 })();
+
 
 /* ===== User Preferred Outs ===== */
 const USER_OUTS_KEY = 'darts_user_preferred_outs_v1';
@@ -751,9 +803,14 @@ function fitPlayerFont(){
 }
 
 function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '\"': '&quot;',
+    "'": '&#39;'
+  }[c]));
 }
-
 function renderRightPanel(){
   if(!isStarted()){ scoreRight.textContent='SET UP'; return; }
 
@@ -891,18 +948,19 @@ async function advanceToNextPlayerHold(over){
   await holdThenAdvance({ takeoverText: over?.text||null, takeoverColor: over?.color||null, nextFn: advanceToNextPlayerImmediate });
 }
 
-// FIX: Record accurate darts for bust in Dart Mode
+// FIX: Always ask how many darts were thrown on bust (any mode)
 async function bustAndAdvance(){
   const idx = activeIndex();
   if(turnStartScore===null) turnStartScore = game.players[idx].score;
+
+  modalActive = true;
+  const dartsToRecord = await Modal.pick123('Darts to Bust?','');
+  modalActive = false;
+
   game.players[idx].score = turnStartScore;
-  
-  const dartsToRecord = inDartMode() ? Math.max(1, visitDartsUsed) : 3;
   recordVisitStats(idx, 0, dartsToRecord);
-  
   await advanceToNextPlayerHold({text:'BUST', color:'#ff9a3c'});
 }
-
 function resetScoresForNewLeg(){
   game.players.forEach(pl=>pl.score=game.startScore);
   resetVisitState();
