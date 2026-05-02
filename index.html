@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.22</title>
+  <title>Darts Master v1.23</title>
 
 <style>
 :root {
@@ -25,7 +25,8 @@ body {
   font-family: -apple-system, sans-serif;
   overflow: hidden;
   /* Reduced restriction to allow better scrolling on start screen */
-  touch-action: manipulation; 
+  touch-action: none;
+ overscroll-behavior: none; 
 }
 
 .start-screen {
@@ -169,6 +170,8 @@ input, select {
   margin-bottom: 0;
 }
 .dart-mode .top-darts { display: block; }
+.dart-mode .score-meta { position: relative; padding-bottom: 18px; }
+.dart-mode .top-darts { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; margin: 0; }
 .active-name {
   color: rgba(255,255,255,0.85);
   font-weight: 800;
@@ -361,8 +364,11 @@ input, select {
 </div>
 
 <script>
-// v1.22 integrated build
+// v1.23 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+// v1.23: hard lock screen drag/pan
+document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
+document.addEventListener('gesturestart', (e) => { e.preventDefault(); }, { passive: false });
 
 /* ===== Modal (in-app cards) ===== */
 const Modal = (() => {
@@ -762,7 +768,7 @@ function fitTakeoverFont(){
   const maxW = wrap.clientWidth - 16;
   const maxH = wrap.clientHeight - 16;
   if(maxW <= 0 || maxH <= 0) return;
-  let lo = 18, hi = 80;
+  let lo = 18, hi = 140;
   const fits = (px) => {
     takeoverEl.style.fontSize = px + 'px';
     return takeoverEl.scrollWidth <= maxW && takeoverEl.scrollHeight <= maxH;
@@ -909,6 +915,9 @@ function refreshUI(){
   });
 
   const p = game.players[activeIndex()];
+ activeNameEl.textContent = (game.mode==='practice') ? 'Practice' : String(p.name || '');
+ fitActiveNameFont();
+
   scoreMain.textContent = p.score;
   legsValueEl.textContent = String(p.legs);
   avgValueEl.textContent = computeAvg(p);
