@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.23</title>
+  <title>Darts Master v1.24</title>
 
 <style>
 :root {
@@ -98,7 +98,7 @@ input, select {
 .app {
   width: 100%;
   height: 100dvh;
-  padding: 10px;
+  padding: calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
 }
@@ -364,7 +364,7 @@ input, select {
 </div>
 
 <script>
-// v1.23 integrated build
+// v1.24 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -502,6 +502,10 @@ const Modal = (() => {
       { label:'2', value:2, variant:'primaryFill' },
       { label:'3', value:3, variant:'primaryFill' }
     ]}),
+ resumeOrNew: (title='RESUME MATCH?', message='') => show({ title, message, buttons: [
+  { label:'RESUME', value:'resume', variant:'primaryFill' },
+  { label:'NEW MATCH', value:'new', variant:'secondary' }
+ ]}),
     matchOver: () => show({ title:'MATCH OVER', message:'', buttons: [
       { label:'NEW MATCH', value:'new', variant:'primaryFill' },
       { label:'REPLAY SAME', value:'replay', variant:'secondary' }
@@ -713,6 +717,30 @@ let visitDartsUsed = 0;
 let undoStack = [];
 let holdActive = false;
 let modalActive = false;
+const GAME_STATE_KEY = 'darts_master_state_v1_24';
+let saveTimer = null;
+function clearSavedGame(){ try{ localStorage.removeItem(GAME_STATE_KEY); }catch{} }
+function scheduleSaveGame(){
+ if(!game){ clearSavedGame(); return; }
+ if(saveTimer) return;
+ saveTimer = setTimeout(() => {
+  saveTimer = null;
+  try{
+   const payload = { game, currentInput, turnStartScore, visitPoints, visitDartsUsed, dartMode: inDartMode() };
+   localStorage.setItem(GAME_STATE_KEY, JSON.stringify(payload));
+  }catch{}
+ }, 80);
+}
+function loadSavedGame(){
+ try{
+  const raw = localStorage.getItem(GAME_STATE_KEY);
+  if(!raw) return null;
+  const p = JSON.parse(raw);
+  if(!p || !p.game || !Array.isArray(p.game.players)) return null;
+  return p;
+ }catch{ return null; }
+}
+
 
 const VALID_DART_VALUES = new Set([
   0, 25, 50,
@@ -785,7 +813,8 @@ function showTakeover(text, color){
   takeoverEl.textContent = text;
   takeoverEl.style.color = color || 'var(--accent)';
   takeoverEl.style.display = 'flex';
-  fitTakeoverFont();
+ takeoverEl.style.fontSize = '96px';
+ fitTakeoverFont();
   const wrap = document.querySelector('.score-view');
   Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
 }
@@ -926,6 +955,7 @@ function refreshUI(){
   updateTopDarts();
   fitPlayerFont();
   renderRightPanel();
+ scheduleSaveGame();
 }
 
 function syncVisitDisplay(){ renderRightPanel(); }
@@ -991,6 +1021,14 @@ async function showUndoTakeover(){
   hideTakeover();
   refreshUI();
 }
+
+async function showInvalidTakeover(){
+ showTakeover('INVALID SCORE', 'rgba(255,75,92,0.95)');
+ await sleep(1000);
+ hideTakeover();
+ refreshUI();
+}
+
 
 function recordVisitStats(playerIdx, points, darts){
   const p = game.players[playerIdx];
@@ -1076,7 +1114,8 @@ async function handleMatchOverAsync(){
   modalActive=false;
 
   if(choice==='new'){
-    game=null;
+ clearSavedGame();
+ game=null;
     undoStack=[];
     resetVisitState();
     currentInput='';
@@ -1127,8 +1166,51 @@ function renderNames(){
 playerCount.addEventListener('change', renderNames);
 renderNames();
 
+async function maybeResumeSavedGame(){
+ const saved = loadSavedGame();
+ if(!saved) return;
+ modalActive = true;
+ const choice = await Modal.resumeOrNew();
+ modalActive = false;
+ if(choice !== 'resume'){ clearSavedGame(); return; }
+
+ // restore state (no undo restore)
+ game = saved.game;
+ currentInput = saved.currentInput || '';
+ turnStartScore = (saved.turnStartScore === undefined) ? null : saved.turnStartScore;
+ visitPoints = saved.visitPoints || 0;
+ visitDartsUsed = saved.visitDartsUsed || 0;
+ undoStack = [];
+
+ // rebuild left panel
+ scoreLeft.innerHTML = '';
+ for(let i=0;i<game.players.length;i++){
+  const div=document.createElement('div');
+  div.className='player'+(i=== (game.activeIndex||0) ? ' active' : '');
+  div.textContent = String(game.players[i].score);
+  scoreLeft.appendChild(div);
+ }
+
+ // ensure prefs
+ if(!Array.isArray(game.prefs) || game.prefs.length !== game.players.length){
+  resetPrefsForNewLeg();
+ }
+
+ // restore dart-mode (without resetting visit/input)
+ app.classList.toggle('dart-mode', !!saved.dartMode);
+ btnDart.classList.toggle('active', !!saved.dartMode);
+ const idx = activeIndex();
+ btnHelp.classList.toggle('active', !!game.prefs?.[idx]?.help);
+
+ startScreen.style.display='none';
+ refreshUI();
+}
+
+maybeResumeSavedGame();
+
 // FIX: Ensure all input variables are correctly fetched from DOM
 startBtn.addEventListener('click', () => {
+ clearSavedGame();
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
   const lToWin = Number(document.getElementById('legsToWin').value);
@@ -1229,7 +1311,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
   const p = game.players[idx];
 
   if(inDartMode()){
-    if(!VALID_DART_VALUES.has(val)) return;
+ if(!VALID_DART_VALUES.has(val)) { await showInvalidTakeover(); return; }
 
     pushUndo('dart');
     if(turnStartScore===null) turnStartScore = p.score;
@@ -1281,7 +1363,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
   }
 
   // visit mode
-  if(val<0 || val>180) return;
+ if(val<0 || val>180) { await showInvalidTakeover(); return; }
 
   pushUndo('turn');
   turnStartScore = p.score;
