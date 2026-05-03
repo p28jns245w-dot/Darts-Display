@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.27</title>
+  <title>Darts Master v1.28</title>
 
 <style>
 :root {
@@ -387,7 +387,7 @@ input, select {
 </div>
 
 <script>
-// v1.27 integrated build
+// v1.28 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -875,6 +875,16 @@ function statsEnabled(){ return !!(game && game.statsEnabled); }
 function applyStatsModeFromGame(){
   app.classList.toggle('no-stats', !!(game && game.statsEnabled === false));
 }
+function isPhoneLandscape(){
+  try { return window.matchMedia('(orientation: landscape) and (max-width: 900px) and (pointer: coarse)').matches; } catch { return false; }
+}
+function updatePlayerLayout(){
+  if(!isStarted()) return false;
+  const two = isPhoneLandscape() && game.players.length > 3;
+  scoreLeft.classList.toggle('two-col', two);
+  return two;
+}
+
 
 function activeIndex(){ return game?.activeIndex ?? 0; }
 function setActiveIndex(i){ if(game) game.activeIndex = i; }
