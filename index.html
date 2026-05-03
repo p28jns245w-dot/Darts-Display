@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.28</title>
+  <title>Darts Master v1.29</title>
 
 <style>
 :root {
@@ -387,7 +387,7 @@ input, select {
 </div>
 
 <script>
-// v1.28 integrated build
+// v1.29 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -999,7 +999,7 @@ function refreshUI(){
   items.forEach((el, idx) => {
     const p = game.players[idx];
     el.classList.toggle('active', idx === activeIndex());
-    el.textContent = (twoCol && idx === activeIndex()) ? ('▶ ' + String(p.score)) : String(p.score);
+    el.textContent = String(p.score);
   });
 
   const p = game.players[activeIndex()];
