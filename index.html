@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.24</title>
+  <title>Darts Master v1.25</title>
 
 <style>
 :root {
@@ -173,7 +173,7 @@ input, select {
 .dart-mode .score-meta { position: relative; padding-bottom: 18px; }
 .dart-mode .top-darts { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; margin: 0; }
 .active-name {
-  color: rgba(255,255,255,0.85);
+  color: var(--accent);
   font-weight: 800;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -210,6 +210,8 @@ input, select {
   line-height: 1;
 }
 .score-meta .value { margin-top: 2px; }
+.no-stats .score-meta { grid-template-columns: 1fr 1fr; }
+.no-stats .score-meta .avg { display: none; }
 
 .score-right {
   display: flex;
@@ -222,10 +224,15 @@ input, select {
 }
 
 @media (orientation: portrait) {
+ .app { padding: calc(10px + env(safe-area-inset-top)) calc(6px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
+ .score-view { padding: 4px; }
+
   .keypad {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  }
+    /* v1.25 iphone portrait fit */
+  gap: 6px;
+ }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
 
   .k1 { grid-area: 2 / 1; } .k2 { grid-area: 2 / 2; } .k3 { grid-area: 2 / 3; }
@@ -310,7 +317,13 @@ input, select {
       </div>
     </div>
 
-    <button class="start-btn" id="startMatch" style="margin-top:4px; background: var(--accent); color:#0d0d0d; border-color: var(--accent);">START MATCH</button>
+    <div class="group" style="margin-top:10px;">
+  <label style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; opacity:0.85; margin-bottom:0;">
+    <span>Stats / Avg</span>
+    <input id="statsToggle" type="checkbox" style="width:auto; transform:scale(1.1);" />
+  </label>
+</div>
+<button class="start-btn" id="startMatch" style="margin-top:4px; background: var(--accent); color:#0d0d0d; border-color: var(--accent);">START MATCH</button>
     <button type="button" class="start-btn" id="openUserOuts" style="margin-top:12px; border-style:solid; border-width:1px; opacity:0.9;">Add User Preferred Out</button>
   </div>
 </div>
@@ -364,7 +377,7 @@ input, select {
 </div>
 
 <script>
-// v1.24 integrated build
+// v1.25 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -717,28 +730,28 @@ let visitDartsUsed = 0;
 let undoStack = [];
 let holdActive = false;
 let modalActive = false;
-const GAME_STATE_KEY = 'darts_master_state_v1_24';
+const GAME_STATE_KEY = 'darts_master_state_v1_25';
 let saveTimer = null;
 function clearSavedGame(){ try{ localStorage.removeItem(GAME_STATE_KEY); }catch{} }
 function scheduleSaveGame(){
- if(!game){ clearSavedGame(); return; }
- if(saveTimer) return;
- saveTimer = setTimeout(() => {
-  saveTimer = null;
-  try{
-   const payload = { game, currentInput, turnStartScore, visitPoints, visitDartsUsed, dartMode: inDartMode() };
-   localStorage.setItem(GAME_STATE_KEY, JSON.stringify(payload));
-  }catch{}
- }, 80);
+  if(!game){ clearSavedGame(); return; }
+  if(saveTimer) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    try{
+      const payload = { game, currentInput, turnStartScore, visitPoints, visitDartsUsed, dartMode: inDartMode() };
+      localStorage.setItem(GAME_STATE_KEY, JSON.stringify(payload));
+    }catch{}
+  }, 80);
 }
 function loadSavedGame(){
- try{
-  const raw = localStorage.getItem(GAME_STATE_KEY);
-  if(!raw) return null;
-  const p = JSON.parse(raw);
-  if(!p || !p.game || !Array.isArray(p.game.players)) return null;
-  return p;
- }catch{ return null; }
+  try{
+    const raw = localStorage.getItem(GAME_STATE_KEY);
+    if(!raw) return null;
+    const p = JSON.parse(raw);
+    if(!p || !p.game || !Array.isArray(p.game.players)) return null;
+    return p;
+  }catch{ return null; }
 }
 
 
@@ -769,6 +782,18 @@ const startBtn = document.getElementById('startMatch');
 
 const btnHelp = document.querySelector('.help-btn');
 const btnDart = document.querySelector('.dart');
+const statsToggle = document.getElementById('statsToggle');
+const STATS_PREF_KEY = 'darts_master_stats_pref_v1';
+try{
+  const v = localStorage.getItem(STATS_PREF_KEY);
+  if(statsToggle) statsToggle.checked = (v === '1');
+}catch{}
+if(statsToggle){
+  statsToggle.addEventListener('change', () => {
+    try{ localStorage.setItem(STATS_PREF_KEY, statsToggle.checked ? '1' : '0'); }catch{}
+  });
+}
+
 
 let takeoverEl = null;
 function ensureTakeover(){
@@ -813,8 +838,8 @@ function showTakeover(text, color){
   takeoverEl.textContent = text;
   takeoverEl.style.color = color || 'var(--accent)';
   takeoverEl.style.display = 'flex';
- takeoverEl.style.fontSize = '96px';
- fitTakeoverFont();
+  takeoverEl.style.fontSize = '96px';
+  fitTakeoverFont();
   const wrap = document.querySelector('.score-view');
   Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = 'hidden'; });
 }
@@ -827,6 +852,11 @@ function hideTakeover(){
 function isStarted(){ return !!game; }
 function isPlayable(){ return !!game && !game.frozen && !holdActive && !modalActive; }
 function inDartMode(){ return app.classList.contains('dart-mode'); }
+function statsEnabled(){ return !!(game && game.statsEnabled); }
+function applyStatsModeFromGame(){
+  app.classList.toggle('no-stats', !!(game && game.statsEnabled === false));
+}
+
 function activeIndex(){ return game?.activeIndex ?? 0; }
 function setActiveIndex(i){ if(game) game.activeIndex = i; }
 
@@ -908,9 +938,7 @@ function renderRightPanel(){
   scoreRight.style.textAlign='center';
   scoreRight.style.whiteSpace='normal';
 
-  const big = `<div style="font-size:1.35em; font-weight:800; line-height:1;">${escapeHtml(currentInput||'')}</div>`;
-
-  if(!btnHelp.classList.contains('active')){ scoreRight.innerHTML = big; return; }
+  if(!btnHelp.classList.contains('active')){ scoreRight.textContent = ''; return; }
 
   const score = game.players[activeIndex()].score;
   const dartsLeft = inDartMode() ? Math.max(0, 3 - visitDartsUsed) : 3;
@@ -924,7 +952,7 @@ function renderRightPanel(){
   const lines = (hd.lines||[]).slice(0,3);
   const opts = lines.map((l,i)=>`<div style="font-size:0.92em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>`+(i<lines.length-1?gap:'' )).join('');
 
-  scoreRight.innerHTML = big + spacer + header + spacer + opts;
+  scoreRight.innerHTML = header + spacer + opts;
 }
 
 function computeAvg(p){
@@ -949,17 +977,32 @@ function refreshUI(){
 
   scoreMain.textContent = p.score;
   legsValueEl.textContent = String(p.legs);
-  avgValueEl.textContent = computeAvg(p);
+  avgValueEl.textContent = statsEnabled() ? computeAvg(p) : '';
   setsValueEl.textContent = `${p.sets}/${game.setsToWin}`;
 
   updateTopDarts();
   fitPlayerFont();
   renderRightPanel();
- scheduleSaveGame();
+  updateTypingDisplay();
+  scheduleSaveGame();
 }
 
 function syncVisitDisplay(){ renderRightPanel(); }
-function clearInput(){ currentInput=''; syncVisitDisplay(); }
+function updateTypingDisplay(){
+  if(!isStarted()) return;
+  const p = game.players[activeIndex()];
+  if(currentInput){
+    if(inDartMode()){
+      const v = Number(currentInput);
+      scoreMain.textContent = Number.isFinite(v) ? String(visitPoints + v) : String(visitPoints);
+    } else {
+      scoreMain.textContent = currentInput;
+    }
+  } else {
+    scoreMain.textContent = p.score;
+  }
+}
+function clearInput(){ currentInput=''; updateTypingDisplay(); syncVisitDisplay(); }
 function resetVisitState(){ turnStartScore=null; visitPoints=0; visitDartsUsed=0; updateTopDarts(); }
 function updateTopDarts(){ const filled=Math.max(0,Math.min(3,visitDartsUsed)); topDartsEl.textContent=Array.from({length:3},(_,i)=>(i<filled?'●':'○')).join(' '); }
 
@@ -1023,10 +1066,10 @@ async function showUndoTakeover(){
 }
 
 async function showInvalidTakeover(){
- showTakeover('INVALID SCORE', 'rgba(255,75,92,0.95)');
- await sleep(1000);
- hideTakeover();
- refreshUI();
+  showTakeover('INVALID SCORE', 'rgba(255,75,92,0.95)');
+  await sleep(1000);
+  hideTakeover();
+  updateTypingDisplay && updateTypingDisplay();
 }
 
 
@@ -1055,14 +1098,19 @@ async function bustAndAdvance(){
   const idx = activeIndex();
   if(turnStartScore===null) turnStartScore = game.players[idx].score;
 
-  modalActive = true;
-  const dartsToRecord = await Modal.pick123('Darts to Bust?','');
-  modalActive = false;
+  if(statsEnabled()){
+    modalActive = true;
+    const dartsToRecord = await Modal.pick123('Darts to Bust?','');
+    modalActive = false;
+    game.players[idx].score = turnStartScore;
+    recordVisitStats(idx, 0, dartsToRecord);
+  } else {
+    game.players[idx].score = turnStartScore;
+  }
 
-  game.players[idx].score = turnStartScore;
-  recordVisitStats(idx, 0, dartsToRecord);
   await advanceToNextPlayerHold({text:'BUST', color:'#ff9a3c'});
 }
+
 function resetScoresForNewLeg(){
   game.players.forEach(pl=>pl.score=game.startScore);
   resetVisitState();
@@ -1114,8 +1162,8 @@ async function handleMatchOverAsync(){
   modalActive=false;
 
   if(choice==='new'){
- clearSavedGame();
- game=null;
+  clearSavedGame();
+  game=null;
     undoStack=[];
     resetVisitState();
     currentInput='';
@@ -1167,50 +1215,46 @@ playerCount.addEventListener('change', renderNames);
 renderNames();
 
 async function maybeResumeSavedGame(){
- const saved = loadSavedGame();
- if(!saved) return;
- modalActive = true;
- const choice = await Modal.resumeOrNew();
- modalActive = false;
- if(choice !== 'resume'){ clearSavedGame(); return; }
+  const saved = loadSavedGame();
+  if(!saved) return;
+  modalActive = true;
+  const choice = await Modal.resumeOrNew();
+  modalActive = false;
+  if(choice !== 'resume'){ clearSavedGame(); return; }
 
- // restore state (no undo restore)
- game = saved.game;
- currentInput = saved.currentInput || '';
- turnStartScore = (saved.turnStartScore === undefined) ? null : saved.turnStartScore;
- visitPoints = saved.visitPoints || 0;
- visitDartsUsed = saved.visitDartsUsed || 0;
- undoStack = [];
+  game = saved.game;
+  currentInput = saved.currentInput || '';
+  turnStartScore = (saved.turnStartScore === undefined) ? null : saved.turnStartScore;
+  visitPoints = saved.visitPoints || 0;
+  visitDartsUsed = saved.visitDartsUsed || 0;
+  undoStack = [];
 
- // rebuild left panel
- scoreLeft.innerHTML = '';
- for(let i=0;i<game.players.length;i++){
-  const div=document.createElement('div');
-  div.className='player'+(i=== (game.activeIndex||0) ? ' active' : '');
-  div.textContent = String(game.players[i].score);
-  scoreLeft.appendChild(div);
- }
+  scoreLeft.innerHTML = '';
+  for(let i=0;i<game.players.length;i++){
+    const div=document.createElement('div');
+    div.className='player'+(i=== (game.activeIndex||0) ? ' active' : '');
+    div.textContent = String(game.players[i].score);
+    scoreLeft.appendChild(div);
+  }
 
- // ensure prefs
- if(!Array.isArray(game.prefs) || game.prefs.length !== game.players.length){
-  resetPrefsForNewLeg();
- }
+  if(!Array.isArray(game.prefs) || game.prefs.length !== game.players.length){
+    resetPrefsForNewLeg();
+  }
 
- // restore dart-mode (without resetting visit/input)
- app.classList.toggle('dart-mode', !!saved.dartMode);
- btnDart.classList.toggle('active', !!saved.dartMode);
- const idx = activeIndex();
- btnHelp.classList.toggle('active', !!game.prefs?.[idx]?.help);
+  app.classList.toggle('dart-mode', !!saved.dartMode);
+  btnDart.classList.toggle('active', !!saved.dartMode);
 
- startScreen.style.display='none';
- refreshUI();
+  startScreen.style.display='none';
+  applyStatsModeFromGame();
+  applyPrefsForPlayer(activeIndex());
+  refreshUI();
 }
 
 maybeResumeSavedGame();
 
 // FIX: Ensure all input variables are correctly fetched from DOM
 startBtn.addEventListener('click', () => {
- clearSavedGame();
+  clearSavedGame();
   const count = Number(playerCount.value);
   const startScore = Number(startScoreSel.value);
   const lToWin = Number(document.getElementById('legsToWin').value);
@@ -1219,7 +1263,8 @@ startBtn.addEventListener('click', () => {
 
   undoStack=[];
   game = {
-    mode: count===1?'practice':'match',
+ mode: count===1?'practice':'match',
+ statsEnabled: (statsToggle ? !!statsToggle.checked : false),
     startScore,
     legsToWin: lToWin,
     setsToWin: sToWin,
@@ -1253,6 +1298,7 @@ startBtn.addEventListener('click', () => {
   setsValueEl.textContent=`0/${game.setsToWin}`;
 
   startScreen.style.display='none';
+  applyStatsModeFromGame();
   applyPrefsForPlayer(0);
   refreshUI();
 });
@@ -1295,7 +1341,7 @@ for(const k of document.querySelectorAll('.num')){
 document.querySelector('.del').addEventListener('click', () => {
   if(!isPlayable()) return;
   currentInput = currentInput.slice(0,-1);
-  syncVisitDisplay();
+  updateTypingDisplay();
 });
 
 // ENTER
@@ -1311,7 +1357,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
   const p = game.players[idx];
 
   if(inDartMode()){
- if(!VALID_DART_VALUES.has(val)) { await showInvalidTakeover(); return; }
+  if(!VALID_DART_VALUES.has(val)) { await showInvalidTakeover(); return; }
 
     pushUndo('dart');
     if(turnStartScore===null) turnStartScore = p.score;
@@ -1340,7 +1386,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
         return;
       }
 
-      recordVisitStats(idx, visitPoints, visitDartsUsed);
+      if(statsEnabled()) recordVisitStats(idx, visitPoints, visitDartsUsed);
       p.score = 0;
       refreshUI();
 
@@ -1354,7 +1400,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
     refreshUI();
 
     if(visitDartsUsed >= 3){
-      recordVisitStats(idx, visitPoints, 3);
+      if(statsEnabled()) recordVisitStats(idx, visitPoints, 3);
       await advanceToNextPlayerHold();
       return;
     }
@@ -1363,7 +1409,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
   }
 
   // visit mode
- if(val<0 || val>180) { await showInvalidTakeover(); return; }
+  if(val<0 || val>180) { await showInvalidTakeover(); return; }
 
   pushUndo('turn');
   turnStartScore = p.score;
@@ -1383,11 +1429,12 @@ document.querySelector('.enter').addEventListener('click', async () => {
       return;
     }
 
+    if(statsEnabled()){
     modalActive=true;
     const dartsUsed = await Modal.pick123('Darts to Checkout?','');
     modalActive=false;
-
     recordVisitStats(idx, val, dartsUsed);
+  }
     p.score = 0;
     clearInput();
     refreshUI();
@@ -1398,7 +1445,7 @@ document.querySelector('.enter').addEventListener('click', async () => {
   }
 
   p.score = newScore;
-  recordVisitStats(idx, val, 3);
+  if(statsEnabled()) recordVisitStats(idx, val, 3);
   clearInput();
   refreshUI();
 
