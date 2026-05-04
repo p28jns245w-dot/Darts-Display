@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.39</title>
+  <title>Darts Master v1.40</title>
 
 <style>
 :root {
@@ -178,8 +178,8 @@ input, select {
 .dart-mode .top-darts { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; margin: 0; }
 .dart-mode .score-meta { padding-bottom: 0 !important; }
 .dart-mode .score-meta .top-darts { display: none !important; }
-.dart-mode .score-left { position: relative; }
-.dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); margin: 0; font-size: 0.75em; letter-spacing: 2px; }
+.dart-mode .score-left { position: relative; padding-top: 16px; }
+.dart-mode .top-darts-left { display: block; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); margin: 0; font-size: 0.75em; letter-spacing: 2px; }
 .active-name {
   color: var(--accent);
   font-weight: 800;
@@ -188,7 +188,7 @@ input, select {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.05;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 
@@ -392,10 +392,14 @@ input, select {
 </div>
 
 <script>
-// v1.39 integrated build
+// v1.40 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
-document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  // allow vertical scrolling inside in-app cards (start screen / user-outs)
+  if(e.target && e.target.closest && e.target.closest('.start-card')) return;
+  e.preventDefault();
+}, { passive: false });
 document.addEventListener('gesturestart', (e) => { e.preventDefault(); }, { passive: false });
 
 /* ===== Modal (in-app cards) ===== */
@@ -662,7 +666,7 @@ const HelpEngine = (() => {
 
   function genSetupSuggestions(score, dartsLeft){
     dartsLeft = Math.max(1, Math.min(3, dartsLeft||3));
-    if(score<171 || score>350) return [];
+    if(score<2 || score>350) return [];
     const key = score+'|'+dartsLeft;
     if(setupCache.has(key)) return setupCache.get(key);
 
@@ -722,7 +726,12 @@ const HelpEngine = (() => {
     if(!Number.isFinite(score)) return {header:'', lines:[]};
     if(score<=170){
       const outs = genCheckoutRoutes(score, dartsLeft);
-      if(!outs.length) return {header:'CHECKOUT', lines:['NO OUT']};
+      if(!outs.length){
+  const sets = genSetupSuggestions(score, dartsLeft);
+  if(!sets.length) return {header:'CHECKOUT', lines:['NO OUT']};
+  return {header:'SETUP', lines: sets.map(s=>`${s.route.join(' ')} (${s.leave})`)};
+}
+
       return {header:'CHECKOUT', lines: outs.map(r=>r.join(' '))};
     }
     if(score<=350){
@@ -895,21 +904,13 @@ function isPhoneLandscape(){
 }
 function updatePlayerLayout(){
   if(!isStarted()) return false;
-  const two = isPhoneLandscape() && game.players.length > 3;
+  const two = isPhoneLandscape() && game.players.length === 6;
   scoreLeft.classList.toggle('two-col', two);
   return two;
 }
 
 
-function activeIndex()
-function activePlayerLabel(){
-  try{
-    const idx = activeIndex();
-    if(game && game.mode==='practice') return 'Practice';
-    return (game && game.players && game.players[idx] && game.players[idx].name) ? game.players[idx].name : 'Player';
-  }catch{ return 'Player'; }
-}
-{ return game?.activeIndex ?? 0; }
+function activeIndex(){ return game?.activeIndex ?? 0; }
 function setActiveIndex(i){ if(game) game.activeIndex = i; }
 
 function initPlayerPrefs(count){ return Array.from({length:count},()=>({help:true,dart:false,lock:false})); }
