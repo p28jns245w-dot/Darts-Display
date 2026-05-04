@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.30</title>
+  <title>Darts Master v1.31</title>
 
 <style>
 :root {
@@ -387,7 +387,7 @@ input, select {
 </div>
 
 <script>
-// v1.30 integrated build
+// v1.31 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -779,6 +779,16 @@ const scoreLeft = document.querySelector('.score-left');
 const scoreMain = document.querySelector('.score-main');
 const scoreRight = document.querySelector('.score-right');
 const topDartsEl = document.querySelector('.top-darts');
+function ensureLeftDots(){
+  let el = scoreLeft.querySelector('.top-darts-left');
+  if(!el){
+    el = document.createElement('div');
+    el.className = 'top-darts top-darts-left';
+    scoreLeft.insertBefore(el, scoreLeft.firstChild);
+  }
+  return el;
+}
+
 const topDartsLeftEl = (() => {
   try {
     const el = document.createElement('div');
@@ -993,27 +1003,20 @@ function computeAvg(p){
 
 function refreshUI(){
  if(!isStarted()) return;
- // ensure left dots element exists (start/resume rebuild clears scoreLeft)
- if(!scoreLeft.querySelector('.top-darts-left')){
-  const el = document.createElement('div');
-  el.className = 'top-darts top-darts-left';
-  scoreLeft.insertBefore(el, scoreLeft.firstChild);
- }
+ ensureLeftDots();
  applyStatsModeFromGame();
  const twoCol = updatePlayerLayout();
  const items = scoreLeft.querySelectorAll('.player');
- // two-col display order: [0,half,1,half+1,...] -> P1/P3 (or P1/P4), then P2/P4 etc
  const nodes = Array.from(items);
- if(nodes.length === (game?.players?.length || 0)) {
-  const n = nodes.length;
-  const half = Math.floor((n + 1) / 2);
-  const order = [];
-  for(let i=0;i<half;i++){
-    order.push(i);
-    if(i+half < n) order.push(i+half);
-  }
-  const desired = twoCol ? order : Array.from({length:n},(_,i)=>i);
-  desired.forEach(ix => { if(nodes[ix]) scoreLeft.appendChild(nodes[ix]); });
+ if(twoCol && nodes.length === (game?.players?.length || 0)) {
+   const n = nodes.length;
+   const half = Math.floor((n + 1) / 2);
+   const order = [];
+   for(let i=0;i<half;i++){
+     order.push(i);
+     if(i+half < n) order.push(i+half);
+   }
+   order.forEach(ix => { if(nodes[ix]) scoreLeft.appendChild(nodes[ix]); });
  }
   items.forEach((el, idx) => {
     const p = game.players[idx];
@@ -1058,7 +1061,7 @@ function updateTopDarts(){
   const filled = Math.max(0, Math.min(3, visitDartsUsed));
   const s = Array.from({length:3},(_,i)=>(i<filled?'●':'○')).join(' ');
   topDartsEl.textContent = s;
-  const left = scoreLeft.querySelector('.top-darts-left');
+  const left = ensureLeftDots();
   if(left) left.textContent = s;
 },(_,i)=>(i<filled?'●':'○')).join(' '); topDartsEl.textContent=s; if(topDartsLeftEl) topDartsLeftEl.textContent=s; }
 
