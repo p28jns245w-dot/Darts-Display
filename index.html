@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.32</title>
+  <title>Darts Master v1.34</title>
 
 <style>
 :root {
@@ -150,6 +150,7 @@ input, select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 .score-left .active { color: var(--accent); font-weight: 700; }
 
@@ -387,7 +388,7 @@ input, select {
 </div>
 
 <script>
-// v1.32 integrated build
+// v1.34 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -1008,7 +1009,8 @@ function refreshUI(){
  const twoCol = updatePlayerLayout();
  const items = scoreLeft.querySelectorAll('.player');
  const nodes = Array.from(items);
- if(twoCol && nodes.length === (game?.players?.length || 0)) {
+ if(nodes.length === (game?.players?.length || 0)) {
+   const byIdx = new Map(nodes.map(el => [Number(el.dataset.idx), el]));
    const n = nodes.length;
    const half = Math.floor((n + 1) / 2);
    const order = [];
@@ -1016,10 +1018,12 @@ function refreshUI(){
      order.push(i);
      if(i+half < n) order.push(i+half);
    }
-   order.forEach(ix => { if(nodes[ix]) scoreLeft.appendChild(nodes[ix]); });
+   const desired = twoCol ? order : Array.from({length:n},(_,i)=>i);
+   desired.forEach(ix => { const el = byIdx.get(ix); if(el) scoreLeft.appendChild(el); });
  }
-  items.forEach((el, idx) => {
-    const p = game.players[idx];
+ items.forEach((el, _pos) => {
+  const idx = Number(el.dataset.idx);
+  const p = game.players[idx];
     el.classList.toggle('active', idx === activeIndex());
     el.textContent = String(p.score);
   });
@@ -1291,7 +1295,8 @@ async function maybeResumeSavedGame(){
   for(let i=0;i<game.players.length;i++){
     const div=document.createElement('div');
     div.className='player'+(i=== (game.activeIndex||0) ? ' active' : '');
-    div.textContent = String(game.players[i].score);
+    div.dataset.idx = String(i);
+ div.textContent = String(game.players[i].score);
     scoreLeft.appendChild(div);
   }
 
@@ -1309,6 +1314,15 @@ async function maybeResumeSavedGame(){
 }
 
 maybeResumeSavedGame();
+
+function onViewportChange(){
+  if(!isStarted()) return;
+  if(holdActive || modalActive) return;
+  refreshUI();
+}
+window.addEventListener('resize', onViewportChange);
+window.addEventListener('orientationchange', onViewportChange);
+
 
 // FIX: Ensure all input variables are correctly fetched from DOM
 startBtn.addEventListener('click', () => {
@@ -1342,7 +1356,8 @@ startBtn.addEventListener('click', () => {
     game.players.push(pl);
     const div=document.createElement('div');
     div.className='player'+(i===0?' active':'');
-    div.textContent = String(startScore);
+ div.dataset.idx = String(i);
+ div.textContent = String(startScore);
     scoreLeft.appendChild(div);
   }
 
