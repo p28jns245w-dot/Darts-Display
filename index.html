@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.34</title>
+  <title>Darts Master v1.35</title>
 
 <style>
 :root {
@@ -176,6 +176,10 @@ input, select {
 .dart-mode .top-darts { display: block; }
 .dart-mode .score-meta { position: relative; padding-bottom: 18px; }
 .dart-mode .top-darts { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; margin: 0; }
+.dart-mode .score-meta { padding-bottom: 0 !important; }
+.dart-mode .score-meta .top-darts { display: none !important; }
+.dart-mode .score-left { position: relative; }
+.dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); margin: 0; font-size: 0.75em; letter-spacing: 2px; }
 .active-name {
   color: var(--accent);
   font-weight: 800;
@@ -280,7 +284,7 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
-  .score-left { position: relative; padding-top: 18px; }
+  .score-left { position: relative; padding-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
 }
@@ -388,7 +392,7 @@ input, select {
 </div>
 
 <script>
-// v1.34 integrated build
+// v1.35 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
@@ -931,7 +935,7 @@ function fitPlayerFont(){
   if (!items.length || container.clientWidth === 0) return;
   const maxWidth = container.classList.contains('two-col') ? (container.clientWidth/2 - 10) : container.clientWidth;
   items.forEach(el => (el.style.fontSize = ''));
-  let lo=10, hi=22;
+  let lo=10, hi=(container.classList.contains('two-col') ? 26 : 22);
   const fits=(px)=>{ 
     items.forEach(el => (el.style.fontSize = px+'px')); 
     return Array.from(items).every(el => el.scrollWidth <= maxWidth); 
