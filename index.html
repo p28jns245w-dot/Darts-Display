@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.37</title>
+  <title>Darts Master v1.38</title>
 
 <style>
 :root {
@@ -392,10 +392,14 @@ input, select {
 </div>
 
 <script>
-// v1.37 integrated build
+// v1.38 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.23: hard lock screen drag/pan
-document.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  // allow vertical scrolling inside in-app cards (start screen / user-outs)
+  if(e.target && e.target.closest && e.target.closest('.start-card')) return;
+  e.preventDefault();
+}, { passive: false });
 document.addEventListener('gesturestart', (e) => { e.preventDefault(); }, { passive: false });
 
 /* ===== Modal (in-app cards) ===== */
@@ -662,7 +666,7 @@ const HelpEngine = (() => {
 
   function genSetupSuggestions(score, dartsLeft){
     dartsLeft = Math.max(1, Math.min(3, dartsLeft||3));
-    if(score<171 || score>350) return [];
+    if(score<2 || score>350) return [];
     const key = score+'|'+dartsLeft;
     if(setupCache.has(key)) return setupCache.get(key);
 
@@ -722,7 +726,12 @@ const HelpEngine = (() => {
     if(!Number.isFinite(score)) return {header:'', lines:[]};
     if(score<=170){
       const outs = genCheckoutRoutes(score, dartsLeft);
-      if(!outs.length) return {header:'CHECKOUT', lines:['NO OUT']};
+      if(!outs.length){
+  const sets = genSetupSuggestions(score, dartsLeft);
+  if(!sets.length) return {header:'CHECKOUT', lines:['NO OUT']};
+  return {header:'SETUP', lines: sets.map(s=>`${s.route.join(' ')} (${s.leave})`)};
+}
+
       return {header:'CHECKOUT', lines: outs.map(r=>r.join(' '))};
     }
     if(score<=350){
