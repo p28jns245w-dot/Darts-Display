@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.44</title>
+  <title>Darts Master v1.45</title>
 
 <style>
 :root {
@@ -286,7 +286,7 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
- .keypad { gap: 8px; }
+ .keypad { gap: 6px; }
   .score-left { position: relative; padding-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
@@ -395,7 +395,7 @@ input, select {
 </div>
 
 <script>
-// v1.44 integrated build
+// v1.45 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -1514,7 +1514,7 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
       }
 
       modalActive=true;
-      const ok = await Modal.yesNo('Doubled Out?','');
+      const ok = await Modal.yesNo((val===50?'BULLSEYE?':'Doubled Out?'),'');
       modalActive=false;
       if(!ok){
         await bustAndAdvance();
@@ -1557,7 +1557,7 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
 
   if(newScore === 0){
     modalActive=true;
-    const ok = await Modal.yesNo('Doubled Out?','');
+    const ok = await Modal.yesNo((val===50?'BULLSEYE?':'Doubled Out?'),'');
     modalActive=false;
     if(!ok){
       await bustAndAdvance();
