@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.43</title>
+  <title>Darts Master v1.44</title>
 
 <style>
 :root {
@@ -42,7 +42,7 @@ body {
   width: 90%;
   max-width: 380px;
   background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border-std);
+  border: 2px solid var(--border-std);
   border-radius: 16px;
   padding: 20px;
   text-align: center;
@@ -69,7 +69,7 @@ label {
 input, select {
   width: 100%;
   background: transparent;
-  border: 1px solid var(--border-std);
+  border: 2px solid var(--border-std);
   border-radius: 8px;
   padding: 6px;
   color: var(--text);
@@ -89,7 +89,7 @@ input, select {
   width: 100%;
   padding: 12px;
   border-radius: 12px;
-  border: 2px solid var(--accent);
+  border: 3px solid var(--accent);
   background: transparent;
   color: var(--accent);
   font-weight: 700;
@@ -111,7 +111,7 @@ input, select {
 
 .key {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-std);
+  border: 2px solid var(--border-std);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -124,13 +124,14 @@ input, select {
   background: rgba(80, 216, 144, 0.12);
 }
 .key.pressed {
-  background: rgba(80, 216, 144, 0.12);
-}
+ background: rgba(80, 216, 144, 0.22);
+ box-shadow: 0 0 0 2px rgba(80, 216, 144, 0.18) inset;
+ }
 
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn  { border-color: var(--accent); color: var(--accent); }
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
-.enter     { border: 2.5px solid var(--accent); color: var(--accent); }
+.enter     { border: 3.5px solid var(--accent); color: var(--accent); }
 .dart      { font-size: 2.5rem !important; }
 
 .score-view {
@@ -240,6 +241,7 @@ input, select {
     grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr 1fr;
     /* v1.25 iphone portrait fit */
   gap: 6px;
+ padding: 1px;
  }
   .score-view { grid-area: 1 / 1 / 2 / 4; }
 
@@ -284,6 +286,7 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
+ .keypad { gap: 8px; }
   .score-left { position: relative; padding-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
@@ -339,7 +342,7 @@ input, select {
   </label>
 </div>
 <button class="start-btn" id="startMatch" style="margin-top:4px; background: var(--accent); color:#0d0d0d; border-color: var(--accent);">START MATCH</button>
-    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:12px; border-style:solid; border-width:1px; opacity:0.9;">Add User Preferred Out</button>
+    <button type="button" class="start-btn" id="openUserOuts" style="margin-top:12px; border-style:solid; border-width:2px; opacity:0.9;">Add User Preferred Out</button>
   </div>
 </div>
 
@@ -348,7 +351,7 @@ input, select {
     <h1 style="font-size:1.2rem; margin-bottom:10px;">User Preferred Outs</h1>
     <div style="font-size:0.75rem; opacity:0.7; margin-bottom:12px;">Add up to 3 preferred checkout routes. Saved on this device.</div>
     <div id="userOutsList" style="display:flex; flex-direction:column; gap:10px;"></div>
-    <div style="border-top:1px solid var(--border-std); margin:12px 0;"></div>
+    <div style="border-top:2px solid var(--border-std); margin:12px 0;"></div>
     <div style="display:flex; gap:10px;">
       <button type="button" id="userOutsSave" class="start-btn" style="flex:1; padding:10px;">SAVE</button>
       <button type="button" id="userOutsClose" class="start-btn" style="flex:1; padding:10px; border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.85);">CLOSE</button>
@@ -392,8 +395,29 @@ input, select {
 </div>
 
 <script>
-// v1.43 integrated build
+// v1.44 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+// v1.44: key click sound (no files)
+let __audioCtx = null;
+function playKeyClick(){
+ try{
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return;
+  if(!__audioCtx) __audioCtx = new AC();
+  if(__audioCtx.state === 'suspended') __audioCtx.resume().catch(()=>{});
+  const o = __audioCtx.createOscillator();
+  const g = __audioCtx.createGain();
+  o.type = 'square';
+  o.frequency.value = 850;
+  const t = __audioCtx.currentTime;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.05, t + 0.003);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.018);
+  o.connect(g); g.connect(__audioCtx.destination);
+  o.start(t); o.stop(t + 0.02);
+ }catch{}
+}
+
 // v1.23: hard lock screen drag/pan
 document.addEventListener('touchmove', (e) => {
   // allow vertical scrolling inside in-app cards (start screen / user-outs)
@@ -1397,7 +1421,8 @@ startBtn.addEventListener('click', () => {
   refreshUI();
 });
 
-btnHelp.addEventListener('click', async () => {
+btnHelp.addEventListener('pointerdown', async (e) => {
+ if(e) e.preventDefault();
  const wasOn = btnHelp.classList.contains('active');
   const idx = activeIndex();
   game.prefs[idx].help = !game.prefs[idx].help;
@@ -1410,7 +1435,8 @@ btnHelp.addEventListener('click', async () => {
   renderRightPanel();
 });
 
-btnDart.addEventListener('click', async () => {
+btnDart.addEventListener('pointerdown', async (e) => {
+ if(e) e.preventDefault();
  if(!isStarted()) return;
  if(!isPlayable()) return;
  const wasOn = btnDart.classList.contains('active');
@@ -1432,7 +1458,8 @@ btnDart.addEventListener('click', async () => {
 
 // keypad
 for(const k of document.querySelectorAll('.num')){
-  k.addEventListener('click', () => {
+  k.addEventListener('pointerdown', (e) => {
+ if(e) e.preventDefault();
     if(!isPlayable()) return;
     const d = k.textContent;
    if(currentInput === '0'){
@@ -1444,7 +1471,8 @@ for(const k of document.querySelectorAll('.num')){
 });
 }
 
-document.querySelector('.del').addEventListener('click', () => {
+document.querySelector('.del').addEventListener('pointerdown', (e) => {
+ if(e) e.preventDefault();
   if(!isPlayable()) return;
   currentInput = currentInput.slice(0,-1);
   updateTypingDisplay();
@@ -1452,7 +1480,8 @@ document.querySelector('.del').addEventListener('click', () => {
 
 // ENTER
 
-document.querySelector('.enter').addEventListener('click', async () => {
+document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
+ if(e) e.preventDefault();
   if(!isPlayable()) return;
   if(!currentInput) return;
 
@@ -1560,7 +1589,8 @@ document.querySelector('.enter').addEventListener('click', async () => {
 
 // BUST
 
-document.querySelector('.bust').addEventListener('click', async () => {
+document.querySelector('.bust').addEventListener('pointerdown', async (e) => {
+ if(e) e.preventDefault();
   if(!isPlayable()) return;
   pushUndo(inDartMode()?'dart':'turn');
   await bustAndAdvance();
@@ -1568,7 +1598,8 @@ document.querySelector('.bust').addEventListener('click', async () => {
 
 // UNDO
 
-document.querySelector('.undo').addEventListener('click', async () => {
+document.querySelector('.undo').addEventListener('pointerdown', async (e) => {
+ if(e) e.preventDefault();
   if(!isStarted()) return;
   if(holdActive || modalActive) return;
 
@@ -1594,13 +1625,14 @@ document.querySelector('.undo').addEventListener('click', async () => {
 
 // Press flash
 for(const btn of document.querySelectorAll('.keypad .key:not(.score-view)')){
-  btn.addEventListener('click', () => {
-    if(!isPlayable()) return;
-    btn.classList.add('pressed');
-    setTimeout(()=>btn.classList.remove('pressed'),120);
-  });
+ btn.addEventListener('pointerdown', (e) => {
+  if(e) e.preventDefault();
+  if(!isPlayable()) return;
+  playKeyClick();
+  btn.classList.add('pressed');
+  setTimeout(()=>btn.classList.remove('pressed'),120);
+ });
 }
-
 // User outs overlay
 const userOutsOverlay = document.getElementById('userOutsOverlay');
 const userOutsList = document.getElementById('userOutsList');
@@ -1611,7 +1643,7 @@ document.getElementById('userOutsSave').addEventListener('click', () => { saveUs
 
 function buildUserOutRow(slot, existing){
   const row=document.createElement('div');
-  row.style.border='1px solid var(--border-std)';
+  row.style.border='2px solid var(--border-std)';
   row.style.borderRadius='12px';
   row.style.padding='10px';
   row.style.background='rgba(255,255,255,0.03)';
