@@ -286,14 +286,14 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
- .keypad { gap: 6px; column-gap: 6px; }
+ .keypad { gap: 6px;  gap: 6px; column-gap: 5px; }
   .score-left { position: relative; padding-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
 }
 
 /* v1.46: tiered keypad text emphasis */
-.key.num { font-weight: 900; }
+.key.num { font-weight: 900; font-size: 1.05em; }
 .enter, .dart { font-weight: 800; }
 </style>
 </head>
@@ -1490,6 +1490,7 @@ document.querySelector('.del').addEventListener('pointerdown', (e) => {
 document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
  if(e) e.preventDefault();
   if(!isPlayable()) return;
+ playKeyClick();
   if(!currentInput) return;
 
   const val = Number(currentInput);
@@ -1599,6 +1600,7 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
 document.querySelector('.bust').addEventListener('pointerdown', async (e) => {
  if(e) e.preventDefault();
   if(!isPlayable()) return;
+ playKeyClick();
   pushUndo(inDartMode()?'dart':'turn');
   await bustAndAdvance();
 });
