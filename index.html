@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.45</title>
+  <title>Darts Master v1.46</title>
 
 <style>
 :root {
@@ -286,11 +286,15 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
- .keypad { gap: 6px; }
+ .keypad { gap: 6px; column-gap: 6px; }
   .score-left { position: relative; padding-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
 }
+
+/* v1.46: tiered keypad text emphasis */
+.key.num { font-weight: 900; }
+.enter, .dart { font-weight: 800; }
 </style>
 </head>
 <body>
@@ -319,9 +323,9 @@ input, select {
         <select id="startScore">
           <option>101</option>
           <option>201</option>
-          <option>301</option>
+          <option selected>301</option>
           <option>401</option>
-          <option selected>501</option>
+          <option>501</option>
           <option>601</option>
         </select>
       </div>
@@ -395,7 +399,7 @@ input, select {
 </div>
 
 <script>
-// v1.45 integrated build
+// v1.46 integrated build
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -905,7 +909,8 @@ function showTakeover(text, color){
   if(!takeoverEl) return;
   takeoverEl.textContent = text;
   takeoverEl.style.color = color || 'var(--accent)';
-  takeoverEl.style.display = 'flex';
+  takeoverEl.style.whiteSpace = 'nowrap';
+ takeoverEl.style.display = 'flex';
   takeoverEl.style.fontSize = '96px';
   fitTakeoverFont();
   const wrap = document.querySelector('.score-view');
@@ -1161,7 +1166,7 @@ async function holdThenAdvance({ takeoverText=null, takeoverColor=null, nextFn=n
 }
 
 async function showUndoTakeover(){
-  showTakeover('UNDO', 'rgba(255,255,255,0.85)');
+  showTakeover(`${game.players[activeIndex()].name}'s SCORE UNDONE!`, 'rgba(255,255,255,0.85)');
   await sleep(1000);
   hideTakeover();
   refreshUI();
@@ -1215,7 +1220,7 @@ async function bustAndAdvance(){
     game.players[idx].score = turnStartScore;
   }
 
-  await advanceToNextPlayerHold({text:'BUST', color:'#ff9a3c'});
+  await advanceToNextPlayerHold({text:`${game.players[activeIndex()].name} BUSTED!`, color:'#ff9a3c'});
 }
 
 function resetScoresForNewLeg(){
@@ -1439,6 +1444,8 @@ btnDart.addEventListener('pointerdown', async (e) => {
  if(e) e.preventDefault();
  if(!isStarted()) return;
  if(!isPlayable()) return;
+ playKeyClick();
+ playKeyClick();
  const wasOn = btnDart.classList.contains('active');
   if(!isStarted()) return;
   if(!isPlayable()) return;
