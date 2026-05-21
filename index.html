@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.53</title>
+  <title>Darts Master v1.54</title>
 
 <style>
 :root {
@@ -298,11 +298,11 @@ input, select {
 .key.num { font-weight: 900; }
 .enter, .dart { font-weight: 800; }
 
-/* v1.53: outline tuning */
+/* v1.54: outline tuning */
 .key.num { border-color: #9CA3AF; }
 .key.score-view { border-color: #B9A7FF; }
 .key.dart { border-color: #8FB7FF; color: #8FB7FF; }
-.key.undo { border-color: var(--border-std); color: var(--text); }
+.key.undo { border-color: #A9C7D6; color: #A9C7D6; }
 </style>
 </head>
 <body>
@@ -407,7 +407,7 @@ input, select {
 </div>
 
 <script>
-// v1.53 integrated build (active-player colors + outline tuning + active-row emphasis)
+// v1.54 integrated build (global undo + modal wrapper + visual tuning)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -939,6 +939,14 @@ function hideTakeover(){
   Array.from(wrap.children).forEach(ch => { if(ch !== takeoverEl) ch.style.visibility = ''; });
 }
 function isStarted(){ return !!game; }
+async function withModal(factory){
+  modalActive = true;
+  try {
+    return await factory();
+  } finally {
+    modalActive = false;
+  }
+}
 function isPlayable(){ return !!game && !game.frozen && !holdActive && !modalActive; }
 function inDartMode(){ return app.classList.contains('dart-mode'); }
 function statsEnabled(){ return !!(game && game.statsEnabled); }
@@ -1004,14 +1012,13 @@ function fitPlayerFont(){
     if(fits(mid)) lo=mid; else hi=mid-1; 
   }
   items.forEach(el => (el.style.fontSize = lo+'px'));// ACTIVE_ROW_EMPHASIS
-  // Strong emphasis for active player in left list (inline override)
   const activeEl = Array.from(items).find(el => el.classList && el.classList.contains('active'));
   if(activeEl){
     const base = lo;
     const maxW2 = maxWidth;
     let target = Math.round(base * 1.25);
     const tryFit = (px) => { activeEl.style.fontSize = px + 'px'; return activeEl.scrollWidth <= maxW2; };
-    if(!tryFit(target)) {
+    if(!tryFit(target)){
       for(let px = target - 1; px >= base; px--){ if(tryFit(px)) break; }
     }
   };
@@ -1048,7 +1055,6 @@ function renderRightPanel(){
   let hd;
   try { hd = HelpEngine.getHelpDisplay(score, dartsLeft); } catch { hd = {header:'',lines:[]}; }
 
-  // Safe render: DOM nodes + textContent (no innerHTML)
   scoreRight.textContent = '';
 
   if(hd.header){
@@ -1172,12 +1178,7 @@ function pushUndo(kind){
 
 function popUndoForMode(){
   if(!undoStack.length) return null;
-  const want = inDartMode() ? 'dart' : 'turn';
-  while(undoStack.length){
-    const item = undoStack.pop();
-    if(item.kind===want) return item;
-  }
-  return null;
+  return undoStack.pop();
 }
 
 function restoreUndoSnap(snap){
@@ -1255,9 +1256,7 @@ async function bustAndAdvance(){
   if(turnStartScore===null) turnStartScore = game.players[idx].score;
 
   if(statsEnabled()){
-    modalActive = true;
-    const dartsToRecord = await Modal.pick123('Darts to Bust?','');
-    modalActive = false;
+    const dartsToRecord = await withModal(() => Modal.pick123('Darts to Bust?',''));
     game.players[idx].score = turnStartScore;
     recordVisitStats(idx, 0, dartsToRecord);
   } else {
@@ -1313,9 +1312,7 @@ function resetMatchSame(){
 }
 
 async function handleMatchOverAsync(){
-  modalActive=true;
-  const choice = await Modal.matchOver();
-  modalActive=false;
+  const choice = await withModal(() => Modal.matchOver());
 
   if(choice==='new'){
   clearSavedGame();
@@ -1336,9 +1333,7 @@ async function handleMatchOverAsync(){
 }
 
 async function nextLegModalThen(fn){
-  modalActive=true;
-  await Modal.ok('NEXT LEG','');
-  modalActive=false;
+  await withModal(() => Modal.ok('NEXT LEG',''));
   fn();
 }
 
@@ -1374,51 +1369,35 @@ renderNames();
 function validateAndNormalizeGame(g){
   try{
     if(!g || !Array.isArray(g.players) || g.players.length < 1 || g.players.length > 6) return false;
-
     const toInt = (v, d) => Number.isFinite(Number(v)) ? Math.trunc(Number(v)) : d;
-    g.startScore = toInt(g.startScore, 501);
-    if(g.startScore < 2) g.startScore = 501;
+    g.startScore = toInt(g.startScore, 501); if(g.startScore < 2) g.startScore = 501;
     g.legsToWin = toInt(g.legsToWin, 3); if(g.legsToWin < 1) g.legsToWin = 3;
     g.setsToWin = toInt(g.setsToWin, 1); if(g.setsToWin < 1) g.setsToWin = 1;
-
     const n = g.players.length;
-    g.activeIndex = toInt(g.activeIndex, 0);
-    if(g.activeIndex < 0 || g.activeIndex >= n) g.activeIndex = 0;
-    g.legStarterIndex = toInt(g.legStarterIndex, 0);
-    if(g.legStarterIndex < 0 || g.legStarterIndex >= n) g.legStarterIndex = 0;
-    g.setStarterIndex = toInt(g.setStarterIndex, 0);
-    if(g.setStarterIndex < 0 || g.setStarterIndex >= n) g.setStarterIndex = 0;
-
+    g.activeIndex = toInt(g.activeIndex, 0); if(g.activeIndex < 0 || g.activeIndex >= n) g.activeIndex = 0;
+    g.legStarterIndex = toInt(g.legStarterIndex, 0); if(g.legStarterIndex < 0 || g.legStarterIndex >= n) g.legStarterIndex = 0;
+    g.setStarterIndex = toInt(g.setStarterIndex, 0); if(g.setStarterIndex < 0 || g.setStarterIndex >= n) g.setStarterIndex = 0;
     g.statsEnabled = !!g.statsEnabled;
     g.frozen = !!g.frozen;
     g.mode = (g.mode === 'practice' || g.mode === 'match') ? g.mode : (n === 1 ? 'practice' : 'match');
-
     for(let i=0;i<n;i++){
       const p = g.players[i] || (g.players[i] = {});
       p.name = (p.name === undefined || p.name === null) ? `P${i+1}` : String(p.name);
-      p.score = toInt(p.score, g.startScore);
-      p.legs  = toInt(p.legs, 0);
-      p.sets  = toInt(p.sets, 0);
-      if(p.score < 0) p.score = g.startScore;
-      if(p.legs < 0) p.legs = 0;
-      if(p.sets < 0) p.sets = 0;
-
+      p.score = toInt(p.score, g.startScore); if(p.score < 0) p.score = g.startScore;
+      p.legs = toInt(p.legs, 0); if(p.legs < 0) p.legs = 0;
+      p.sets = toInt(p.sets, 0); if(p.sets < 0) p.sets = 0;
       if(!p.stats || typeof p.stats !== 'object') p.stats = {points:0,darts:0};
       p.stats.points = toInt(p.stats.points, 0); if(p.stats.points < 0) p.stats.points = 0;
-      p.stats.darts  = toInt(p.stats.darts, 0);  if(p.stats.darts  < 0) p.stats.darts  = 0;
+      p.stats.darts = toInt(p.stats.darts, 0); if(p.stats.darts < 0) p.stats.darts = 0;
     }
-
     if(!Array.isArray(g.prefs) || g.prefs.length !== n){
       g.prefs = initPlayerPrefs(n);
     } else {
       for(let i=0;i<n;i++){
         const pr = g.prefs[i] || (g.prefs[i] = {});
-        pr.help = !!pr.help;
-        pr.dart = !!pr.dart;
-        pr.lock = !!pr.lock;
+        pr.help = !!pr.help; pr.dart = !!pr.dart; pr.lock = !!pr.lock;
       }
     }
-
     return true;
   }catch{ return false; }
 }
@@ -1426,9 +1405,7 @@ function validateAndNormalizeGame(g){
 async function maybeResumeSavedGame(){
   const saved = loadSavedGame();
   if(!saved) return;
-  modalActive = true;
-  const choice = await Modal.resumeOrNew();
-  modalActive = false;
+  const choice = await withModal(() => Modal.resumeOrNew());
   if(choice !== 'resume'){ clearSavedGame(); return; }
 
   game = saved.game;
@@ -1613,9 +1590,7 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
         return;
       }
 
-      modalActive=true;
-      const ok = await Modal.yesNo((val===50?'BULLSEYE?':'Doubled Out?'),'');
-      modalActive=false;
+      const ok = await withModal(() => Modal.yesNo((val===50?'BULLSEYE?':'Doubled Out?'),''));
       if(!ok){
         await bustAndAdvance();
         return;
@@ -1665,9 +1640,7 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
     }
 
     if(statsEnabled()){
-    modalActive=true;
-    const dartsUsed = await Modal.pick123('Darts to Checkout?','');
-    modalActive=false;
+    const dartsUsed = await withModal(() => Modal.pick123('Darts to Checkout?',''));
     recordVisitStats(idx, val, dartsUsed);
   }
     p.score = 0;
@@ -1713,9 +1686,7 @@ document.querySelector('.undo').addEventListener('pointerdown', async (e) => {
  }
 
   if(undoWouldRevertLegOrSet(item.snap.game)){
-    modalActive=true;
-    const ok = await Modal.yesNo('Undo leg?','');
-    modalActive=false;
+    const ok = await withModal(() => Modal.yesNo('Undo leg?',''));
     if(!ok){ undoStack.push(item); return; }
   }
 
