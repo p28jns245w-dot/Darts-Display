@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.52</title>
+  <title>Darts Master v1.53</title>
 
 <style>
 :root {
@@ -280,7 +280,8 @@ input, select {
 }
 
 @media (min-width: 768px) {
-  .key   { font-size: 1.9rem; }
+  .key   { font-size: 1.9rem;
+  border-width: 3.5px; }
   .enter { font-size: 2.1rem; }
   .dart  { font-size: 3.6rem !important; }
 }
@@ -297,11 +298,11 @@ input, select {
 .key.num { font-weight: 900; }
 .enter, .dart { font-weight: 800; }
 
-/* v1.52: outline colors for non-special keys */
-.key.num { border-color: #A7B6CC; }
+/* v1.53: outline tuning */
+.key.num { border-color: #9CA3AF; }
 .key.score-view { border-color: #B9A7FF; }
 .key.dart { border-color: #8FB7FF; color: #8FB7FF; }
-.key.undo { border-color: #A9C7D6; color: #A9C7D6; }
+.key.undo { border-color: var(--border-std); color: var(--text); }
 </style>
 </head>
 <body>
@@ -406,7 +407,7 @@ input, select {
 </div>
 
 <script>
-// v1.52 integrated build (player colors + outlines + prior stability fixes)
+// v1.53 integrated build (active-player colors + outline tuning + active-row emphasis)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -1002,7 +1003,18 @@ function fitPlayerFont(){
     const mid = Math.floor((lo + hi + 1) / 2); 
     if(fits(mid)) lo=mid; else hi=mid-1; 
   }
-  items.forEach(el => (el.style.fontSize = lo+'px'));
+  items.forEach(el => (el.style.fontSize = lo+'px'));// ACTIVE_ROW_EMPHASIS
+  // Strong emphasis for active player in left list (inline override)
+  const activeEl = Array.from(items).find(el => el.classList && el.classList.contains('active'));
+  if(activeEl){
+    const base = lo;
+    const maxW2 = maxWidth;
+    let target = Math.round(base * 1.25);
+    const tryFit = (px) => { activeEl.style.fontSize = px + 'px'; return activeEl.scrollWidth <= maxW2; };
+    if(!tryFit(target)) {
+      for(let px = target - 1; px >= base; px--){ if(tryFit(px)) break; }
+    }
+  };
 }
 
 
@@ -1067,6 +1079,7 @@ function renderRightPanel(){
     }
   }
 }
+
 function computeAvg(p){
   const darts = p.stats?.darts || 0;
   const pts = p.stats?.points || 0;
@@ -1409,6 +1422,7 @@ function validateAndNormalizeGame(g){
     return true;
   }catch{ return false; }
 }
+
 async function maybeResumeSavedGame(){
   const saved = loadSavedGame();
   if(!saved) return;
