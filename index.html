@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.47</title>
+  <title>Darts Master v1.48</title>
 
 <style>
 :root {
@@ -399,7 +399,7 @@ input, select {
 </div>
 
 <script>
-// v1.47 integrated build (HELP sound + overlay text fixes)
+// v1.48 integrated build (surgical fixes: safe help panel render, save/resume integrity, UX)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -429,6 +429,19 @@ document.addEventListener('touchmove', (e) => {
   e.preventDefault();
 }, { passive: false });
 document.addEventListener('gesturestart', (e) => { e.preventDefault(); }, { passive: false });
+
+// v1.48: prevent iOS double-tap zoom on keypad
+let __lastTapTS = 0;
+document.addEventListener('touchend', (e) => {
+  const t = e.target;
+  if(t && t.closest && t.closest('.keypad')){
+    const now = Date.now();
+    if(now - __lastTapTS < 320){
+      e.preventDefault();
+    }
+    __lastTapTS = now;
+  }
+}, { passive: false });
 
 /* ===== Modal (in-app cards) ===== */
 const Modal = (() => {
@@ -783,7 +796,7 @@ let visitDartsUsed = 0;
 let undoStack = [];
 let holdActive = false;
 let modalActive = false;
-const GAME_STATE_KEY = 'darts_master_state_v1_25';
+const GAME_STATE_KEY = 'darts_master_state_v1_48';
 let saveTimer = null;
 function clearSavedGame(){ try{ localStorage.removeItem(GAME_STATE_KEY); }catch{} }
 function scheduleSaveGame(){
@@ -792,7 +805,7 @@ function scheduleSaveGame(){
   saveTimer = setTimeout(() => {
     saveTimer = null;
     try{
-      const payload = { game, currentInput, turnStartScore, visitPoints, visitDartsUsed, dartMode: inDartMode() };
+      const payload = { game, currentInput, turnStartScore, visitPoints, visitDartsUsed };
       localStorage.setItem(GAME_STATE_KEY, JSON.stringify(payload));
     }catch{}
   }, 80);
@@ -832,15 +845,6 @@ function ensureLeftDots(){
   return el;
 }
 
-const topDartsLeftEl = (() => {
-  try {
-    const el = document.createElement('div');
-    el.className = 'top-darts top-darts-left';
-    // attach into left panel (absolute-positioned via CSS on iPhone landscape)
-    scoreLeft.insertBefore(el, scoreLeft.firstChild);
-    return el;
-  } catch { return null; }
-})();
 const activeNameEl = document.querySelector('.active-name');
 const legsValueEl = document.querySelector('.score-meta .legs .value');
 const avgValueEl  = document.querySelector('.score-meta .avg .value');
@@ -1005,15 +1009,6 @@ function fitActiveNameFont(){
   }
   activeNameEl.style.fontSize = lo + 'px';
 }
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, (c) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
-}
 function renderRightPanel(){
   if(!isStarted()){ scoreRight.textContent='SET UP'; return; }
 
@@ -1029,13 +1024,36 @@ function renderRightPanel(){
   let hd;
   try { hd = HelpEngine.getHelpDisplay(score, dartsLeft); } catch { hd = {header:'',lines:[]}; }
 
-  const header = hd.header ? `<div style="font-size:0.8em; opacity:0.85; letter-spacing:0.5px;">${escapeHtml(hd.header)}</div>` : '';
-  const spacer = `<div style="height:10px;"></div>`;
-  const gap = `<div style="height:10px;"></div>`;
-  const lines = (hd.lines||[]).slice(0,3);
-  const opts = lines.map((l,i)=>`<div style="font-size:0.92em; opacity:0.9; line-height:1.08;">${escapeHtml(l)}</div>`+(i<lines.length-1?gap:'' )).join('');
+  // Safe render: DOM nodes + textContent (no innerHTML)
+  scoreRight.textContent = '';
 
-  scoreRight.innerHTML = header + spacer + opts;
+  if(hd.header){
+    const h = document.createElement('div');
+    h.style.fontSize = '0.8em';
+    h.style.opacity = '0.85';
+    h.style.letterSpacing = '0.5px';
+    h.textContent = String(hd.header);
+    scoreRight.appendChild(h);
+  }
+
+  const spacer = document.createElement('div');
+  spacer.style.height = '10px';
+  scoreRight.appendChild(spacer);
+
+  const lines = (hd.lines || []).slice(0,3);
+  for(let i=0;i<lines.length;i++){
+    const d = document.createElement('div');
+    d.style.fontSize = '0.92em';
+    d.style.opacity = '0.9';
+    d.style.lineHeight = '1.08';
+    d.textContent = String(lines[i]);
+    scoreRight.appendChild(d);
+    if(i < lines.length-1){
+      const gap = document.createElement('div');
+      gap.style.height = '10px';
+      scoreRight.appendChild(gap);
+    }
+  }
 }
 
 function computeAvg(p){
@@ -1123,7 +1141,7 @@ function pushUndo(kind){
     visitDartsUsed
   };
   undoStack.push({kind,snap});
-  if(undoStack.length>250) undoStack.shift();
+  if(undoStack.length>60) undoStack.shift();
 }
 
 function popUndoForMode(){
@@ -1326,6 +1344,59 @@ function renderNames(){
 playerCount.addEventListener('change', renderNames);
 renderNames();
 
+
+function validateAndNormalizeGame(g){
+  try{
+    if(!g || !Array.isArray(g.players) || g.players.length < 1 || g.players.length > 6) return false;
+
+    const toInt = (v, d) => Number.isFinite(Number(v)) ? Math.trunc(Number(v)) : d;
+    g.startScore = toInt(g.startScore, 501);
+    if(g.startScore < 2) g.startScore = 501;
+    g.legsToWin = toInt(g.legsToWin, 3); if(g.legsToWin < 1) g.legsToWin = 3;
+    g.setsToWin = toInt(g.setsToWin, 1); if(g.setsToWin < 1) g.setsToWin = 1;
+
+    const n = g.players.length;
+    g.activeIndex = toInt(g.activeIndex, 0);
+    if(g.activeIndex < 0 || g.activeIndex >= n) g.activeIndex = 0;
+    g.legStarterIndex = toInt(g.legStarterIndex, 0);
+    if(g.legStarterIndex < 0 || g.legStarterIndex >= n) g.legStarterIndex = 0;
+    g.setStarterIndex = toInt(g.setStarterIndex, 0);
+    if(g.setStarterIndex < 0 || g.setStarterIndex >= n) g.setStarterIndex = 0;
+
+    g.statsEnabled = !!g.statsEnabled;
+    g.frozen = !!g.frozen;
+    g.mode = (g.mode === 'practice' || g.mode === 'match') ? g.mode : (n === 1 ? 'practice' : 'match');
+
+    for(let i=0;i<n;i++){
+      const p = g.players[i] || (g.players[i] = {});
+      p.name = (p.name === undefined || p.name === null) ? `P${i+1}` : String(p.name);
+      p.score = toInt(p.score, g.startScore);
+      p.legs  = toInt(p.legs, 0);
+      p.sets  = toInt(p.sets, 0);
+      if(p.score < 0) p.score = g.startScore;
+      if(p.legs < 0) p.legs = 0;
+      if(p.sets < 0) p.sets = 0;
+
+      if(!p.stats || typeof p.stats !== 'object') p.stats = {points:0,darts:0};
+      p.stats.points = toInt(p.stats.points, 0); if(p.stats.points < 0) p.stats.points = 0;
+      p.stats.darts  = toInt(p.stats.darts, 0);  if(p.stats.darts  < 0) p.stats.darts  = 0;
+    }
+
+    if(!Array.isArray(g.prefs) || g.prefs.length !== n){
+      g.prefs = initPlayerPrefs(n);
+    } else {
+      for(let i=0;i<n;i++){
+        const pr = g.prefs[i] || (g.prefs[i] = {});
+        pr.help = !!pr.help;
+        pr.dart = !!pr.dart;
+        pr.lock = !!pr.lock;
+      }
+    }
+
+    return true;
+  }catch{ return false; }
+}
+
 async function maybeResumeSavedGame(){
   const saved = loadSavedGame();
   if(!saved) return;
@@ -1335,7 +1406,9 @@ async function maybeResumeSavedGame(){
   if(choice !== 'resume'){ clearSavedGame(); return; }
 
   game = saved.game;
-  currentInput = saved.currentInput || '';
+  
+  if(!validateAndNormalizeGame(game)){ clearSavedGame(); game = null; return; }
+currentInput = saved.currentInput || '';
   turnStartScore = (saved.turnStartScore === undefined) ? null : saved.turnStartScore;
   visitPoints = saved.visitPoints || 0;
   visitDartsUsed = saved.visitDartsUsed || 0;
@@ -1353,11 +1426,7 @@ async function maybeResumeSavedGame(){
   if(!Array.isArray(game.prefs) || game.prefs.length !== game.players.length){
     resetPrefsForNewLeg();
   }
-
-  app.classList.toggle('dart-mode', !!saved.dartMode);
-  btnDart.classList.toggle('active', !!saved.dartMode);
-
-  startScreen.style.display='none';
+startScreen.style.display='none';
   applyStatsModeFromGame();
   applyPrefsForPlayer(activeIndex());
   refreshUI();
@@ -1428,6 +1497,7 @@ startBtn.addEventListener('click', () => {
 
 btnHelp.addEventListener('pointerdown', async (e) => {
  if(e) e.preventDefault();
+  playKeyClick();
  const wasOn = btnHelp.classList.contains('active');
   const idx = activeIndex();
   game.prefs[idx].help = !game.prefs[idx].help;
