@@ -5,14 +5,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.49</title>
+  <title>Darts Master v1.50</title>
 
 <style>
 :root {
+  --enter-blue: #3B82F6;
   --bg: #0d0d0d;
   --text: #ffffff;
   --accent: #50d890;
-  --border-std: rgba(255, 255, 255, 0.15);
+  --border-std: rgba(255, 255, 255, 0.28);
   --border-red: rgba(255, 75, 92, 0.4);
   --border-amber: rgba(255, 154, 60, 0.4);
 }
@@ -131,7 +132,7 @@ input, select {
 .del, .undo { border-color: var(--border-red); color: #ff4b5c; }
 .help-btn  { border-color: var(--accent); color: var(--accent); }
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
-.enter     { border: 3.5px solid var(--accent); color: var(--accent); }
+.enter { border: 3.5px solid var(--enter-blue); color: var(--enter-blue); }
 .dart      { font-size: 2.5rem !important; }
 
 .score-view {
@@ -293,7 +294,7 @@ input, select {
 }
 
 /* v1.46: tiered keypad text emphasis */
-.key.num { font-weight: 900; font-size: 1.05em; }
+.key.num { font-weight: 900; }
 .enter, .dart { font-weight: 800; }
 </style>
 </head>
@@ -399,7 +400,7 @@ input, select {
 </div>
 
 <script>
-// v1.49 integrated build (audio unified + v1.48 fixes)
+// v1.50 integrated build (v1.48 stability + v1.49 audio + iPad visual tweaks)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -1015,16 +1016,13 @@ function fitActiveNameFont(){
 }
 function renderRightPanel(){
   if(!isStarted()){ scoreRight.textContent='SET UP'; return; }
-
   scoreRight.style.display='block';
   scoreRight.style.textAlign='center';
   scoreRight.style.whiteSpace='normal';
-
   if(!btnHelp.classList.contains('active')){ scoreRight.textContent = ''; return; }
 
   const score = game.players[activeIndex()].score;
   const dartsLeft = inDartMode() ? Math.max(0, 3 - visitDartsUsed) : 3;
-
   let hd;
   try { hd = HelpEngine.getHelpDisplay(score, dartsLeft); } catch { hd = {header:'',lines:[]}; }
 
@@ -1059,7 +1057,6 @@ function renderRightPanel(){
     }
   }
 }
-
 function computeAvg(p){
   const darts = p.stats?.darts || 0;
   const pts = p.stats?.points || 0;
@@ -1400,7 +1397,6 @@ function validateAndNormalizeGame(g){
     return true;
   }catch{ return false; }
 }
-
 async function maybeResumeSavedGame(){
   const saved = loadSavedGame();
   if(!saved) return;
