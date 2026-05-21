@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.51</title>
+  <title>Darts Master v1.52</title>
 
 <style>
 :root {
@@ -296,6 +296,12 @@ input, select {
 /* v1.46: tiered keypad text emphasis */
 .key.num { font-weight: 900; }
 .enter, .dart { font-weight: 800; }
+
+/* v1.52: outline colors for non-special keys */
+.key.num { border-color: #A7B6CC; }
+.key.score-view { border-color: #B9A7FF; }
+.key.dart { border-color: #8FB7FF; color: #8FB7FF; }
+.key.undo { border-color: #A9C7D6; color: #A9C7D6; }
 </style>
 </head>
 <body>
@@ -400,7 +406,7 @@ input, select {
 </div>
 
 <script>
-// v1.51 integrated build (active-player colors in score display)
+// v1.52 integrated build (player colors + outlines + prior stability fixes)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -1091,7 +1097,7 @@ function refreshUI(){
   const idx = Number(el.dataset.idx);
   const p = game.players[idx];
     el.classList.toggle('active', idx === activeIndex());
-  el.style.color = (idx === activeIndex()) ? playerColor(idx) : '';
+  el.style.color = playerColor(idx);
     el.textContent = String(p.score);
   });
 
