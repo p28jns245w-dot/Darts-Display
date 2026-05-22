@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.55</title>
+  <title>Darts Master v1.56</title>
 
 <style>
 :root {
@@ -287,8 +287,15 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
-  .keypad { grid-template-rows: 1.95fr 1fr 1fr 1fr; gap: 6px; gap: 6px; column-gap: 5px; }
+  .keypad { gap: 4px; column-gap: 4px; }
+  .score-view { padding: 2px; }
+  .key { font-size: 1.58rem; }
+  .enter { font-size: 1.82rem; }
+  .dart { font-size: 2.95rem !important; }
   .score-left { position: relative; padding-top: 0; }
+  .score-main { font-size: clamp(2.2rem, 5.8vw, 3.0rem); }
+  .active-name { margin-bottom: 4px; }
+  .score-meta { margin-top: 2px; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
 }
@@ -297,26 +304,28 @@ input, select {
 .key.num { font-weight: 900; }
 .enter, .dart { font-weight: 800; }
 
-/* v1.55: leg results + outline tuning */
+/* v1.56: outlines + active-row emphasis + results screens */
 .key.num { border-color: #9CA3AF; color: rgba(245,247,250,0.82); }
 .key.score-view { border-color: #B9A7FF; }
 .key.dart { border-color: #8FB7FF; color: #8FB7FF; }
 .key.undo { border-color: #A9C7D6; color: #A9C7D6; }
 .score-left .player.active { transform: scale(1.18); transform-origin: center; }
-#legResultsOverlay { display:none; z-index: 2100; }
-.leg-results-card { max-width: 560px; }
-.leg-results-title { font-size: 1.2rem; margin: 0 0 10px; color: var(--text); }
-.leg-results-sub { font-size: 0.78rem; opacity: 0.72; margin-bottom: 12px; }
-.leg-results-table { display:flex; flex-direction:column; gap:6px; }
-.leg-results-row, .leg-results-head { display:grid; gap:10px; align-items:center; }
-.leg-results-head { font-size: 0.72rem; opacity: 0.68; letter-spacing: 0.4px; margin-bottom: 2px; }
-.leg-results-row { border:2px solid var(--border-std); border-radius:10px; padding:8px 10px; background: rgba(255,255,255,0.03); }
-.leg-results-row.winner { border-color: rgba(255,255,255,0.34); background: rgba(255,255,255,0.05); }
-.leg-col-name { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(0.74rem, 2.6vw, 0.98rem); }
-.leg-col-avg, .leg-col-legs { text-align:center; font-weight:700; white-space: nowrap; }
+.results-overlay { display:none; z-index: 2100; }
+.results-card { max-width: 560px; }
+.results-title { font-size: 1.2rem; margin: 0 0 10px; color: var(--text); }
+.results-sub { font-size: 0.78rem; opacity: 0.72; margin-bottom: 12px; }
+.results-table { display:flex; flex-direction:column; gap:6px; }
+.results-row, .results-head { display:grid; gap:10px; align-items:center; }
+.results-head { font-size: 0.72rem; opacity: 0.68; letter-spacing: 0.4px; margin-bottom: 2px; }
+.results-row { border:2px solid var(--border-std); border-radius:10px; padding:8px 10px; background: rgba(255,255,255,0.03); }
+.results-row.winner { border-color: rgba(255,255,255,0.34); background: rgba(255,255,255,0.05); }
+.results-col-name { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
+.results-col-val { text-align:center; font-weight:700; white-space: nowrap; }
+.results-btn-row { display:flex; gap:10px; margin-top:14px; }
+.results-btn-row .start-btn { flex:1; }
 @media (max-width: 430px) {
-  .leg-results-row, .leg-results-head { gap:8px; }
-  .leg-col-name { font-size: clamp(0.68rem, 2.4vw, 0.92rem); }
+  .results-row, .results-head { gap:8px; }
+  .results-col-name { font-size: 14px; }
 }
 
 </style>
@@ -388,12 +397,23 @@ input, select {
 </div>
 
 
-<div id="legResultsOverlay" class="start-screen">
-  <div class="start-card leg-results-card">
-    <h1 class="leg-results-title">LEG OVER</h1>
-    <div class="leg-results-sub" id="legResultsSub"></div>
-    <div class="leg-results-table" id="legResultsTable"></div>
+<div id="legResultsOverlay" class="start-screen results-overlay">
+  <div class="start-card results-card">
+    <h1 class="results-title">LEG OVER</h1>
+    <div class="results-sub" id="legResultsSub"></div>
+    <div class="results-table" id="legResultsTable"></div>
     <button type="button" class="start-btn" id="legResultsNext" style="margin-top:14px; background: var(--accent); color:#0d0d0d; border-color: var(--accent);">NEXT LEG</button>
+  </div>
+</div>
+<div id="matchResultsOverlay" class="start-screen results-overlay">
+  <div class="start-card results-card">
+    <h1 class="results-title">MATCH OVER</h1>
+    <div class="results-sub" id="matchResultsSub"></div>
+    <div class="results-table" id="matchResultsTable"></div>
+    <div class="results-btn-row">
+      <button type="button" class="start-btn" id="matchResultsNew" style="background: var(--accent); color:#0d0d0d; border-color: var(--accent);">NEW MATCH</button>
+      <button type="button" class="start-btn" id="matchResultsReplay">REPLAY SAME</button>
+    </div>
   </div>
 </div>
 
@@ -433,7 +453,7 @@ input, select {
 </div>
 
 <script>
-// v1.55 integrated build (leg results + fit fixes + global undo + modal wrapper)
+// v1.56 integrated build (match results + iPhone landscape fit + orientation jitter fix)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -1014,8 +1034,18 @@ const legResultsOverlay = document.getElementById('legResultsOverlay');
 const legResultsTable = document.getElementById('legResultsTable');
 const legResultsSub = document.getElementById('legResultsSub');
 const legResultsNext = document.getElementById('legResultsNext');
-function legResultsCols(){ return statsEnabled() ? 'minmax(0, 1.7fr) 0.8fr 0.75fr' : 'minmax(0, 1.7fr) 0.75fr'; }
-function sortedLegResults(winnerIdx){
+const matchResultsOverlay = document.getElementById('matchResultsOverlay');
+const matchResultsTable = document.getElementById('matchResultsTable');
+const matchResultsSub = document.getElementById('matchResultsSub');
+const matchResultsNew = document.getElementById('matchResultsNew');
+const matchResultsReplay = document.getElementById('matchResultsReplay');
+function resultsCols(showAvg, showSets){
+  if(showAvg && showSets) return 'minmax(0, 1.55fr) 0.8fr 0.65fr 0.65fr';
+  if(showAvg) return 'minmax(0, 1.7fr) 0.8fr 0.75fr';
+  if(showSets) return 'minmax(0, 1.7fr) 0.8fr 0.75fr';
+  return 'minmax(0, 1.7fr) 0.75fr';
+}
+function sortedWinnerFirst(winnerIdx){
   const arr = game.players.map((p, idx) => ({ p, idx }));
   return arr.sort((a,b) => {
     if(a.idx === winnerIdx) return -1;
@@ -1023,45 +1053,68 @@ function sortedLegResults(winnerIdx){
     return a.idx - b.idx;
   });
 }
-function buildLegResultsTable(winnerIdx){
-  if(!legResultsTable) return;
-  legResultsTable.innerHTML = '';
-  const showAvg = statsEnabled();
+function fitResultsNameCells(scope){
+  if(!scope) return;
+  scope.querySelectorAll('.results-col-name').forEach(el => {
+    if(!el.clientWidth) return;
+    let lo = 11, hi = parseInt(window.getComputedStyle(el).fontSize || '16', 10) || 16;
+    const fits = (px) => { el.style.fontSize = px + 'px'; return el.scrollWidth <= el.clientWidth; };
+    while(lo < hi){
+      const mid = Math.floor((lo + hi + 1) / 2);
+      if(fits(mid)) lo = mid; else hi = mid - 1;
+    }
+    el.style.fontSize = lo + 'px';
+  });
+}
+function buildResultsTable(container, winnerIdx, opts){
+  if(!container) return;
+  container.innerHTML = '';
+  const showAvg = !!opts.showAvg;
+  const showSets = !!opts.showSets;
   const head = document.createElement('div');
-  head.className = 'leg-results-head';
-  head.style.gridTemplateColumns = legResultsCols();
-  head.innerHTML = showAvg
-    ? '<div>PLAYER</div><div style="text-align:center;">AVG</div><div style="text-align:center;">LEGS</div>'
-    : '<div>PLAYER</div><div style="text-align:center;">LEGS</div>';
-  legResultsTable.appendChild(head);
-  sortedLegResults(winnerIdx).forEach(({p, idx}) => {
+  head.className = 'results-head';
+  head.style.gridTemplateColumns = resultsCols(showAvg, showSets);
+  let headHtml = '<div>PLAYER</div>';
+  if(showAvg) headHtml += '<div style="text-align:center;">AVG</div>';
+  headHtml += '<div style="text-align:center;">LEGS</div>';
+  if(showSets) headHtml += '<div style="text-align:center;">SETS</div>';
+  head.innerHTML = headHtml;
+  container.appendChild(head);
+  sortedWinnerFirst(winnerIdx).forEach(({p, idx}) => {
     const row = document.createElement('div');
-    row.className = 'leg-results-row' + (idx === winnerIdx ? ' winner' : '');
-    row.style.gridTemplateColumns = legResultsCols();
+    row.className = 'results-row' + (idx === winnerIdx ? ' winner' : '');
+    row.style.gridTemplateColumns = resultsCols(showAvg, showSets);
     const name = document.createElement('div');
-    name.className = 'leg-col-name';
+    name.className = 'results-col-name';
     name.textContent = String((game.mode==='practice' && idx===0) ? 'Practice' : p.name || `P${idx+1}`);
-    const legs = document.createElement('div');
-    legs.className = 'leg-col-legs';
-    legs.textContent = String(p.legs);
     row.appendChild(name);
     if(showAvg){
       const avg = document.createElement('div');
-      avg.className = 'leg-col-avg';
+      avg.className = 'results-col-val';
       avg.textContent = computeAvg(p);
       row.appendChild(avg);
     }
+    const legs = document.createElement('div');
+    legs.className = 'results-col-val';
+    legs.textContent = String(p.legs);
     row.appendChild(legs);
-    legResultsTable.appendChild(row);
+    if(showSets){
+      const sets = document.createElement('div');
+      sets.className = 'results-col-val';
+      sets.textContent = String(p.sets);
+      row.appendChild(sets);
+    }
+    container.appendChild(row);
   });
 }
 async function showLegResultsThen(winnerIdx, nextFn){
   if(!legResultsOverlay || !legResultsNext){ nextFn(); return; }
-  buildLegResultsTable(winnerIdx);
+  buildResultsTable(legResultsTable, winnerIdx, { showAvg: statsEnabled(), showSets: false });
   const winnerName = (game.mode==='practice' && winnerIdx===0) ? 'Practice' : String(game.players[winnerIdx].name || `P${winnerIdx+1}`);
   legResultsSub.textContent = `${winnerName} WON THE LEG`;
   await withModal(() => new Promise(resolve => {
     legResultsOverlay.style.display = 'flex';
+    requestAnimationFrame(() => fitResultsNameCells(legResultsOverlay));
     const done = () => {
       legResultsOverlay.style.display = 'none';
       legResultsNext.removeEventListener('click', done);
@@ -1070,6 +1123,25 @@ async function showLegResultsThen(winnerIdx, nextFn){
     legResultsNext.addEventListener('click', done, { once:true });
   }));
   nextFn();
+}
+async function showMatchResults(){
+  const winnerIdx = activeIndex();
+  buildResultsTable(matchResultsTable, winnerIdx, { showAvg: statsEnabled(), showSets: true });
+  const winnerName = (game.mode==='practice' && winnerIdx===0) ? 'Practice' : String(game.players[winnerIdx].name || `P${winnerIdx+1}`);
+  matchResultsSub.textContent = `${winnerName} WON THE MATCH`;
+  return await withModal(() => new Promise(resolve => {
+    matchResultsOverlay.style.display = 'flex';
+    requestAnimationFrame(() => fitResultsNameCells(matchResultsOverlay));
+    const onNew = () => { cleanup(); resolve('new'); };
+    const onReplay = () => { cleanup(); resolve('replay'); };
+    const cleanup = () => {
+      matchResultsOverlay.style.display = 'none';
+      matchResultsNew.removeEventListener('click', onNew);
+      matchResultsReplay.removeEventListener('click', onReplay);
+    };
+    matchResultsNew.addEventListener('click', onNew, { once:true });
+    matchResultsReplay.addEventListener('click', onReplay, { once:true });
+  }));
 }
 function isPlayable(){ return !!game && !game.frozen && !holdActive && !modalActive; }
 function inDartMode(){ return app.classList.contains('dart-mode'); }
@@ -1412,7 +1484,7 @@ function resetMatchSame(){
 }
 
 async function handleMatchOverAsync(){
-  const choice = await withModal(() => Modal.matchOver());
+  const choice = await showMatchResults();
 
   if(choice==='new'){
   clearSavedGame();
@@ -1502,9 +1574,14 @@ maybeResumeSavedGame();
 
 function onViewportChange(){
   if(!isStarted()) return;
-  if(holdActive || modalActive) return;
-  refreshUI();
+  if(__viewportTimer) clearTimeout(__viewportTimer);
+  __viewportTimer = setTimeout(() => {
+    if(!isStarted()) return;
+    if(holdActive || modalActive) return;
+    refreshUI();
+  }, 140);
 }
+let __viewportTimer = null;
 window.addEventListener('resize', onViewportChange);
 window.addEventListener('orientationchange', onViewportChange);
 
