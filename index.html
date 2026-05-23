@@ -5,7 +5,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Darts Master v1.56</title>
+  <title>Darts Master v1.57</title>
 
 <style>
 :root {
@@ -98,7 +98,8 @@ input, select {
 
 .app {
   width: 100%;
-  height: 100dvh;
+  height: 100svh;
+  min-height: 100svh;
   padding: calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
@@ -234,7 +235,7 @@ input, select {
 }
 
 @media (orientation: portrait) {
- .app { padding: calc(10px + env(safe-area-inset-top)) calc(6px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
+ .app { padding: calc(8px + env(safe-area-inset-top)) calc(6px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
  .score-view { padding: 4px; }
 
   .keypad {
@@ -287,15 +288,16 @@ input, select {
 
 @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
   /* iphone-landscape-left-dots */
-  .keypad { gap: 4px; column-gap: 4px; }
-  .score-view { padding: 2px; }
-  .key { font-size: 1.58rem; }
-  .enter { font-size: 1.82rem; }
-  .dart { font-size: 2.95rem !important; }
+  .app { padding: calc(3px + env(safe-area-inset-top)) calc(3px + env(safe-area-inset-right)) calc(3px + env(safe-area-inset-bottom)) calc(3px + env(safe-area-inset-left)); }
+  .keypad { grid-template-rows: 1.8fr 1fr 1fr 1fr; gap: 2px; column-gap: 2px; }
+  .score-view { padding: 0; }
+  .key { font-size: 1.30rem; }
+  .enter { font-size: 1.42rem; }
+  .dart { font-size: 2.35rem !important; }
   .score-left { position: relative; padding-top: 0; }
-  .score-main { font-size: clamp(2.2rem, 5.8vw, 3.0rem); }
-  .active-name { margin-bottom: 4px; }
-  .score-meta { margin-top: 2px; }
+  .score-main { font-size: clamp(1.95rem, 5vw, 2.65rem); }
+  .active-name { margin-bottom: 1px; }
+  .score-meta { margin-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
 }
@@ -431,7 +433,7 @@ input, select {
  <div class="top-darts">● ● ●</div>
 </div>
           <div class="avg"><div class="label">Avg</div><div class="value">0.00</div></div>
-          <div class="sets"><div class="label">Sets</div><div class="value">0/1</div></div>
+          <div class="sets"><div class="label">Wins</div><div class="value">0</div></div>
         </div>
       </div>
 
@@ -453,7 +455,7 @@ input, select {
 </div>
 
 <script>
-// v1.56 integrated build (match results + iPhone landscape fit + orientation jitter fix)
+// v1.57 integrated build (wins, no checkout overlay, stronger iPhone fit/jitter fixes)
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 // v1.44: key click sound (no files)
 let __audioCtx = null;
@@ -996,6 +998,30 @@ function isPhonePortrait(){
 }
 const PLAYER_COLORS = ['#50D890','#FBBF24','#22D3EE','#C084FC','#60A5FA','#FB7185'];
 function playerColor(idx){ return PLAYER_COLORS[(idx||0) % PLAYER_COLORS.length]; }
+function seriesSignatureFromSetup(cfg){
+  const names = (cfg.names || []).map(v => String(v || '').trim().toLowerCase());
+  return JSON.stringify({
+    count: Number(cfg.count || 0),
+    names,
+    startScore: Number(cfg.startScore || 0),
+    legsToWin: Number(cfg.legsToWin || 0),
+    setsToWin: Number(cfg.setsToWin || 0),
+    statsEnabled: !!cfg.statsEnabled
+  });
+}
+const SERIES_WINS_KEY = 'darts_master_series_wins_v1';
+function loadSeriesWins(){
+  try{
+    const o = JSON.parse(localStorage.getItem(SERIES_WINS_KEY) || '{}');
+    return (o && typeof o === 'object') ? o : {};
+  }catch{ return {}; }
+}
+function saveSeriesWinsState(signature, wins){
+  try{ localStorage.setItem(SERIES_WINS_KEY, JSON.stringify({ signature, wins })); }catch{}
+}
+function clearSeriesWinsState(){
+  try{ localStorage.removeItem(SERIES_WINS_KEY); }catch{}
+}
 function validateAndNormalizeGame(g){
   try{
     if(!g || !Array.isArray(g.players) || g.players.length < 1 || g.players.length > 6) return false;
@@ -1009,12 +1035,14 @@ function validateAndNormalizeGame(g){
     g.setStarterIndex = toInt(g.setStarterIndex, 0); if(g.setStarterIndex < 0 || g.setStarterIndex >= n) g.setStarterIndex = 0;
     g.statsEnabled = !!g.statsEnabled; g.frozen = !!g.frozen;
     g.mode = (g.mode === 'practice' || g.mode === 'match') ? g.mode : (n===1 ? 'practice' : 'match');
+    g.seriesSignature = typeof g.seriesSignature === 'string' ? g.seriesSignature : '';
     for(let i=0;i<n;i++){
       const p = g.players[i] || (g.players[i] = {});
       p.name = (p.name === undefined || p.name === null) ? `P${i+1}` : String(p.name);
       p.score = toInt(p.score, g.startScore); if(p.score < 0) p.score = g.startScore;
       p.legs = toInt(p.legs, 0); if(p.legs < 0) p.legs = 0;
       p.sets = toInt(p.sets, 0); if(p.sets < 0) p.sets = 0;
+      p.wins = toInt(p.wins, 0); if(p.wins < 0) p.wins = 0;
       if(!p.stats || typeof p.stats !== 'object') p.stats = {points:0,darts:0};
       p.stats.points = toInt(p.stats.points, 0); if(p.stats.points < 0) p.stats.points = 0;
       p.stats.darts = toInt(p.stats.darts, 0); if(p.stats.darts < 0) p.stats.darts = 0;
@@ -1305,7 +1333,7 @@ function refreshUI(){
   scoreMain.textContent = p.score;
   legsValueEl.textContent = String(p.legs);
   avgValueEl.textContent = statsEnabled() ? computeAvg(p) : '';
-  setsValueEl.textContent = `${p.sets}/${game.setsToWin}`;
+  setsValueEl.textContent = String(p.wins || 0);
 
   updateTopDarts();
   fitPlayerFont();
@@ -1470,6 +1498,7 @@ function resetMatchSame(){
     pl.legs=0;
     pl.sets=0;
     pl.stats={points:0,darts:0};
+    if(!Number.isFinite(pl.wins)) pl.wins = 0;
   });
   game.activeIndex=0;
   game.legStarterIndex=0;
@@ -1497,7 +1526,7 @@ async function handleMatchOverAsync(){
     scoreMain.textContent=startScoreSel.value||'501';
     legsValueEl.textContent='0';
     avgValueEl.textContent='0.00';
-    setsValueEl.textContent=`0/${document.getElementById('setsToWin').value||1}`;
+    setsValueEl.textContent='0';
     startScreen.style.display='flex';
     return;
   }
@@ -1515,6 +1544,8 @@ async function awardLegToAsync(playerIdx){
   if(p.legs >= game.legsToWin){
     p.sets += 1;
     if(p.sets >= game.setsToWin){
+      p.wins = (Number.isFinite(p.wins) ? p.wins : 0) + 1;
+      if(game.seriesSignature) saveSeriesWinsState(game.seriesSignature, game.players.map(pl => pl.wins || 0));
       await handleMatchOverAsync();
       return;
     }
@@ -1578,12 +1609,15 @@ function onViewportChange(){
   __viewportTimer = setTimeout(() => {
     if(!isStarted()) return;
     if(holdActive || modalActive) return;
-    refreshUI();
-  }, 140);
+    requestAnimationFrame(() => requestAnimationFrame(() => refreshUI()));
+  }, 280);
 }
 let __viewportTimer = null;
 window.addEventListener('resize', onViewportChange);
 window.addEventListener('orientationchange', onViewportChange);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', onViewportChange);
+}
 
 
 // FIX: Ensure all input variables are correctly fetched from DOM
@@ -1594,14 +1628,23 @@ startBtn.addEventListener('click', () => {
   const lToWin = Number(document.getElementById('legsToWin').value);
   const sToWin = Number(document.getElementById('setsToWin').value);
   const nameInputs = namesWrap.querySelectorAll('input');
+  const names = Array.from({length:count}, (_,i) => nameInputs[i]?.value.trim() || `P${i+1}`);
+  const statsEnabledVal = (statsToggle ? !!statsToggle.checked : false);
+  const signature = seriesSignatureFromSetup({ count, names, startScore, legsToWin:lToWin, setsToWin:sToWin, statsEnabled: statsEnabledVal });
+  const persistedSeries = loadSeriesWins();
+  const seriesWins = (persistedSeries.signature === signature && Array.isArray(persistedSeries.wins) && persistedSeries.wins.length === count)
+    ? persistedSeries.wins.map(v => Number.isFinite(Number(v)) ? Math.trunc(Number(v)) : 0)
+    : Array.from({length:count}, () => 0);
+  saveSeriesWinsState(signature, seriesWins);
 
   undoStack=[];
   game = {
- mode: count===1?'practice':'match',
- statsEnabled: (statsToggle ? !!statsToggle.checked : false),
+    mode: count===1?'practice':'match',
+    statsEnabled: statsEnabledVal,
     startScore,
     legsToWin: lToWin,
     setsToWin: sToWin,
+    seriesSignature: signature,
     players: [],
     prefs: [],
     activeIndex: 0,
@@ -1613,25 +1656,23 @@ startBtn.addEventListener('click', () => {
 
   scoreLeft.innerHTML='';
   for(let i=0;i<count;i++){
-    const name = nameInputs[i]?.value.trim() || `P${i+1}`;
-    const pl = {name, score:startScore, legs:0, sets:0, stats:{points:0,darts:0}};
+    const name = names[i];
+    const pl = {name, score:startScore, legs:0, sets:0, wins: seriesWins[i] || 0, stats:{points:0,darts:0}};
     game.players.push(pl);
     const div=document.createElement('div');
     div.className='player'+(i===0?' active':'');
- div.dataset.idx = String(i);
- div.textContent = String(startScore);
+    div.dataset.idx = String(i);
+    div.textContent = String(startScore);
     scoreLeft.appendChild(div);
   }
 
   resetPrefsForNewLeg();
   resetVisitState();
   clearInput();
-
   scoreMain.textContent=startScore;
   legsValueEl.textContent='0';
   avgValueEl.textContent='0.00';
-  setsValueEl.textContent=`0/${game.setsToWin}`;
-
+  setsValueEl.textContent=String(game.players[0].wins || 0);
   startScreen.style.display='none';
   applyStatsModeFromGame();
   applyPrefsForPlayer(0);
@@ -1744,7 +1785,6 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
       p.score = 0;
       refreshUI();
 
-      await holdThenAdvance({takeoverText:'CHECKOUT', takeoverColor:'var(--accent)', nextFn:null});
       await awardLegToAsync(idx);
       return;
     }
@@ -1789,7 +1829,6 @@ document.querySelector('.enter').addEventListener('pointerdown', async (e) => {
     clearInput();
     refreshUI();
 
-    await holdThenAdvance({takeoverText:'CHECKOUT', takeoverColor:'var(--accent)', nextFn:null});
     await awardLegToAsync(idx);
     return;
   }
