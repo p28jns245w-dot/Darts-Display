@@ -130,10 +130,11 @@ input, select {
  box-shadow: 0 0 0 2px rgba(80, 216, 144, 0.18) inset;
  }
 
-.del, .undo { border-color: var(--border-red); color: #ff4b5c; }
+.del { border-color: var(--border-red); color: #ff4b5c; }
+.undo { border-color: #22D3EE; color: #22D3EE; }
 .help-btn  { border-color: var(--accent); color: var(--accent); }
 .bust      { border-color: var(--border-amber); color: #ff9a3c; }
-.enter { border: 3.5px solid var(--enter-blue); color: var(--enter-blue); }
+.enter { border: 3.5px solid var(--enter-blue); color: var(--enter-blue); background: rgba(59,130,246,0.12); }
 .dart      { font-size: 2.5rem !important; }
 
 .score-view {
@@ -177,9 +178,11 @@ input, select {
 .score-left.two-col { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: auto; row-gap: 2px; column-gap: 10px; align-content: center; }
 
 .dart-mode .top-darts { display: block; }
-.dart-mode .score-meta { position: relative; padding-bottom: 18px; }
+.dart-mode .score-meta {
+  color: rgba(245,245,235,0.9); position: relative; padding-bottom: 18px; }
 .dart-mode .top-darts { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; margin: 0; }
-.dart-mode .score-meta { padding-bottom: 0 !important; }
+.dart-mode .score-meta {
+  color: rgba(245,245,235,0.9); padding-bottom: 0 !important; }
 .dart-mode .score-meta .top-darts { display: none !important; }
 .dart-mode .score-left { position: relative; padding-top: 16px; }
 .dart-mode .top-darts-left { display: block; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); margin: 0; font-size: 0.75em; letter-spacing: 2px; }
@@ -202,6 +205,7 @@ input, select {
 }
 
 .score-meta {
+  color: rgba(245,245,235,0.9);
   display: grid;
   grid-template-columns: 0.7fr auto 0.7fr;
   font-size: 0.8em;
@@ -216,15 +220,18 @@ input, select {
   align-items: center;
 }
 .score-meta .label {
+  color: rgba(245,245,235,0.7);
   font-size: 0.65em;
   opacity: 0.7;
   line-height: 1;
 }
 .score-meta .value { margin-top: 2px; }
-.no-stats .score-meta { grid-template-columns: 1fr 1fr; }
+.no-stats .score-meta {
+  color: rgba(245,245,235,0.9); grid-template-columns: 1fr 1fr; }
 .no-stats .score-meta .avg { display: none; }
 
 .score-right {
+  color: rgba(245,245,235,0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,7 +304,8 @@ input, select {
   .score-left { position: relative; padding-top: 0; }
   .score-main { font-size: clamp(1.95rem, 5vw, 2.65rem); }
   .active-name { margin-bottom: 1px; }
-  .score-meta { margin-top: 0; }
+  .score-meta {
+  color: rgba(245,245,235,0.9); margin-top: 0; }
   .dart-mode .top-darts-left { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
   .dart-mode .score-meta .top-darts { display: none; }
 }
@@ -1098,7 +1106,7 @@ function buildResultsTable(container, winnerIdx, opts){
   if(!container) return;
   container.innerHTML = '';
   const showAvg = !!opts.showAvg;
-  const showSets = !!opts.showSets;
+  const showSets = true;
   const head = document.createElement('div');
   head.className = 'results-head';
   head.style.gridTemplateColumns = resultsCols(showAvg, showSets);
@@ -1108,7 +1116,7 @@ function buildResultsTable(container, winnerIdx, opts){
   if(showSets) headHtml += '<div style="text-align:center;">SETS</div>';
   head.innerHTML = headHtml;
   container.appendChild(head);
-  sortedWinnerFirst(winnerIdx).forEach(({p, idx}) => {
+  game.players.forEach((p, idx) => {
     const row = document.createElement('div');
     row.className = 'results-row' + (idx === winnerIdx ? ' winner' : '');
     row.style.gridTemplateColumns = resultsCols(showAvg, showSets);
@@ -1359,9 +1367,11 @@ function resetVisitState(){ turnStartScore=null; visitPoints=0; visitDartsUsed=0
 function updateTopDarts(){
   const filled = Math.max(0, Math.min(3, visitDartsUsed));
   const s = Array.from({length:3},(_,i)=>(i<filled?'●':'○')).join(' ');
+  const color = playerColor(activeIndex());
   topDartsEl.textContent = s;
+  topDartsEl.style.color = color;
   const left = ensureLeftDots();
-  if(left) left.textContent = s;
+  if(left){ left.textContent = s; left.style.color = color; }
 }
 function pushUndo(kind){
   if(!isStarted()) return;
@@ -1543,17 +1553,17 @@ async function awardLegToAsync(playerIdx){
 
   if(p.legs >= game.legsToWin){
     p.sets += 1;
-    if(p.sets >= game.setsToWin){
+    if(p.sets >= game.setsToWin){ game.frozen = true;
       p.wins = (Number.isFinite(p.wins) ? p.wins : 0) + 1;
       if(game.seriesSignature) saveSeriesWinsState(game.seriesSignature, game.players.map(pl => pl.wins || 0));
       await handleMatchOverAsync();
       return;
     }
-    await nextLegModalThen(playerIdx, startNextSetImmediate);
+    await showMatchResults(); startNextSetImmediate();
     return;
   }
 
-  await nextLegModalThen(playerIdx, startNextLegImmediate);
+  await showMatchResults(); startNextLegImmediate();
 }
 
 function renderNames(){
